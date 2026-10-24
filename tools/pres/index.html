@@ -1497,6 +1497,8 @@ function textW(str, size, role, bold) {
 }
 function lineCount(str, size, role, bold, width) {
   if (!str) return 0;
+  // a box can be squeezed to zero or less while layouts are tried; never let that loop forever
+  if (!(width > 8)) width = 8;
   let lines = 0;
   for (const seg of String(str).split('\n')) {
     const words = seg.split(/\s+/).filter(Boolean);
@@ -1506,7 +1508,7 @@ function lineCount(str, size, role, bold, width) {
     for (const w of words) {
       const ww = textW(w, size, role, bold);
       if (cur > 0 && cur + sp + ww > width) { n++; cur = ww; } else cur += (cur > 0 ? sp : 0) + ww;
-      while (cur > width * 1.02 && ww > width) { n++; cur -= width; }
+      if (cur > width * 1.02 && ww > width) { const k = Math.ceil(cur / width) - 1; n += k; cur -= k * width; }
     }
     lines += n;
   }
