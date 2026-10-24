@@ -67,6 +67,11 @@ button{font:inherit;color:inherit}
 .enter svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .w-foot{padding:0 24px 28px;display:flex;justify-content:center}
 
+.unzip{margin-top:36px;max-width:520px;text-align:right;border:1px solid rgba(255,181,71,.45);background:rgba(255,181,71,.08);border-radius:18px;padding:20px 22px}
+.unzip b{display:block;font-size:18px;color:#FFD08A}
+.unzip p{margin-top:6px;font-size:15px;line-height:1.7;color:var(--t2)}
+.unzip ol{margin-top:10px;padding-right:20px;font-size:15px;line-height:1.9;color:#fff}
+.unzip .en{display:inline-block;direction:ltr;unicode-bidi:isolate;white-space:nowrap;font-family:var(--en)}
 /* ---------- home ---------- */
 header{padding-top:28px}
 header .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px}
@@ -203,6 +208,15 @@ body.phone #homeBtn svg{width:16px;height:16px}
     <div class="smile rise" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="28"/><path class="eye" d="M23 25v4"/><path class="eye" d="M41 25v4"/><path class="mouth" d="M20.5 38.5c6.5 7.5 16.5 7.5 23 0"/></svg></div>
     <div class="greet rise d2" id="greet">صباح الخير</div>
     <div class="line rise d2" id="line">صباحك ابتكار</div>
+    <div class="unzip" id="unzip" hidden role="alert">
+      <b>فك الضغط أول عشان تشتغل الأدوات</b>
+      <p>الظاهر إنك فتحت الأداة من داخل الملف المضغوط. كذا تنفتح هذي الصفحة بس، والأدوات ما توصلها.</p>
+      <ol>
+        <li>سكّر هذي الصفحة.</li>
+        <li>اضغط كلك يمين على الملف المضغوط واختر <span class="en">Extract All</span>.</li>
+        <li>افتح الفولدر الجديد، وبعدين افتح منه <span class="en">JEDCO Toolkit.html</span>.</li>
+      </ol>
+    </div>
     <button class="enter rise d3" id="enter">دخول<svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
   </div>
   <div class="w-foot"><span class="sig">Designed by Mohammed Wagih · <span class="num">2026</span><span class="beta">v<span class="num">1.0</span> Beta</span></span></div>
@@ -278,6 +292,7 @@ body.phone #homeBtn svg{width:16px;height:16px}
   </div>
 </div>
 
+<script src="shared/ok.js"></script>
 <script>
 (function(){
   'use strict';
@@ -393,6 +408,7 @@ body.phone #homeBtn svg{width:16px;height:16px}
   function n(){var on=navigator.onLine;net.classList.toggle('off',!on);tx.textContent=on?'متصل بالإنترنت':'بدون إنترنت، وكل الأدوات تشتغل'}
   addEventListener('online',n);addEventListener('offline',n);n();
 
+  if(!window.JEDHUB_FILES_OK){$('#unzip').hidden=false;$('#enter').hidden=true;}
   show('welcome');
 })();
 </script>
