@@ -133,7 +133,7 @@
   function isWork(e) {
     var t = e.target;
     if (!t || !t.closest) return false;
-    if (t.closest('#hubCover,#splash,.sp-step,#devPick,.dp')) return false;
+    if (t.closest('#hubCover,#splash,.sp-step,#devPick,.dp,[data-hub-autosave]')) return false;
     return true;
   }
   document.addEventListener('change', function (e) { if (isWork(e) && e.target.type === 'file' && e.target.files && e.target.files.length) markDirty(); }, true);
