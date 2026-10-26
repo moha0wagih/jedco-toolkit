@@ -206,7 +206,7 @@ textarea.inp{height:auto;min-height:90px;padding:10px 12px;resize:vertical;line-
 @keyframes spin{to{transform:rotate(360deg)}}
 .prog b{font-size:16px}.prog span{font-size:13px;color:#AFC2DD}
 /* toast */
-.toast{position:fixed;top:72px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:12px;font-size:13.5px;z-index:300;box-shadow:0 12px 30px rgba(0,0,0,.25);max-width:calc(100vw - 30px);text-align:center}
+.toast{position:fixed;top:auto;bottom:74px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:12px;font-size:13.5px;z-index:300;box-shadow:0 12px 30px rgba(0,0,0,.25);max-width:calc(100vw - 30px);text-align:center}
 /* data editor */
 .dgrid{border-collapse:collapse;width:100%}
 .dgrid td,.dgrid th{border:1px solid var(--line);padding:0}
@@ -265,6 +265,64 @@ textarea.inp{height:auto;min-height:90px;padding:10px 12px;resize:vertical;line-
 .side .grab{display:none;width:44px;height:5px;border-radius:3px;background:var(--line2);margin:8px auto 0}
 .phoneBtn{display:none}
 @media (max-width:860px){.phoneBtn{display:inline-flex}}
+.rng{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 6px;color:var(--ink2);font-size:12px;flex:none}
+.rng input[type=range]{width:86px;accent-color:#004EAA}
+.rng .num{min-width:20px;text-align:center;font-size:11px}
+.rng .rl{font-size:12px;color:var(--muted)}
+.phhead{display:flex;gap:8px;align-items:center;margin-bottom:8px}.phhead .inp{flex:1}
+.phgrid.big{grid-template-columns:repeat(2,1fr)}.phgrid.big .ph{aspect-ratio:3/2}
+/* ---------- layout dock (right of the stage) ---------- */
+.stagerow{flex:1;min-height:0;display:flex;position:relative}
+.stagerow #stageHost{flex:1;min-width:0}
+.dock{width:172px;flex:none;display:flex;flex-direction:column;background:#F7F9FC;border-inline-end:1px solid var(--line);min-height:0;position:relative;z-index:3}
+body.dock-off .dock{display:none}
+#dkOpen{display:none}body.dock-off #dkOpen{display:inline-flex}
+.dk-h{display:flex;align-items:center;gap:6px;padding:10px 12px 4px}.dk-h b{font-size:13px}.dk-h .num{font-size:11px;color:var(--muted)}
+.dk-x{margin-inline-start:auto;width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--muted)}.dk-x:hover{background:var(--soft);color:var(--navy)}
+.dk-f{display:flex;gap:6px;padding:4px 10px;align-items:center}
+.seg.sm button{height:26px;padding:0 9px;font-size:12px}
+.dk-sel{flex:1;min-width:0;height:28px;border:1px solid var(--line2);border-radius:8px;background:#fff;font-size:11.5px;padding:0 4px}
+.dk-all{display:flex;gap:6px;align-items:center;font-size:11.5px;color:var(--muted);padding:2px 12px 6px}
+.dk-list{flex:1;overflow-y:auto;overflow-x:hidden;padding:6px 10px 30px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin}
+.dk-t{width:116px;margin-inline-start:0;flex:none;cursor:pointer;transform-origin:right center;transition:transform .12s ease-out;position:relative}
+html[dir=ltr] .dk-t{transform-origin:left center}
+.dk-t .h{position:relative;overflow:hidden;border-radius:7px;background:#fff;box-shadow:0 0 0 1px var(--line2)}
+.dk-t.on .h{box-shadow:0 0 0 2.5px var(--blue)}
+.dk-t:hover .h{box-shadow:0 0 0 2px var(--sky),0 8px 22px rgba(0,26,61,.18)}
+.dk-t .cap{display:block;font-size:10.5px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:116px}
+.dk-t.bad .h,.dk-t.nf .h{opacity:.45}
+.dk-pv{position:absolute;left:14px;top:14px;background:rgba(0,38,87,.88);color:#fff;font:600 13px SanTaj,sans-serif;padding:6px 12px;border-radius:8px;direction:rtl;pointer-events:none}
+@media (max-width:860px){.dock{display:none}#dkOpen{display:none!important}}
+/* ---------- brain: directive · review · story ---------- */
+.issue .dot.i{background:var(--sky)}
+.cb.dirb{background:linear-gradient(90deg,#002657,#004EAA);color:#fff;font-weight:700}
+.cb.dirb:hover{background:#004EAA;color:#fff}
+body.painting .ed-frame{cursor:copy}
+.dir-scope{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);margin-bottom:10px;flex-wrap:wrap}
+.bc-pre{direction:rtl;white-space:pre-wrap;font-size:12px;background:var(--soft);border-radius:10px;padding:12px;max-height:220px;overflow:auto;margin:10px 0 0}
+.rv-top{display:flex;gap:18px;align-items:center;margin-bottom:14px}
+.rv-ring{width:86px;height:86px;border-radius:50%;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(closest-side,#fff 78%,transparent 80% 100%),conic-gradient(var(--c) calc(var(--p)*1%),#E3E8EF 0)}
+.rv-ring b{font-size:26px;line-height:1;color:var(--c)}.rv-ring span{font-size:11px;color:var(--muted)}
+.rv-list .btn{white-space:nowrap}
+.sflow{display:flex;gap:4px;flex-wrap:wrap;padding:10px;background:var(--soft);border-radius:12px;margin-bottom:12px}
+.sf{display:flex;flex-direction:column;align-items:center;gap:2px;width:52px;padding:6px 2px;border-radius:9px;background:#fff;border-top:3px solid var(--rc);font-size:10.5px}
+.sf .num{font-size:11px;color:var(--ink2)}.sf i{font-style:normal;color:var(--rc);font-weight:700}
+.sf:hover{box-shadow:0 0 0 2px var(--sky)}
+.ssecs{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.ssec{display:flex;gap:10px;font-size:12.5px;align-items:baseline}.ssec b{min-width:120px;color:var(--navy)}.ssec span{color:var(--muted)}
+.sbetter{margin-top:16px;padding-top:12px;border-top:1px dashed var(--line2)}
+.splan{margin:6px 0 12px;padding-inline-start:22px;display:flex;flex-direction:column;gap:5px}
+.splan li{font-size:13px}.splan li em{font-style:normal;font-size:11px;border-radius:999px;padding:1px 8px;margin-inline-start:8px;background:var(--soft);color:var(--blue)}
+.splan li.sp-new em{background:#E7F6EF;color:var(--good)}.splan li.sp-appendix em{background:#FFF4E0;color:var(--warn)}
+.splan li small{display:block;color:var(--muted);font-size:11.5px}
+label.f{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px}
+.ctxbar{height:auto;min-height:52px;flex-wrap:wrap;row-gap:2px;padding:6px 14px;overflow:visible}
+@media (max-width:860px){.ctxbar{flex-wrap:nowrap;overflow-x:auto;height:52px}}
+.mbody h4{display:flex;align-items:center;gap:8px;font-size:14px;margin:12px 0 8px;color:var(--navy)}
+.mbody h4 svg.i{width:18px;height:18px;color:var(--blue)}
+.ctxbar{flex-wrap:nowrap;height:52px;min-height:0;padding:0 14px;overflow-x:auto;overflow-y:hidden}
+.cb.clr{gap:3px;padding:0 6px}.cb.clr .sw{margin:0;width:20px;height:20px}.cb.clr svg.i{width:13px;height:13px}
+.menu.cpop{z-index:400}.swrow{display:flex;gap:6px;padding:6px}.swrow .sw{width:26px;height:26px}
 
 </style>
 </head>
@@ -280,6 +338,7 @@ textarea.inp{height:auto;min-height:90px;padding:10px 12px;resize:vertical;line-
         <hr>
         <button data-a="saveProj"><svg class="i" data-ic="download"></svg>حفظ ملف المشروع<span class="k">Ctrl+S</span></button>
         <button data-a="openProj"><svg class="i" data-ic="folder-open"></svg>فتح ملف مشروع…</button>
+        <button data-a="find"><svg class="i" data-ic="search"></svg>بحث واستبدال<span class="k">Ctrl+F</span></button>
         <button data-a="recent"><svg class="i" data-ic="history"></svg>ملفاتي…</button>
         <hr>
         <button data-a="home"><svg class="i" data-ic="house"></svg>شاشة البداية</button>
@@ -292,6 +351,7 @@ textarea.inp{height:auto;min-height:90px;padding:10px 12px;resize:vertical;line-
     <div class="seg wide" id="segBg" title="لون الصفحات"><button data-v="white">أبيض</button><button data-v="grey">رمادي فاتح</button></div>
     <div class="seg wide" id="segTone" title="نمط العرض"><button data-v="light">فاتح</button><button data-v="dark">داكن</button></div>
     <button class="tbb ghost" id="bCopilot" title="تحسين التوزيع بكوبايلوت — اختياري" data-needs-online><svg class="i" data-ic="sparkles"></svg><span class="t">كوبايلوت</span></button>
+    <button class="tbb" id="bStory" title="قصة العرض وكيف تكون أفضل"><svg class="i" data-ic="book-open"></svg><span class="t">القصة</span></button>
     <button class="tbb" id="bCheck" title="فحص العرض"><svg class="i" data-ic="shield-check"></svg><span class="t">فحص</span></button>
     <button class="tbb" id="bShow" title="عرض الشرائح"><svg class="i" data-ic="play"></svg><span class="t">عرض</span></button>
     <button class="tbb" id="bPdf" title="حفظ PDF"><svg class="i" data-ic="file-text"></svg><span class="t">PDF</span></button>
@@ -306,13 +366,15 @@ textarea.inp{height:auto;min-height:90px;padding:10px 12px;resize:vertical;line-
     </aside>
     <section class="center">
       <div class="ctxbar" id="ctx"></div>
-      <div id="stageHost"></div>
+      <div class="stagerow"><aside class="dock" id="dock"></aside><div id="stageHost"></div></div>
       <div class="laybar">
         <button class="lb-arr" id="lbPrev" title="التصميم السابق"><svg class="i" data-ic="chevron-right"></svg></button>
         <div class="lb-name"><b id="lbName"></b><span id="lbInfo"></span></div>
         <button class="lb-arr" id="lbNext" title="التصميم التالي"><svg class="i" data-ic="chevron-left"></svg></button>
+        <button class="pill" id="dkOpen" title="أظهر دك التصاميم"><svg class="i" data-ic="panel-right-open"></svg>الدك</button>
         <button class="pill acc" id="bLib"><svg class="i" data-ic="layout-grid"></svg>مكتبة التصاميم</button>
         <button class="pill" id="bTone" title="هذه الشريحة فاتحة أو داكنة"><svg class="i" data-ic="contrast"></svg><span id="toneLbl">داكن</span></button>
+        <button class="pill" id="bReview" title="رأي الأداة في هذه الشريحة"><svg class="i" data-ic="scan-eye"></svg>رأي الأداة</button>
         <button class="pill" id="bAuto" title="أعد توزيع هذه الشريحة"><svg class="i" data-ic="wand-sparkles"></svg>توزيع ذكي</button>
         <button class="pill phoneBtn" id="bPanel"><svg class="i" data-ic="panel-bottom-open"></svg>الأدوات</button>
       </div>
@@ -343,6 +405,7 @@ textarea.inp{height:auto;min-height:90px;padding:10px 12px;resize:vertical;line-
     <div class="st-opts">
       <label>لغة العرض <div class="seg" id="stLang"><button data-v="auto" class="on">تلقائي</button><button data-v="ar">عربي</button><button data-v="en">English</button></div></label>
       <label>لون الصفحات <div class="seg" id="stBg"><button data-v="white" class="on">أبيض</button><button data-v="grey">رمادي فاتح</button></div></label>
+      <label>قراءة الملف <div class="seg" id="stRead"><button data-v="smart" class="on" title="الأداة تفهم المحتوى وتوزّعه، وتنقل ملاحظات المراجعة للملاحظات">توزيع ذكي</button><button data-v="keep" title="كل سطر في الملف يبقى كما هو بدون أي تعديل، والأداة توزّعه بس">النص كما هو</button></div></label>
       <label>النمط <div class="seg" id="stTone"><button data-v="light" class="on">فاتح</button><button data-v="dark">داكن</button></div></label>
     </div>
     <div class="st-row">
@@ -351,7 +414,7 @@ textarea.inp{height:auto;min-height:90px;padding:10px 12px;resize:vertical;line-
       <button class="st-btn hide" id="stBack"><svg class="i" data-ic="arrow-right"></svg>رجوع للعرض الحالي</button>
     </div>
     <div class="st-recent hide" id="stRecent"><h5>ملفاتي (محفوظة تلقائياً على هذا الجهاز)</h5><div id="stRecentList"></div></div>
-    <div class="credit">Designed by Mohammed Wagih · 2026 · v2.0</div>
+    <div class="credit">Designed by Mohammed Wagih · 2026 · v2.1</div>
   </div>
 </div>
 
@@ -5048,6 +5111,7 @@ if (typeof module !== 'undefined') module.exports = { creativize, leadIn, number
 </script>
 <script src="tpl_ar.js"></script>
 <script src="tpl_en.js"></script>
+<script src="photos/lib.js"></script>
 <script>
 window.PM = window.PM || {};
 PM.LOGO = `<svg style="width:100%;height:100%;display:block" xmlns="http://www.w3.org/2000/svg" viewBox="22 21.5 72.5 24"><path fill-rule="nonzero" fill="rgb(100%, 100%, 100%)" fill-opacity="1" d="M 58.539062 42.875 L 59.085938 42.875 L 60.355469 41.675781 L 58.699219 41.675781 L 58.699219 40.695312 L 60.355469 40.695312 L 60.355469 42.875 L 61.867188 42.875 L 61.867188 38.886719 C 61.867188 38.1875 61.234375 37.558594 60.515625 37.558594 L 57.757812 37.558594 L 57.757812 38.757812 L 59.847656 38.757812 C 60.246094 38.757812 60.367188 38.878906 60.367188 39.21875 L 60.367188 39.65625 L 58.527344 39.65625 C 57.820312 39.65625 57.199219 40.238281 57.199219 40.957031 L 57.199219 41.546875 C 57.199219 42.257812 57.828125 42.875 58.546875 42.875 "/>
@@ -5146,7 +5210,20 @@ function fam(p, t) {
 PM.fam = fam;
 /* digits inside Arabic text are set in Sequel (brand rule: every number in Sequel) */
 const NUMRUN = /([0-9٠-٩][0-9٠-٩.,٫٬:%٪+\-/]*[0-9٠-٩%٪+]?|[0-9٠-٩])/g;
+/* bold words inside a paragraph are wrapped in two private-use markers (kept in the text so they survive edits and re-layouts) */
+const BO = '\uE010', BC = '\uE011';
+PM.BO = BO; PM.BC = BC;
+PM.plain = t => String(t == null ? '' : t).replace(/[\uE010\uE011]/g, '');
 function runs(t, p) {
+  t = String(t);
+  if (t.indexOf(BO) < 0 && t.indexOf(BC) < 0) return runs0(t, p);
+  const out = []; let b = false, buf = '';
+  const flush = () => { if (buf) runs0(buf, p).forEach(r => { if (b) r.b = true; out.push(r); }); buf = ''; };
+  for (const ch of t) { if (ch === BO) { flush(); b = true; } else if (ch === BC) { flush(); b = false; } else buf += ch; }
+  flush();
+  return out;
+}
+function runs0(t, p) {
   if (p.font === 'num') {
     // a number with an Arabic word ("12 مليون"): digits in Sequel, the word in Tajawal
     // a unit word next to the figure ("53.3 million", "12 مليون") is set smaller in the text face
@@ -5166,9 +5243,11 @@ PM.runs = runs;
 function textW(t, p, size) {
   let w = 0;
   for (const r of runs(t, p)) {
-    mc.font = `${p.bold && r.f === PM.FONT.ar ? 700 : 400} ${size * r.k}px ${r.f}`;
+    const bold = p.bold || r.b;
+    mc.font = `${bold && r.f === PM.FONT.ar ? 700 : 400} ${size * r.k}px ${r.f}`;
     let x = mc.measureText(r.t).width;
-    if (p.bold && r.f !== PM.FONT.ar) x *= 1.045;
+    if (bold && r.f !== PM.FONT.ar) x *= 1.045;
+    if (p.sw) x += r.t.length * p.sw * size * 0.012;
     if (p.track) x += r.t.length * p.track * size;
     w += x;
   }
@@ -5479,7 +5558,9 @@ PM.chartFromRows = chartFromRows;
 /* ======================================================================
    PowerPoint → specs
    ====================================================================== */
-async function analyzePptx(parsed) {
+async function analyzePptx(parsed, opt = {}) {
+  const KEEP = !!opt.keep;
+  const tc = t => KEEP ? t : titleCase(t);
   const S = parsed.slides;
   const assets = {};
   // texts repeated across many slides at the same spot are chrome (progress strips, footers, confidentiality lines)
@@ -5739,7 +5820,7 @@ async function analyzePptx(parsed) {
     }
     const AXIS = /^((19|20)\d\d|now|today|الآن|اليوم|q[1-4]|h[12])$/i;
     const axisOnly = b => b.items && b.items.length >= 2 && b.items.every(it => { const parts = (typeof it === 'string' ? [it] : [it.value, it.date, it.title, it.label, it.text]).filter(Boolean).map(t => clean(t)); return parts.length && parts.every(t => t.split(/\n/).every(x => AXIS.test(x.trim()))); });
-    let bl = blocks.filter(b => b.k !== '_col' && b.k !== '_hdr' && !axisOnly(b) && !(b.k === 'para' && clean(b.text).split(/\n/).every(x => AXIS.test(x.trim()))));
+    let bl = blocks.filter(b => b.k !== '_col' && b.k !== '_hdr' && (KEEP || (!axisOnly(b) && !(b.k === 'para' && clean(b.text).split(/\n/).every(x => AXIS.test(x.trim()))))));
     // the same list twice (a list and its diagram) → keep the richer one
     bl = bl.filter((b, i) => {
       if (!b.items) return true;
@@ -5759,7 +5840,7 @@ async function analyzePptx(parsed) {
     bl.sort((a, b) => (Math.abs(a.y - b.y) < 30 ? (rtl ? b.x - a.x : a.x - b.x) : a.y - b.y));
     // figures repeated as chart labels ("31.6" over a drawn bar) are already in a KPI
     const figs = new Set(bl.filter(b => b.k === 'kpis').flatMap(b => b.items.map(it => norm(it.value))).filter(Boolean));
-    bl = bl.filter(b => !(b.k === 'para' && figs.has(norm(b.text))));
+    if (!KEEP) bl = bl.filter(b => !(b.k === 'para' && figs.has(norm(b.text))));
     bl.forEach(b => {
       if (b.k === 'para' && b.text.includes('\n')) { const ls = b.text.split('\n'); if (figs.has(norm(ls[0]))) b.text = ls.slice(1).join('\n'); }
       if (b.k === 'bullets' && b.items.length > 2 && figs.has(norm(b.items[0]))) b.items.shift();
@@ -5781,15 +5862,28 @@ async function analyzePptx(parsed) {
     {
       const capsT = t => /[A-Z]{2}/.test(t) && t === t.toUpperCase() && wc(t) <= 6;
       const flat = bl.flatMap(b => b.k === 'para' ? b.text.split('\n') : b.k === 'bullets' ? b.items : b.k === 'items' && b.items.every(it => !it.text && !it.bullets && !it.value) ? b.items.map(it => it.title) : [null]);
-      if (bl.length && flat.length >= 2 && flat.every(t => t && capsT(t))) bl = [{ k: 'items', items: flat.map(t => ({ title: titleCase(t), text: '' })) }];
+      if (bl.length && flat.length >= 2 && flat.every(t => t && capsT(t))) bl = [{ k: 'items', items: flat.map(t => ({ title: tc(t), text: '' })) }];
     }
     spec.blocks.push(...mergeBlocks(bl, spec));
     spec.blocks = spec.blocks.map(b => { if (b.k !== 'para' || b.head) return b; const ls = b.text.split('\n'); return ls.length === 2 && isNumLike(ls[0]) && !/^(19|20)\d\d$/.test(PM.digits(ls[0]).trim()) && wc(ls[1]) <= 12 ? { k: 'kpis', items: [{ value: ls[0], label: ls[1], text: '' }] } : b; });
     if (!spec.title) {
       const b0 = spec.blocks[0];
-      if (b0 && b0.head) { spec.title = titleCase(b0.head); delete b0.head; }
+      if (b0 && b0.head) { spec.title = tc(b0.head); delete b0.head; }
       else if (b0 && b0.k === 'para' && wc(b0.text) <= 10) { spec.title = b0.text; spec.blocks.shift(); }
       else if (b0 && b0.k === 'para' && b0.text.includes('\n') && wc(b0.text.split('\n')[0]) <= 6) { spec.title = b0.text.split('\n')[0]; b0.text = b0.text.split('\n').slice(1).join('\n'); }
+    }
+    // nothing from the source may silently disappear: lines the structure did not place are added back
+    {
+      const have = norm([spec.title, spec.sub, spec.eyebrow, PM.specText ? PM.specText(spec) : JSON.stringify(spec.blocks)].join(' '));
+      const lost = [];
+      for (const g of segs) for (const p of g.paras) {
+        const t = paraText(p); if (!t) continue;
+        const k = norm(t); if (!k || have.includes(k)) continue;
+        if (!KEEP && (wc(t) < 3 || isNumLike(t) || /^((19|20)\d\d|now|today)$/i.test(t.trim()))) continue;
+        if (lost.some(x => norm(x) === k)) continue;
+        lost.push(t);
+      }
+      if (lost.length) spec.blocks.push(lost.length > 1 ? { k: 'bullets', items: lost } : { k: 'para', text: lost[0] });
     }
     specs.push(spec);
   }
@@ -6338,16 +6432,39 @@ function overlapCount(objs) {
 }
 PM.overlapCount = overlapCount;
 /* best layout for a slide: the top candidates are tried and the first that fits cleanly wins */
+/* how good a rendered slide reads: body text size, balance, use of space (1 = fine) */
+PM.layoutQuality = function (objs, c) {
+  const plain = t => PM.plain ? PM.plain(t) : t;
+  const body = [];
+  let mx = 0, mw = 0, area = 0, full = false;
+  for (const o of objs) {
+    if (o.hidden || o.role === 'tplbg' || o.role === 'chrome' || o.role === 'veil' || o.pageNum || o.t === 'logo') continue;
+    if (o.t === 'image' && o.w > 900 && o.h > 500) { full = true; continue; }
+    if (o.w > 900 && o.h > 500) continue;
+    let wgt = o.w * o.h;
+    if (o.t === 'text') { o.paras.forEach(p => { if (PM.words(plain(p.t)) >= 4) body.push(p.size); }); wgt = o.w * Math.min(o.h, PM.blockH(o.paras, o.w)) * 1.4; }
+    else if (o.t === 'rect' || o.t === 'ellipse') wgt *= (o.fill ? 0.35 : 0.08);
+    else if (o.t === 'line') wgt = (o.w + o.h) * 2;
+    mx += (o.x + o.w / 2) * wgt; mw += wgt;
+    if (o.t !== 'line') area += Math.min(o.w * o.h, 900 * 460);
+  }
+  const minB = body.length ? Math.min(...body) : 16;
+  const comfy = c && c.lang === 'en' ? 12.5 : 13.5;
+  let q = Math.pow(PM.clamp(minB / comfy, 0.55, 1), 1.6);
+  if (!full) { const bal = mw ? Math.abs(mx / mw - 480) / 960 : 0; q *= 1 - Math.min(0.3, Math.max(0, bal - 0.06) * 1.6); const fill = area / (840 * 438); if (fill < 0.2) q *= 0.88; }
+  return q;
+};
 PM.autoLayout = function (spec, c, avoid = []) {
   const cand = PM.candidates(spec, c);
   let best = null;
-  for (const { L, s } of cand.slice(0, 18)) {
+  for (const { L, s } of cand.slice(0, 14)) {
     const r = PM.renderLayout(L, spec, c);
     if (r.missing && r.missing.length) continue;
     const pen = (r.overflow ? 0.35 : 1) * (avoid.includes(L.fam) ? 0.82 : 1) * (avoid.includes(L.id) ? 0.5 : 1);
-    const sc = s * pen;
+    const q = PM.layoutQuality(r.objs, c);
+    const sc = s * pen * (0.45 + 0.55 * q);
     if (!best || sc > best.sc) best = { L, sc, r };
-    if (!r.overflow && sc >= cand[0].s * 0.95) break;
+    if (!r.overflow && q > 0.97 && s >= cand[0].s * 0.97) break;
   }
   return best;
 };
@@ -6387,12 +6504,12 @@ function paraHTML(p, o) {
   const boxR = o.dir === 'rtl';
   let al = p.al ? ({ l: 'left', c: 'center', r: 'right' })[p.al] : (o.align === 'center' ? 'center' : o.align === 'end' ? (boxR ? 'left' : 'right') : (boxR ? 'right' : 'left'));
   const t = p.caps ? String(p.t).toUpperCase() : String(p.t);
-  const runs = PM.runs(t, p).map(r => `<span style="font-family:${r.f};${r.k !== 1 ? `font-size:${(p.size * r.k).toFixed(2)}px;` : ''}">${esc(r.t)}</span>`).join('');
+  const runs = PM.runs(t, p).map(r => `<span${r.b ? ' data-b="1"' : ''} style="font-family:${r.f};${r.k !== 1 ? `font-size:${(p.size * r.k).toFixed(2)}px;` : ''}${r.b ? 'font-weight:700;' : ''}">${esc(r.t)}</span>`).join('');
   const ind = p.bullet ? p.size * 1.25 : 0;
   const bpos = boxR ? 'right:0;' : 'left:0;';
   const bul = p.bullet === 'dot' ? `<span class="pmb" style="${bpos}width:${ind}px;color:#${p.bc || '004EAA'};">●</span>` : p.bullet === 'num' ? `<span class="pmb" style="${bpos}width:${ind}px;font-family:SanSeq;font-size:${p.size * 0.8}px;color:#${p.bc || '62B6F3'}">${o.n}</span>` : p.bullet === 'dash' ? `<span class="pmb" style="${bpos}width:${ind}px;color:#${p.bc || '62B6F3'}">—</span>` : '';
   const fw = p.bold ? 700 : 400;
-  return `<div class="pmp" dir="${dir}" data-bind="${p.bind || ''}" style="font-size:${p.size}px;line-height:${(p.size * (p.lh || 1.2)).toFixed(2)}px;color:#${p.color};font-weight:${fw};text-align:${al};margin-top:${(p.sb || 0).toFixed(2)}px;margin-bottom:${(p.sa || 0).toFixed(2)}px;${ind ? (boxR ? `padding-right:${ind}px;` : `padding-left:${ind}px;`) : ''}${p.track ? `letter-spacing:${(p.track * p.size).toFixed(2)}px;` : ''}">${bul}${runs || '&#8203;'}</div>`;
+  return `<div class="pmp" dir="${dir}" data-bind="${p.bind || ''}" style="font-size:${p.size}px;line-height:${(p.size * (p.lh || 1.2)).toFixed(2)}px;color:#${p.color};font-weight:${fw};text-align:${al};margin-top:${(p.sb || 0).toFixed(2)}px;margin-bottom:${(p.sa || 0).toFixed(2)}px;${ind ? (boxR ? `padding-right:${ind}px;` : `padding-left:${ind}px;`) : ''}${p.track ? `letter-spacing:${(p.track * p.size).toFixed(2)}px;` : ''}${p.sw ? `-webkit-text-stroke:${(p.sw * p.size * 0.025).toFixed(2)}px currentColor;` : ''}">${bul}${runs || '&#8203;'}</div>`;
 }
 PM.textHTML = function (o) {
   let n = 0;
@@ -6430,6 +6547,14 @@ PM.objEl = function (o, assets) {
       break;
     }
     case 'image': {
+      const sa = assets && assets[o.src];
+      if (sa && sa.kind === 'sug') {
+        el.classList.add('pm-sug');
+        const sm = Math.min(o.w, o.h) < 150;
+        el.innerHTML = `<div class="pm-sugi"><svg viewBox="0 0 24 24" fill="none" stroke="#004EAA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:${sm ? 22 : 30}px;height:${sm ? 22 : 30}px"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg><b>صورة مقترحة</b>${sm ? '' : `<span>${esc(sa.note || '')}</span>`}</div>`;
+        if (o.r) st.borderRadius = o.r + 'px';
+        break;
+      }
       const url = PM.imgURL(assets, o.src);
       if (url) { st.backgroundImage = `url("${url}")`; st.backgroundSize = 'cover'; st.backgroundPosition = `${(o.fx * 100).toFixed(1)}% ${(o.fy * 100).toFixed(1)}%`; if (o.zoom && o.zoom > 1) { st.backgroundSize = (o.zoom * 100).toFixed(0) + '%'; imgZoom(st, o, assets); } }
       else { st.background = '#DCE5F0'; el.innerHTML = '<div class="pm-ph">＋</div>'; }
@@ -6477,7 +6602,10 @@ PM.injectRenderCSS = function () {
 .pmp{white-space:pre-wrap;word-break:normal;overflow-wrap:normal;position:relative;font-feature-settings:"kern" 1}
 .pmb{position:absolute;top:0;display:inline-block;text-align:start;font-size:.62em;line-height:inherit;font-family:Arial,sans-serif}
 .pm-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#7A8BA3;font-size:26px}
-.pm-image{background-repeat:no-repeat}`;
+.pm-image{background-repeat:no-repeat}
+.pm-sug{background:#E8F0FA;box-shadow:inset 0 0 0 1.5px #62B6F3;background-image:repeating-linear-gradient(135deg,rgba(98,182,243,.10) 0 10px,transparent 10px 20px)}
+.pm-sugi{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px;text-align:center;direction:rtl;font-family:SanTaj,sans-serif;color:#3D4A5C}
+.pm-sugi b{font-size:14px;color:#004EAA;font-weight:700}.pm-sugi span{font-size:11.5px;line-height:1.5;max-width:300px}`;
   document.head.appendChild(st);
 };
 })(window.PM);
@@ -13777,7 +13905,7 @@ PM.applyLayout = function (deck, si, L, opt = {}) {
   const c = PM.slideCtx(deck, si);
   const r = PM.renderLayout(L, s.spec, c);
   s.layout = L.id;
-  s.objs = r.objs;
+  s.objs = PM.explodeText ? PM.explodeText(r.objs) : r.objs;
   s.edited = false;
   s.overflow = r.overflow;
   s.missing = r.missing;
@@ -13874,7 +14002,8 @@ PM.serialize = function (deck) {
   const used = new Set();
   deck.slides.forEach(s => { (s.objs || []).forEach(o => { if (o.src) used.add(o.src); }); (s.spec.imgs || []).forEach(id => used.add(id)); (s.spec.autoImgs || []).forEach(id => used.add(id)); });
   for (const [k, a] of Object.entries(deck.assets)) {
-    if (a.stock || a.tplbg) continue;
+    if (a.stock || a.tplbg || a.libph) continue;
+    if (a.kind === 'sug') { if (used.has(k)) assets[k] = { kind: 'sug', note: a.note, prompt: a.prompt, size: a.size }; continue; }
     if (!used.has(k) && !a.lib) continue;
     const b = PM.assetBytes(a);
     if (b) assets[k] = { kind: a.kind, ext: a.ext, b64: PM.bytesToB64(b), size: a.size, lib: a.lib || false, tags: a.tags || '' };
@@ -14013,7 +14142,7 @@ Ed.drawOverlay = function (guides) {
   let h = '';
   const inv = 1 / Ed.scale;
   for (const o of sel) h += `<div class="sel-box${sel.length > 1 ? ' multi' : ''}" style="left:${o.x}px;top:${o.y}px;width:${o.w}px;height:${o.h}px;border-width:${1.5 * inv}px"></div>`;
-  if (sel.length === 1 && !Ed.editing) {
+  if (sel.length === 1 && !Ed.editing && !sel[0].pin) {
     const o = sel[0];
     const hs = 10 * inv;
     const dirs = o.t === 'line' ? (Math.abs(o.h) < 1 ? ['w', 'e'] : ['n', 's']) : o.t === 'icon' || o.t === 'logo' ? ['nw', 'ne', 'sw', 'se'] : ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
@@ -14074,6 +14203,7 @@ function onDown(e) {
     Ed.drawOverlay(); PM.emit('sel');
     return;
   }
+  if (Ed.painter) { const f = Ed.painter; Ed.painter = null; document.body.classList.remove('painting'); f(o); return; }
   // image focus mode: drag inside the frame to move the photo
   if (Ed.tool === 'focus' && o.t === 'image' && ST.sel.has(o.id)) { startFocus(e, o, p); return; }
   if (e.shiftKey || e.ctrlKey || e.metaKey) { if (ST.sel.has(o.id)) ST.sel.delete(o.id); else ST.sel.add(o.id); }
@@ -14109,7 +14239,7 @@ function onMove(e) {
     const b0 = bounds(drag.start.map(s => Object.assign({}, objById(s.id), { x: s.x, y: s.y })));
     const sn = snap({ x: b0.x + dx, y: b0.y + dy, w: b0.w, h: b0.h }, ids, e.altKey);
     dx += sn.dx; dy += sn.dy;
-    for (const s of drag.start) { const o = objById(s.id); o.x = s.x + dx; o.y = s.y + dy; const el = elFor(o.id); if (el) { el.style.left = o.x + 'px'; el.style.top = o.y + 'px'; } }
+    for (const s of drag.start) { const o = objById(s.id); if (o.pin) continue; o.x = s.x + dx; o.y = s.y + dy; const el = elFor(o.id); if (el) { el.style.left = o.x + 'px'; el.style.top = o.y + 'px'; } }
     Ed.drawOverlay(sn.guides);
     return;
   }
@@ -14329,13 +14459,13 @@ Ed.endEdit = function () {
   const kids = [...ed.inner.childNodes];
   for (const k of kids) {
     if (k.nodeType === 3) { if (k.textContent.trim()) lines.push(k.textContent); continue; }
-    if (k.classList && k.classList.contains('pmp')) { const b = k.querySelector('.pmb'); const t = (k.innerText || '').replace(b ? b.innerText : '', '').replace(/​/g, ''); lines.push(t.replace(/\n+$/, '')); }
-    else lines.push(k.innerText || '');
+    if (k.classList && k.classList.contains('pmp')) lines.push(PM.readRich(k).replace(/\n+$/, ''));
+    else lines.push(PM.readRich(k));
   }
   const flat = [];
   lines.forEach(l => String(l).split('\n').forEach(x => flat.push(x)));
   const texts = flat.map(t => t.replace(/\s+$/g, ''));
-  while (texts.length > 1 && !texts[texts.length - 1].trim()) texts.pop();
+  while (texts.length > 1 && !PM.plain(texts[texts.length - 1]).trim()) texts.pop();
   const s = slide();
   const old = o.paras;
   if (o.joinBind) {
@@ -14354,12 +14484,12 @@ Ed.endEdit = function () {
         nu.forEach((p, i) => p.bind = 'blocks.' + bi + '.items.' + i);
       }
     }
-    o.paras = nu.filter((p, i) => p.t.trim() || i === 0);
+    o.paras = nu.filter((p, i) => PM.plain(p.t).trim() || i === 0);
     o.paras.forEach(p => { if (p.bind) PM.writeBind(s.spec, p.bind, p.t); });
     if (o.paras.some(p => !p.bind)) s.edited = true;
   }
-  o.h = Math.max(o.h, PM.blockH(o.paras, o.w) + 1);
-  o.overflow = false;
+  o.h = o.autoH ? PM.blockH(o.paras, o.w) + 1 : Math.max(o.h, PM.blockH(o.paras, o.w) + 1);
+  o.overflow = false; delete o.base;
   if (JSON.stringify(o.paras) !== ed.before) PM.commit('text');
   Ed.render();
   PM.emit('change');
@@ -14518,6 +14648,269 @@ async function onPaste(e) {
 }
 })(window.PM);
 
+/* ---- 36_text.js ---- */
+/* ==========================================================================
+   صانع العروض 2 — free text
+   · every text piece on a slide is its own object (title, sub-title, each
+     card title, each body, each list) — nothing moves with anything else
+   · text tools from «مصمم التواصل الداخلي»: size slider, thickness slider,
+     bold for selected words (B / ⌘B), reset
+   ========================================================================== */
+(function (PM) {
+'use strict';
+const ST = PM.ST;
+
+/* ---------- split multi-paragraph boxes into independent pieces ---------- */
+// paragraphs of one list (or one multi-paragraph body) stay together; everything else is its own piece
+function runKey(p, i) {
+  if (p.bind) {
+    if (/\.bullets\.\d+$/.test(p.bind)) return p.bind.replace(/\.\d+$/, '');
+    if (/^(blocks\.\d+\.)?items\.\d+$/.test(p.bind) || /^main\.items\.\d+$/.test(p.bind)) return p.bind.replace(/\.\d+$/, '') + (p.bullet ? ':list' : ':' + i);
+    return p.bind;
+  }
+  return p.bullet ? '__list' : '__' + i;
+}
+PM.explodeText = function (objs) {
+  const out = [];
+  for (const o of objs) {
+    if (o.t !== 'text' || o.pageNum || o.role === 'page' || o.role === 'chrome' || !o.paras || o.paras.length < 2 || o.keepGroup) { out.push(o); continue; }
+    const runs = [];
+    o.paras.forEach((p, i) => {
+      const k = runKey(p, i);
+      const last = runs[runs.length - 1];
+      if (last && last.k === k) last.ps.push(p); else runs.push({ k, ps: [p] });
+    });
+    if (runs.length < 2) { out.push(o); continue; }
+    // where the original box placed its content (flex column + vertical anchor)
+    const full = o.paras.map(p => PM.blockH([Object.assign({}, p, { sb: 0 })], o.w) + (p.sb || 0));
+    const total = full.reduce((a, b) => a + b, 0);
+    let y = o.va === 'm' ? o.y + (o.h - total) / 2 : o.va === 'b' ? o.y + o.h - total : o.y;
+    let pi = 0;
+    runs.forEach((r, ri) => {
+      const ps = r.ps.map((p, j) => Object.assign({}, p, j === 0 ? { sb: 0 } : {}));
+      const top = y + (r.ps[0].sb || 0);
+      const h = PM.blockH(ps, o.w);
+      const n = Object.assign({}, o, { id: PM.uid(), y: top, h: h + 1, paras: ps, va: 't', name: (o.name || 'Text') + (runs.length > 1 ? ' · ' + (ri + 1) : ''), autoH: true, overflow: false, used: h });
+      delete n.joinBind;
+      if (o.joinBind && r.ps.every(p => p.bind === r.ps[0].bind)) n.joinBind = true;
+      out.push(n);
+      for (let j = 0; j < r.ps.length; j++) y += full[pi++];
+    });
+  }
+  return out;
+};
+
+/* ---------- read an edited paragraph back, keeping bold words ---------- */
+PM.readRich = function (el) {
+  let out = '';
+  const walk = (n, bold) => {
+    if (n.nodeType === 3) { const t = n.textContent.replace(/​/g, ''); if (t) out += bold ? PM.BO + t + PM.BC : t; return; }
+    if (n.nodeType !== 1) return;
+    if (n.classList && n.classList.contains('pmb')) return;
+    if (n.tagName === 'BR') { out += '\n'; return; }
+    const st = n.getAttribute && (n.getAttribute('style') || '');
+    const b = /font-weight:\s*(normal|400)/.test(st) && n.tagName === 'SPAN' && !(n.dataset && n.dataset.b) ? false : (bold || n.tagName === 'B' || n.tagName === 'STRONG' || (n.dataset && n.dataset.b === '1') || (n.tagName === 'SPAN' && /font-weight:\s*(bold|[6-9]00)/.test(st)));
+    const block = n !== el && /^(DIV|P)$/.test(n.tagName);
+    if (block && out && !out.endsWith('\n')) out += '\n';
+    n.childNodes.forEach(c => walk(c, b));
+  };
+  walk(el, false);
+  // merge neighbouring bold spans, drop empty markers
+  return out.replace(new RegExp(PM.BC + PM.BO, 'g'), '').replace(new RegExp(PM.BO + PM.BC, 'g'), '');
+};
+
+/* ---------- size / thickness / bold tools for the context bar ---------- */
+const TX = PM.TextTools = {};
+TX.base = function (o) { if (!o.base) o.base = o.paras.map(p => ({ size: p.size, sb: p.sb || 0, sa: p.sa || 0 })); return o.base; };
+TX.scaleOf = function (o) { const b = TX.base(o); return b[0] && b[0].size ? o.paras[0].size / b[0].size : 1; };
+TX.setScale = function (o, k) {
+  const b = TX.base(o);
+  o.paras.forEach((p, i) => { const q = b[Math.min(i, b.length - 1)]; p.size = Math.max(5, Math.round(q.size * k * 4) / 4); p.sb = q.sb * k; p.sa = q.sa * k; });
+  TX.fitH(o);
+};
+TX.fitH = function (o) { const need = PM.blockH(o.paras, o.w) + 1; if (o.autoH || need > o.h) o.h = need; };
+TX.setWeight = function (o, v) { o.paras.forEach(p => { p.sw = v || 0; }); };
+TX.reset = function (o) { if (o.base) TX.setScale(o, 1); o.paras.forEach(p => { p.sw = 0; p.t = PM.plain(p.t); }); };
+/* bold the words the user selected while editing (or toggle the whole piece) */
+TX.boldSelection = function () {
+  const ed = PM.Ed.editing;
+  if (ed) { document.execCommand('bold'); return true; }
+  return false;
+};
+})(window.PM);
+
+/* ---- 37_photos.js ---- */
+/* ==========================================================================
+   صانع العروض 2 — Jeddah Airports photo library (offline)
+   · 220+ tagged photos from «مكتبة الصور» (photos/lib.js: tags + thumbnails,
+     photos/<id>.js: full photo, loaded only when used)
+   · picks the photo that matches what the slide talks about
+   · when nothing fits, leaves a marked frame with the picture it suggests
+   ========================================================================== */
+(function (PM) {
+'use strict';
+const ST = PM.ST;
+const LIB = () => PM.PHOTOLIB || {};
+
+/* ---------- text normalising (Arabic + English) ---------- */
+const norm = t => String(t || '').toLowerCase()
+  .replace(/[ً-ْـ]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي')
+  .replace(/[^\p{L}\p{N}\s-]/gu, ' ');
+const STOP = new Set('في من على الى إلى عن مع هذا هذه ذلك التي الذي the and for with from into that this are our your will been have has was ال و او أو ثم كل'.split(' '));
+function tokens(t) {
+  return norm(t).split(/\s+/).map(w => w.replace(/^(و|ف|ب|ل|ك)?ال/, '')).filter(w => w.length >= 3 && !STOP.has(w));
+}
+PM.specText = function (spec) {
+  const out = [spec.title, spec.sub, spec.eyebrow];
+  const walk = v => { if (v == null) return; if (typeof v === 'string') out.push(v); else if (Array.isArray(v)) v.forEach(walk); else if (typeof v === 'object') Object.entries(v).forEach(([k, x]) => { if (!/^(k|kind|icon|unit|pre|dec|w)$/.test(k)) walk(x); }); };
+  walk(spec.blocks); walk(spec.items);
+  return PM.plain(out.filter(Boolean).join(' '));
+};
+
+/* ---------- index ---------- */
+let IDX = null;
+function index() {
+  if (IDX) return IDX;
+  IDX = Object.entries(LIB()).map(([pid, m]) => ({ pid, m, kw: new Set(m.kw.flatMap(k => tokens(k)).concat(m.kw.map(k => norm(k).trim()))) }));
+  return IDX;
+}
+function matchScore(toks, e) {
+  let s = 0; const hit = new Set();
+  for (const t of toks) for (const k of e.kw) {
+    if (hit.has(k)) continue;
+    if (k === t || (k.length >= 4 && t.startsWith(k)) || (t.length >= 4 && k.startsWith(t))) { s += 1; hit.add(k); }
+  }
+  return s;
+}
+
+/* subjects the library may not cover: suggest the picture instead of a random photo */
+const TOPICS = [
+  { re: /حج|حجاج|الحجيج|ضيوف الرحمن|hajj|pilgrim/i, tags: ['hajj', 'حج', 'pilgrims', 'حجاج'], ar: 'حجاج بلباس الإحرام يعبرون صالة الحج تحت المظلات البيضاء', en: 'Hajj pilgrims in white ihram walking under the white tent roof of the Hajj terminal at golden hour, calm and organised' },
+  { re: /عمره|عمرة|معتمر|umrah/i, tags: ['umrah', 'عمره', 'pilgrims', 'حجاج'], ar: 'معتمرون يصلون إلى صالة حديثة ويستقبلهم فريق المطار', en: 'Umrah pilgrims in ihram arriving through a bright modern terminal hall, welcomed by airport staff, warm natural light' },
+  { re: /قطار|الحرمين|train|rail/i, tags: ['train', 'قطار'], ar: 'قطار الحرمين السريع في محطة المطار', en: 'Haramain high speed train at the airport station platform, sleek and modern, soft daylight' },
+  { re: /اطفاء|إطفاء|حريق|الانقاذ|الإنقاذ|fire|rescue/i, tags: ['fire', 'اطفاء'], ar: 'مركبة إطفاء المطار جاهزة على الساحة', en: 'Airport fire and rescue vehicle ready on the apron, crew in protective gear, dramatic sky' },
+  { re: /طاقه شمسيه|طاقة شمسية|استدامه|استدامة|كربون|انبعاث|بيئ|sustainab|carbon|solar/i, tags: ['sustainability', 'استدامه', 'garden', 'حديقه'], ar: 'ألواح طاقة شمسية ومساحات خضراء حول مباني المطار', en: 'Solar panels and green landscaping around a modern airport terminal, clean bright daylight' },
+  { re: /تدريب|تاهيل|تأهيل|ورشه|ورشة|training|workshop/i, tags: ['training', 'تدريب', 'meeting', 'اجتماع'], ar: 'جلسة تدريب لموظفي المطار في قاعة حديثة', en: 'Airport staff in a modern training room, engaged discussion, natural window light' },
+  { re: /رقمي|تقني|ذكاء اصطناعي|ذكي|الكتروني|إلكتروني|digital|technology|smart|ai\b/i, tags: ['technology', 'تقنيه', 'check-in', 'تسجيل'], ar: 'أجهزة خدمة ذاتية وشاشات رقمية في صالة المغادرة', en: 'Self-service kiosks and digital screens in a bright departure hall, travellers using them, clean modern look' },
+  { re: /اتفاقيه|اتفاقية|توقيع|شراكه|شراكة|مذكره|agreement|partnership|signing|mou/i, tags: ['meeting', 'اجتماع', 'office', 'مكتب'], ar: 'توقيع اتفاقية في قاعة اجتماعات رسمية', en: 'Formal agreement signing at a meeting table, two executives shaking hands, premium boardroom' },
+  { re: /عائل|اطفال|أطفال|families|children/i, tags: ['families', 'عائلات'], ar: 'عائلة مسافرة تتجول في صالة المطار', en: 'A travelling family walking through a bright airport terminal, relaxed and happy' }
+];
+
+/* best photo for a slide (or a suggestion when nothing fits) */
+PM.photoPick = function (deck, s, i, o = {}) {
+  const text = PM.specText(s.spec);
+  const toks = tokens(text);
+  const dark = (s.tone || (deck.dark ? 'dark' : 'light')) === 'dark';
+  const si = deck.slides.indexOf(s);
+  const near = new Set();
+  deck.slides.slice(Math.max(0, si - 4), si + 5).forEach(x => { if (x === s) (x.spec.autoImgs || []).forEach((id, k) => { if (k !== i) near.add(id); }); else { (x.spec.autoImgs || []).forEach(id => near.add(id)); (x.spec.imgs || []).forEach(id => near.add(id)); } });
+  const used = new Set(); deck.slides.forEach(x => (x.spec.autoImgs || []).forEach(id => used.add(id)));
+  const cover = ['cover', 'closing', 'divider'].includes(s.spec.kind);
+  const seed = (s.id || '').split('').reduce((a, ch) => a + ch.charCodeAt(0), 0) + i * 13;
+  const list = index().map(e => {
+    const m = matchScore(toks, e);
+    let sc = m * 3 + (e.m.hero || 0) * (cover ? 1.2 : 0.6);
+    if (dark && /night|sunset/.test(e.m.light)) sc += 0.8;
+    if (!dark && e.m.light === 'day') sc += 0.3;
+    if (used.has('ph:' + e.pid)) sc -= 1.5;
+    sc += ((seed * 31 + e.pid.charCodeAt(4) * 7 + +e.pid.slice(2)) % 10) / 25; // gentle variety between equal photos
+    return { id: 'ph:' + e.pid, e, m, sc };
+  }).filter(x => !near.has(x.id)).sort((a, b) => b.sc - a.sc);
+  // the user's own photos join the race with a head start
+  const mine = Object.keys(deck.assets).filter(k => deck.assets[k].lib && !near.has(k));
+  const best = list[0];
+  // topic the library does not cover → suggestion
+  const mode = deck.photoSug || 'auto';
+  if (mode !== 'never' && !cover) {
+    const topic = TOPICS.find(t => t.re.test(text));
+    const covered = topic && list.slice(0, 12).some(x => topic.tags.some(tg => x.e.kw.has(norm(tg).trim())));
+    if ((topic && !covered) || (mode === 'always' && (!best || best.m === 0))) {
+      return PM.suggestPhoto(deck, s, i, topic || null, text);
+    }
+  }
+  if (mine.length && (!best || best.m === 0)) return mine[(seed) % mine.length];
+  if (best) return best.id;
+  const stock = Object.keys(deck.assets).filter(k => deck.assets[k].stock && !near.has(k));
+  return stock[seed % Math.max(1, stock.length)] || null;
+};
+
+/* a marked frame: «صورة مقترحة» with what it should show */
+PM.suggestPhoto = function (deck, s, i, topic, text) {
+  const id = 'sug:' + s.id + ':' + i;
+  const title = PM.plain(s.spec.title || '');
+  const ar = topic ? topic.ar : `صورة تعبّر عن «${title.slice(0, 60) || 'موضوع الشريحة'}» في مطار الملك عبدالعزيز`;
+  const en = topic ? topic.en : `A premium cinematic photo at King Abdulaziz International Airport (Jeddah) that expresses: ${title.slice(0, 80)}. Clean composition, natural light, no text or logos`;
+  deck.assets[id] = { kind: 'sug', note: ar, prompt: en, size: { w: 1600, h: 1000 } };
+  return id;
+};
+
+/* the library replaces the old picker */
+PM.autoPhoto = function (deck, s, i) {
+  s.spec.autoImgs = s.spec.autoImgs || [];
+  const cur = s.spec.autoImgs[i];
+  if (cur && deck.assets[cur]) return cur;
+  const pick = PM.photoPick(deck, s, i);
+  s.spec.autoImgs[i] = pick;
+  return pick;
+};
+/* other photos that fit this slide (for «بدائل» in the photo bar) */
+PM.photoAlternatives = function (deck, s, n = 12) {
+  const toks = tokens(PM.specText(s.spec));
+  return index().map(e => ({ id: 'ph:' + e.pid, sc: matchScore(toks, e) * 3 + (e.m.hero || 0) * 0.5 })).sort((a, b) => b.sc - a.sc).slice(0, n).map(x => x.id);
+};
+PM.photoSearch = function (q, n = 120) {
+  const toks = tokens(q);
+  if (!toks.length) return index().slice().sort((a, b) => (b.m.hero || 0) - (a.m.hero || 0)).slice(0, n).map(e => 'ph:' + e.pid);
+  return index().map(e => ({ id: 'ph:' + e.pid, sc: matchScore(toks, e) + (norm(e.m.note).includes(norm(q).trim()) ? 2 : 0) })).filter(x => x.sc > 0).sort((a, b) => b.sc - a.sc).slice(0, n).map(x => x.id);
+};
+
+/* ---------- assets: thumbnails right away, full photos on demand ---------- */
+const _base = PM.baseAssets;
+PM.baseAssets = function () {
+  const a = _base();
+  for (const [pid, m] of Object.entries(LIB())) a['ph:' + pid] = { kind: 'image', ext: 'jpeg', libph: true, pid, url: 'data:image/jpeg;base64,' + m.th, size: { w: m.w, h: m.h }, thumb: true };
+  return a;
+};
+const loaded = {}, waiting = {};
+PM.__ph = function (pid, b64) { loaded[pid] = b64; (waiting[pid] || []).forEach(f => f(b64)); delete waiting[pid]; };
+PM.loadPhoto = function (pid) {
+  return new Promise(res => {
+    if (loaded[pid]) return res(loaded[pid]);
+    if (waiting[pid]) { waiting[pid].push(res); return; }
+    waiting[pid] = [res];
+    const sc = document.createElement('script');
+    sc.src = 'photos/' + pid + '.js';
+    sc.onerror = () => { (waiting[pid] || []).forEach(f => f(null)); delete waiting[pid]; };
+    document.head.appendChild(sc);
+  });
+};
+/* make sure the full-size photos used in a deck (or a slide) are in memory */
+PM.ensurePhotos = async function (deck, slides) {
+  const ids = new Set();
+  (slides || deck.slides).forEach(s => (s.objs || []).forEach(o => { if (o.t === 'image' && o.src && String(o.src).startsWith('ph:')) ids.add(o.src); }));
+  let changed = false;
+  await Promise.all([...ids].map(async id => {
+    const a = deck.assets[id]; if (!a || !a.thumb) return;
+    const b64 = await PM.loadPhoto(a.pid);
+    if (b64) { a.b64 = b64; a.url = 'data:image/jpeg;base64,' + b64; delete a.bytes; a.thumb = false; changed = true; }
+  }));
+  return changed;
+};
+/* the stage swaps in the sharp photo as soon as it arrives */
+PM.onReady = PM.onReady || [];
+const hookStage = () => {
+  const Ed = PM.Ed; if (!Ed || Ed._phHook) return; Ed._phHook = true;
+  const r0 = Ed.render;
+  Ed.render = function () {
+    r0.apply(this, arguments);
+    const d = ST.deck, s = d && d.slides[ST.cur];
+    if (!s) return;
+    PM.ensurePhotos(d, [s]).then(ch => { if (ch && !Ed.editing) { r0.apply(Ed); if (PM.UI && PM.UI.renderThumb) PM.UI.renderThumb(ST.cur); } });
+  };
+};
+if (PM.Ed) hookStage(); else document.addEventListener('DOMContentLoaded', hookStage);
+})(window.PM);
+
 /* ---- 33_import.js ---- */
 /* ==========================================================================
    صانع العروض 2 — import (PowerPoint · Word · project file) and optional Copilot
@@ -14538,10 +14931,10 @@ PM.importFile = async function (file, opts = {}) {
   let res;
   if (zip.file('word/document.xml')) {
     const d = await parseDocx(zip, {});
-    res = PM.analyzeDocx(d);
+    res = PM.analyzeDocx(d, { keep: !!opts.keep });
   } else if (zip.file('ppt/presentation.xml')) {
     const p = await parsePptx(zip, {});
-    res = await PM.analyzePptx(p);
+    res = await PM.analyzePptx(p, { keep: !!opts.keep });
     res.warnings = p.warnings || [];
   } else throw new Error('الملف ما فيه محتوى Word أو PowerPoint');
   const lang = opts.lang && opts.lang !== 'auto' ? opts.lang : (res.lang || 'ar');
@@ -14641,7 +15034,8 @@ function runXml(r, p) {
   const sz = Math.round(p.size * (r.k || 1) * 100);
   const spc = p.track ? ` spc="${Math.round(p.track * p.size * 100)}"` : '';
   const txt = p.caps ? String(r.t).toUpperCase() : r.t;
-  return `<a:r><a:rPr lang="${ar ? 'ar-SA' : 'en-US'}" altLang="en-US" sz="${sz}" b="${p.bold && !r.num ? 1 : 0}"${spc} dirty="0"><a:solidFill><a:srgbClr val="${p.color}"/></a:solidFill><a:latin typeface="${esc(face)}"/><a:ea typeface="${esc(face)}"/><a:cs typeface="${esc(r.num ? FONTS.num : FONTS.ar)}"/></a:rPr><a:t>${esc(txt)}</a:t></a:r>`;
+  const ln = p.sw ? `<a:ln w="${Math.round(p.sw * p.size * 0.025 * 12700)}"><a:solidFill><a:srgbClr val="${p.color}"/></a:solidFill></a:ln>` : '';
+  return `<a:r><a:rPr lang="${ar ? 'ar-SA' : 'en-US'}" altLang="en-US" sz="${sz}" b="${(p.bold || r.b) && !r.num ? 1 : 0}"${spc} dirty="0">${ln}<a:solidFill><a:srgbClr val="${p.color}"/></a:solidFill><a:latin typeface="${esc(face)}"/><a:ea typeface="${esc(face)}"/><a:cs typeface="${esc(r.num ? FONTS.num : FONTS.ar)}"/></a:rPr><a:t>${esc(txt)}</a:t></a:r>`;
 }
 function paraXml(p, box) {
   const boxR = box.dir === 'rtl';
@@ -14865,6 +15259,7 @@ const maxId = xml => { let m = 1; for (const x of xml.matchAll(/ id="(\d+)"/g)) 
 
 /* ---------- build the deck ---------- */
 PM.exportPptx = async function (deck, onProgress) {
+  if (PM.ensurePhotos) await PM.ensurePhotos(deck);
   const lang = deck.lang === 'en' ? 'en' : 'ar';
   const tplB64 = lang === 'en' ? (window.__TPL_EN || '') : (window.__TPL_AR || '');
   if (!tplB64) throw new Error('ملف التمبلت الرسمي غير موجود بجانب الأداة (tpl_ar.js / tpl_en.js)');
@@ -14930,7 +15325,18 @@ PM.exportPptx = async function (deck, onProgress) {
       else if (o.t === 'rect' || o.t === 'ellipse') sb.shape(o);
       else if (o.t === 'line') sb.line(o);
       else if (o.t === 'image') {
-        const a = deck.assets[o.src]; const b = PM.assetBytes(a);
+        const a = deck.assets[o.src];
+        if (a && a.kind === 'sug') {
+          // suggested photo: a marked frame the team replaces later
+          const rtl = deck.lang !== 'en';
+          sb.shape(Object.assign({}, o, { t: 'rect', fill: 'E8F0FA', fa: 100, stroke: '62B6F3', sw: 1.25, r: o.r || 0, grad: null, name: 'Suggested photo' }));
+          const ps = [PM.P(rtl ? 'صورة مقترحة' : 'Suggested photo', 13, { bold: true, color: '004EAA', al: 'c' }), PM.P(rtl ? a.note : a.prompt, 10.5, { color: '3D4A5C', al: 'c', sb: 4 })];
+          const t = PM.T(o.x + 16, o.y + 16, Math.max(40, o.w - 32), Math.max(30, o.h - 32), ps, { va: 'm', align: 'center', minK: 0.5 });
+          if (rtl) t.dir = 'rtl';
+          sb.text(t);
+          continue;
+        }
+        const b = PM.assetBytes(a);
         if (!b) continue;
         let ext = (a.ext || 'jpeg').replace('jpg', 'jpeg');
         let bytes = b;
@@ -14955,7 +15361,8 @@ PM.exportPptx = async function (deck, onProgress) {
       xml = sb.xml();
       relsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${REL('slideLayout')}" Target="../slideLayouts/${T.contentLayout.split('/').pop()}"/>${sb.rels.map(r => `<Relationship Id="${r.id}" Type="${REL(r.type)}" Target="${r.target}"/>`).join('')}</Relationships>`;
     }
-    out.push({ xml, relsXml, notes: s.spec.notes || '' });
+    const sugs = s.objs.filter(o => o.t === 'image' && deck.assets[o.src] && deck.assets[o.src].kind === 'sug').map(o => deck.assets[o.src]);
+    out.push({ xml, relsXml, notes: [s.spec.notes || '', ...sugs.map(a => (deck.lang !== 'en' ? 'صورة مقترحة: ' + a.note + '\n' : '') + 'Image prompt: ' + a.prompt)].filter(Boolean).join('\n') });
   }
   let sldIds = '';
   out.forEach((s, i) => {
@@ -15077,10 +15484,11 @@ UI.init = function () {
   $('#sLogo').innerHTML = PM.logoSVG('FFFFFF');
   Ed.mount($('#stageHost'));
   bindTop(); bindStart(); bindStrip(); bindLaybar(); bindTabs();
+  if (PM.Dock) PM.Dock.mount();
   PM.on(what => {
     if (what === 'all') { UI.renderAll(); }
     else if (what === 'sel') { UI.renderCtx(); if (UI.tab === 'design') UI.renderPane(); }
-    else if (what === 'change') { UI.renderCtx(); scheduleThumb(); UI.renderLaybar(); }
+    else if (what === 'change') { UI.renderCtx(); scheduleThumb(); UI.renderLaybar(); if (PM.Dock) { clearTimeout(UI.dkT); UI.dkT = setTimeout(() => PM.Dock.render(), 400); } }
     else if (what === 'saved') { const l = $('#savedLbl'); if (l) l.textContent = 'محفوظ ✓'; }
     else if (what === 'go') { }
   });
@@ -15111,7 +15519,7 @@ PM.emit = function (what, arg) {
 function segVal(id) { const b = $(`#${id} button.on`); return b ? b.dataset.v : null; }
 function segBind(id, fn) { $$(`#${id} button`).forEach(b => b.onclick = () => { $$(`#${id} button`).forEach(x => x.classList.toggle('on', x === b)); if (fn) fn(b.dataset.v); }); }
 function bindStart() {
-  segBind('stLang'); segBind('stBg'); segBind('stTone');
+  segBind('stLang'); segBind('stBg'); segBind('stTone'); segBind('stRead');
   const drop = $('#stDrop');
   $('#fIn').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) importFile(f); };
   drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('on'); });
@@ -15141,7 +15549,7 @@ async function importFile(f) {
   UI.progress('جاري قراءة الملف…', f.name);
   await new Promise(r => setTimeout(r, 30));
   try {
-    const opt = { lang, grey: segVal('stBg') === 'grey', dark: segVal('stTone') === 'dark' };
+    const opt = { lang, grey: segVal('stBg') === 'grey', dark: segVal('stTone') === 'dark', keep: segVal('stRead') === 'keep' };
     const r = await PM.importFile(f, opt);
     if (r.report.kind === 'project') { UI.progress(false); openDeck(r.deck, { built: true }); UI.toast('فتحت المشروع'); return; }
     UI.progress('أحلل المحتوى وأوزّع التصاميم…', `${r.deck.slides.length} شريحة`);
@@ -15178,10 +15586,16 @@ function bindTop() {
   segBind('segBg', v => { deck().grey = v === 'grey'; relayoutAll('bg'); });
   segBind('segTone', v => { deck().dark = v === 'dark'; deck().slides.forEach(s => s.tone = null); relayoutAll('tone'); });
   $('#bExport').onclick = exportPptx;
-  $('#bPdf').onclick = () => { if (!deck()) return; Ed.endEdit(); PM.printPdf(deck()); };
-  $('#bShow').onclick = () => { if (!deck()) return; Ed.endEdit(); PM.present(deck(), ST.cur); };
+  $('#bPdf').onclick = async () => { if (!deck()) return; Ed.endEdit(); UI.progress('أجهّز الصور…'); await PM.ensurePhotos(deck()); UI.progress(false); PM.printPdf(deck()); };
+  $('#bShow').onclick = async () => { if (!deck()) return; Ed.endEdit(); UI.progress('أجهّز الصور…'); await PM.ensurePhotos(deck()); UI.progress(false); PM.present(deck(), ST.cur); };
   $('#bCheck').onclick = checkDeck;
   $('#bCopilot').onclick = copilot;
+  $('#bStory').onclick = () => PM.Brain.story();
+  document.addEventListener('keydown', e => {
+    if (!deck() || UI.modalOpen() || (e.target && (e.target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)))) return;
+    if (e.key === '/' ) { e.preventDefault(); PM.Brain.directive(); }
+    if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'f' || e.key.toLowerCase() === 'h')) { e.preventDefault(); PM.Brain.findReplace(); }
+  });
 }
 function relayoutAll(label) {
   const d = deck();
@@ -15199,6 +15613,7 @@ async function fileAction(a) {
   if (a === 'saveProj') saveProject();
   if (a === 'openProj') { const i = document.createElement('input'); i.type = 'file'; i.accept = '.json'; i.onchange = () => i.files[0] && importFile(i.files[0]); i.click(); }
   if (a === 'recent') showStart();
+  if (a === 'find') PM.Brain.findReplace();
 }
 function fileName(ext) { const d = deck(); const n = (d.name || (d.slides[0] && d.slides[0].spec.title) || 'عرض').replace(/[\\/:*?"<>|]+/g, ' ').trim().slice(0, 60); return n + '.' + ext; }
 function saveProject() {
@@ -15229,15 +15644,21 @@ UI.renderAll = function () {
   $$('#segTone button').forEach(b => b.classList.toggle('on', b.dataset.v === (d.dark ? 'dark' : 'light')));
   document.documentElement.dir = 'rtl';
   renderThumbs(); Ed.render(); UI.renderCtx(); UI.renderLaybar(); UI.renderPane();
+  if (PM.Dock) PM.Dock.render();
   $('#bUndo').disabled = ST.undo.length < 2; $('#bRedo').disabled = !ST.redo.length;
 };
 function go(delta) {
   const d = deck(); if (!d) return;
   Ed.endEdit();
   ST.cur = PM.clamp(ST.cur + delta, 0, d.slides.length - 1);
-  ST.sel.clear(); UI.renderAll(); scrollThumb();
+  ST.sel.clear(); UI.renderCur(); scrollThumb();
 }
-UI.select = function (i) { Ed.endEdit(); ST.cur = i; ST.sel.clear(); UI.renderAll(); scrollThumb(); };
+UI.renderCur = function () {
+  $$('#thumbs .th').forEach(t => t.classList.toggle('cur', +t.dataset.i === ST.cur));
+  Ed.render(); UI.renderCtx(); UI.renderLaybar(); UI.renderPane();
+  if (PM.Dock) PM.Dock.render();
+};
+UI.select = function (i) { Ed.endEdit(); ST.cur = i; ST.sel.clear(); if ($$('#thumbs .th').length === deck().slides.length) UI.renderCur(); else UI.renderAll(); scrollThumb(); };
 
 /* ---------- thumbnails ---------- */
 let thumbRaf = null;
@@ -15345,6 +15766,7 @@ function bindLaybar() {
     if (L && L.tones.includes(s.tone)) PM.applyLayout(d, ST.cur, L); else PM.autoSlide(d, ST.cur);
     PM.commit('tone'); UI.renderAll();
   };
+  $('#bReview').onclick = () => PM.Brain.review();
   $('#bAuto').onclick = () => { const d = deck(); PM.autoSlide(d, ST.cur); PM.renumber(d); PM.commit('auto'); UI.renderAll(); UI.toast('أعدت توزيع الشريحة'); };
   $('#bPanel').onclick = () => $('#side').classList.toggle('open');
 }
@@ -15360,6 +15782,7 @@ function cycle(dir) {
   }
   ST.sel.clear(); PM.renumber(d); PM.commit('layout'); UI.renderAll();
 }
+UI.cycle = cycle;
 UI.applyLayoutId = function (id) {
   const d = deck(), L = PM.layoutById(id); if (!L) return;
   Ed.endEdit();
@@ -15407,6 +15830,7 @@ function paneDesign(p) {
     <h4 style="margin-top:18px">${ic('sparkles')}تصاميم مقترحة لهذه الشريحة</h4>
     <div class="sugg" id="sugg"></div>
     <button class="bigbtn" id="pLib">${ic('layout-grid')}افتح مكتبة التصاميم كاملة</button>
+    ${kind === 'content' && s.layout ? `<button class="bigbtn ghost" id="pSame" style="margin-top:8px">${ic('copy-check')}نفس التصميم لكل الشرائح المشابهة</button>` : ''}
     <div class="note" style="margin-top:14px">اضغط مرتين على أي نص لتعديله · اسحب أي عنصر لتحريكه · Shift للتحديد المتعدد · اسحب الصور من جهازك مباشرة على الشريحة</div>`;
   const list = candList().slice(0, 12);
   const g = $('#sugg', p);
@@ -15419,6 +15843,23 @@ function paneDesign(p) {
     el.onclick = () => UI.applyLayoutId(L.id);
   });
   $('#pLib', p).onclick = openLibrary;
+  const same = $('#pSame', p);
+  if (same) same.onclick = () => {
+    const d = deck(), L = PM.layoutById(s.layout); if (!L) return;
+    let n = 0;
+    d.slides.forEach((x, i) => {
+      if (x === s || x.spec.kind !== 'content' || x.edited || x.hidden) return;
+      const sx = PM.shape(x.spec); if (sx.form !== sp.form || (sx.others.length > 0) !== (sp.others.length > 0)) return;
+      const tone = x.tone || (d.dark ? 'dark' : 'light'); if (!L.tones.includes(tone)) return;
+      const c = PM.slideCtx(d, i); let ok = 0; try { ok = L.accepts(sx, c); } catch (e) { ok = 0; }
+      if (!ok) return;
+      const r = PM.renderLayout(L, JSON.parse(JSON.stringify(x.spec)), c);
+      if ((r.missing && r.missing.length) || r.overflow) return;
+      PM.applyLayout(d, i, L); n++;
+    });
+    PM.renumber(d); PM.commit('same-layout'); UI.renderAll();
+    UI.toast(n ? `✓ طبّقت «${L.name}» على ${n} شريحة مشابهة` : 'ما فيه شرائح مشابهة يناسبها نفس التصميم بدون ما يخفي محتوى');
+  };
   $$('[data-conv]', p).forEach(b => b.onclick = () => {
     const d = deck(), s2 = cur();
     const before = JSON.stringify(s2.spec);
@@ -15484,12 +15925,53 @@ function insert(kind) {
   if (isPhone()) $('#side').classList.remove('open');
 }
 async function panePhotos(p) {
-  const d = deck();
-  p.innerHTML = `<label class="dropz" id="phUp"><input type="file" accept="image/*" multiple hidden>${ic('upload')}<div>أضف صورك (تنحفظ في مكتبتك على هذا الجهاز)</div></label>
-    <h4>${ic('folder-heart')}مكتبتي</h4><div class="phgrid" id="phLib"></div>
+  const d = deck(), s = cur();
+  const LIBN = Object.keys(PM.PHOTOLIB || {}).length;
+  const subjCount = {};
+  Object.values(PM.PHOTOLIB || {}).forEach(m => { subjCount[m.subj] = (subjCount[m.subj] || 0) + 1; });
+  const SUBJ_AR = { aircraft: 'طائرات', terminal: 'صالات', passengers: 'مسافرون', architecture: 'عمارة', tower: 'البرج', vehicles: 'مركبات', apron: 'ساحة الطائرات', gate: 'بوابات', hq: 'المقر', lounge: 'صالات انتظار', art: 'فن', retail: 'أسواق', runway: 'المدرج', 'check-in': 'تسجيل', marshaller: 'موجّه الطائرات', aquarium: 'الحوض المائي', security: 'أمن', crew: 'طاقم', maintenance: 'صيانة', boarding: 'صعود', road: 'طرق', helicopter: 'مروحية' };
+  const subs = Object.entries(subjCount).filter(([k, n]) => SUBJ_AR[k] && n >= 2).sort((a, b) => b[1] - a[1]);
+  const mode = d.photoSug || 'auto';
+  p.innerHTML = `<div class="phhead"><input class="inp" id="phq" placeholder="ابحث: طائرة، صالة، غروب، مسافرين، البرج…"><span class="hint"><span class="num">${LIBN}</span> صورة</span></div>
+    <div class="chips" id="phSubj"><button class="chip on" data-sj="">المناسبة للشريحة</button>${subs.map(([k, n]) => `<button class="chip" data-sj="${k}">${SUBJ_AR[k]} <span class="num" style="opacity:.6">${n}</span></button>`).join('')}</div>
+    <div class="phgrid big" id="phLibG"></div>
+    <h4 style="margin-top:16px">${ic('lightbulb')}الصور المقترحة</h4>
+    <div class="seg" id="phSug" style="margin-bottom:6px"><button data-v="auto" class="${mode === 'auto' ? 'on' : ''}">تلقائي</button><button data-v="always" class="${mode === 'always' ? 'on' : ''}">كل صورة ما تطابق</button><button data-v="never" class="${mode === 'never' ? 'on' : ''}">بدون اقتراحات</button></div>
+    <p class="hint">لو موضوع الشريحة ما له صورة في المكتبة (حج، عمرة، قطار…) تحط الأداة إطاراً مكتوب فيه وصف الصورة المقترحة، وتقدر تصنعها من «توليد صورة».</p>
+    <h4 style="margin-top:16px">${ic('folder-heart')}مكتبتي</h4>
+    <label class="dropz" id="phUp"><input type="file" accept="image/*" multiple hidden>${ic('upload')}<div>أضف صورك (تنحفظ في مكتبتك على هذا الجهاز)</div></label>
+    <div class="phgrid" id="phLib"></div>
     <h4>${ic('file-image')}صور من الملف</h4><div class="phgrid" id="phFile"></div>
-    <h4>${ic('plane')}صور مطارات جدة</h4><div class="phgrid" id="phStock"></div>
     <p class="hint" style="margin-top:12px">اسحب أي صورة على الشريحة. لو سحبتها فوق صورة موجودة تستبدلها.</p>`;
+  const tile = (id, del) => { const a = d.assets[id]; const m = a && a.pid && PM.PHOTOLIB[a.pid]; return `<div class="ph" draggable="true" data-asset="${id}" title="${esc(m ? m.note : '')}" style="background-image:url('${PM.imgURL(d.assets, id)}')">${del ? `<button class="x" data-del="${id}">×</button>` : ''}</div>`; };
+  let subj = '';
+  const drawLib = () => {
+    const q = $('#phq', p).value.trim();
+    let ids;
+    if (q) ids = PM.photoSearch(q, 90);
+    else if (subj) ids = Object.entries(PM.PHOTOLIB).filter(([, m]) => m.subj === subj).sort((a, b) => b[1].hero - a[1].hero).map(([k]) => 'ph:' + k);
+    else ids = s ? PM.photoAlternatives(d, s, 24) : [];
+    $('#phLibG', p).innerHTML = ids.length ? ids.filter(id => d.assets[id]).map(id => tile(id)).join('') : '<p class="hint" style="grid-column:1/-1">ما لقيت صوراً بهذه الكلمة. جرّب كلمة ثانية، أو اصنعها من «توليد صورة».</p>';
+    wire($('#phLibG', p));
+  };
+  const wire = (box) => $$('.ph', box).forEach(el => {
+    el.ondragstart = e => e.dataTransfer.setData('application/x-pm-asset', el.dataset.asset);
+    el.onclick = e => {
+      if (e.target.closest('[data-del]')) { e.stopPropagation(); PM.photoLib.del(e.target.dataset.del).then(() => panePhotos(p)); return; }
+      const sel = Ed.selected();
+      Ed.placeImage(el.dataset.asset, { x: 480, y: 270 }, sel.length === 1 && sel[0].t === 'image' ? sel[0] : null);
+      if (isPhone()) $('#side').classList.remove('open');
+    };
+  });
+  let qt; $('#phq', p).oninput = () => { clearTimeout(qt); qt = setTimeout(drawLib, 180); };
+  $$('#phSubj .chip', p).forEach(b => b.onclick = () => { subj = b.dataset.sj; $$('#phSubj .chip', p).forEach(x => x.classList.toggle('on', x === b)); $('#phq', p).value = ''; drawLib(); });
+  $$('#phSug button', p).forEach(b => b.onclick = () => {
+    d.photoSug = b.dataset.v; $$('#phSug button', p).forEach(x => x.classList.toggle('on', x === b));
+    // re-pick photos that were chosen automatically
+    d.slides.forEach((sl, i) => { if (sl.spec.autoImgs && sl.spec.autoImgs.length && !sl.edited) { sl.spec.autoImgs = []; PM.relayout(d, i); } });
+    PM.commit('photosug'); UI.renderAll(); UI.toast(b.dataset.v === 'never' ? 'رجّعت صور المكتبة مكان الاقتراحات' : 'حدّثت الصور حسب الاختيار');
+  });
+  drawLib();
   const up = $('#phUp', p);
   $('input', up).onchange = async e => {
     for (const f of e.target.files) {
@@ -15504,20 +15986,10 @@ async function panePhotos(p) {
   up.addEventListener('drop', async e => { e.preventDefault(); up.classList.remove('on'); const dt = new DataTransfer(); [...e.dataTransfer.files].forEach(f => dt.items.add(f)); $('input', up).files = dt.files; $('input', up).onchange({ target: $('input', up) }); });
   const lib = await PM.photoLib.all();
   lib.forEach(r => { if (!d.assets[r.id]) d.assets[r.id] = { kind: 'image', ext: r.ext, b64: r.b64, size: r.size, lib: true }; });
-  const tile = (id, del) => `<div class="ph" draggable="true" data-asset="${id}" style="background-image:url('${PM.imgURL(d.assets, id)}')">${del ? `<button class="x" data-del="${id}">×</button>` : ''}</div>`;
   $('#phLib', p).innerHTML = lib.length ? lib.map(r => tile(r.id, true)).join('') : '<p class="hint" style="grid-column:1/-1">ما فيه صور بعد.</p>';
   const fromFile = Object.keys(d.assets).filter(k => d.assets[k].fromFile);
   $('#phFile', p).innerHTML = fromFile.length ? fromFile.map(k => tile(k)).join('') : '<p class="hint" style="grid-column:1/-1">الملف ما فيه صور.</p>';
-  $('#phStock', p).innerHTML = Object.keys(d.assets).filter(k => d.assets[k].stock).map(k => tile(k)).join('');
-  $$('.ph', p).forEach(el => {
-    el.ondragstart = e => e.dataTransfer.setData('application/x-pm-asset', el.dataset.asset);
-    el.onclick = e => {
-      if (e.target.closest('[data-del]')) { e.stopPropagation(); PM.photoLib.del(e.target.dataset.del).then(() => panePhotos(p)); return; }
-      const sel = Ed.selected();
-      Ed.placeImage(el.dataset.asset, { x: 480, y: 270 }, sel.length === 1 && sel[0].t === 'image' ? sel[0] : null);
-      if (isPhone()) $('#side').classList.remove('open');
-    };
-  });
+  wire($('#phLib', p)); wire($('#phFile', p));
 }
 UI.panePhotos = () => { if (UI.tab === 'photos') UI.renderPane(); };
 function paneNotes(p) {
@@ -15533,9 +16005,10 @@ UI.renderCtx = function () {
   const bar = $('#ctx'); if (!bar || !deck()) return;
   const sel = Ed.selected();
   let h = '';
-  const sw = (list, cur2, act) => list.map(c => `<span class="sw ${cur2 === c ? 'on' : ''}" style="background:#${c}" data-${act}="${c}"></span>`).join('');
+  const sw = (list, cur2, act) => `<button class="cb clr" data-pop="sw" data-list="${list.join(',')}" data-act="${act}" title="اللون"><span class="sw" style="background:#${cur2 || list[0]}"></span>${ic('chevron-down')}</button>`;
+  const dirBtn = `<button class="cb dirb" data-a="directive" title="اكتب ايش تبي والأداة تنفذ ( / )">${ic('wand-sparkles')}توجيه</button><span class="cbs"></span>`;
   if (!sel.length) {
-    h = `<span class="lbl">اختر عنصراً لتعديله، أو:</span><button class="cb" data-a="addText">${ic('type')}نص</button><button class="cb" data-a="addImg">${ic('image-plus')}صورة</button><button class="cb" data-a="tabIcons">${ic('shapes')}أيقونة</button><button class="cb" data-a="tabGen">${ic('wand-sparkles')}توليد صورة</button><span class="cbs"></span><button class="cb" data-a="selAll">${ic('mouse-pointer-2')}تحديد الكل</button>`;
+    h = dirBtn + `<span class="lbl">اختر عنصراً لتعديله، أو:</span><button class="cb" data-a="addText">${ic('type')}نص</button><button class="cb" data-a="addImg">${ic('image-plus')}صورة</button><button class="cb" data-a="tabIcons">${ic('shapes')}أيقونة</button><button class="cb" data-a="tabGen">${ic('wand-sparkles')}توليد صورة</button><span class="cbs"></span><button class="cb" data-a="selAll">${ic('mouse-pointer-2')}تحديد الكل</button>`;
   } else if (sel.length > 1) {
     h = `<span class="lbl"><span class="num">${sel.length}</span> عناصر</span>
       <button class="cb" data-al="r" title="محاذاة لليمين">${ic('align-horizontal-justify-end')}</button><button class="cb" data-al="c" title="توسيط أفقي">${ic('align-horizontal-justify-center')}</button><button class="cb" data-al="l" title="محاذاة لليسار">${ic('align-horizontal-justify-start')}</button>
@@ -15545,18 +16018,24 @@ UI.renderCtx = function () {
       <span class="cbs"></span><button class="cb" data-a="dup">${ic('copy')}تكرار</button><button class="cb danger" data-a="del">${ic('trash-2')}حذف</button>`;
   } else {
     const o = sel[0];
-    const common = `<span class="cbs"></span><button class="cb" data-a="front" title="للأمام">${ic('bring-to-front')}</button><button class="cb" data-a="back" title="للخلف">${ic('send-to-back')}</button><button class="cb" data-a="dup" title="تكرار (Ctrl+D)">${ic('copy')}</button><button class="cb danger" data-a="del" title="حذف">${ic('trash-2')}</button>`;
+    const more = (extra) => `<button class="cb" data-pop="more" data-extra="${extra || ''}" title="المزيد">${ic('ellipsis')}</button>`;
+    const common = `<span class="cbs"></span>${o.pin ? `<button class="cb on" data-a="pin" title="فك التثبيت">${ic('lock')}</button>` : ''}${more(o.t === 'text' ? 'text' : '')}<button class="cb danger" data-a="del" title="حذف">${ic('trash-2')}</button>`;
     if (o.t === 'text') {
       const p0 = o.paras[0] || {};
+      const painter = `<button class="cb" data-a="paint" title="ناسخ التنسيق: اضغط هنا ثم على نص ثاني">${ic('paintbrush')}</button>`;
       const al = p0.al || (o.align === 'center' ? 'c' : '');
-      h = `<span class="lbl">نص</span><button class="cb" data-a="edit">${ic('pencil')}تعديل</button><button class="cb" data-a="fs-" title="تصغير">A−</button><span class="cb v num">${Math.round(p0.size || 0)}</span><button class="cb" data-a="fs+" title="تكبير">A+</button>
-        <button class="cb ${p0.bold ? 'on' : ''}" data-a="bold" title="عريض">${ic('bold')}</button>${sw(SW_TEXT, p0.color, 'tc')}<span class="cbs"></span>
-        <button class="cb ${al === 'r' ? 'on' : ''}" data-ta="r" title="يمين">${ic('align-right')}</button><button class="cb ${al === 'c' ? 'on' : ''}" data-ta="c" title="وسط">${ic('align-center')}</button><button class="cb ${al === 'l' ? 'on' : ''}" data-ta="l" title="يسار">${ic('align-left')}</button>
-        <button class="cb ${o.paras.some(p => p.bullet) ? 'on' : ''}" data-a="bul" title="نقاط">${ic('list')}</button>${common}`;
+      const TX = PM.TextTools, k = TX.scaleOf(o), wv = p0.sw || 0;
+      h = `<span class="lbl">نص</span><button class="cb" data-a="edit">${ic('pencil')}تعديل</button><span class="cbs"></span>
+        <button class="cb" data-a="fs-" title="تصغير">A−</button><span class="rng" title="حجم هذا النص"><input type="range" id="txSize" min="0.5" max="2.2" step="0.01" value="${k.toFixed(2)}"><span class="num">${Math.round(p0.size || 0)}</span></span><button class="cb" data-a="fs+" title="تكبير">A+</button>
+        <span class="rng" title="سماكة الخط"><span class="rl">سماكة</span><input type="range" id="txW" min="0" max="2" step="0.05" value="${wv}"></span>
+        <button class="cb ${p0.bold ? 'on' : ''}" data-a="bold" title="عريض — وأثناء الكتابة: حدد كلمات واضغط B أو ⌘B">${ic('bold')}</button><button class="cb" data-a="txReset" title="إرجاع الحجم والسماكة الأصلية">${ic('rotate-ccw')}</button>${sw(SW_TEXT, p0.color, 'tc')}<span class="cbs"></span>
+        <button class="cb" data-ta="${al === 'r' || !al ? 'c' : al === 'c' ? 'l' : 'r'}" title="المحاذاة (اضغط للتبديل)">${ic(al === 'c' ? 'align-center' : al === 'l' ? 'align-left' : 'align-right')}</button>${painter}${common}`;
+    } else if (o.t === 'image' && deck().assets[o.src] && deck().assets[o.src].kind === 'sug') {
+      h = `<span class="lbl">صورة مقترحة</span><button class="cb on" data-a="gen">${ic('wand-sparkles')}اصنعها بصانع الصور</button><button class="cb" data-a="tabPhotos">${ic('images')}اختر من المكتبة</button><button class="cb" data-a="replace">${ic('image-up')}من جهازي</button><button class="cb" data-a="unsug" title="رجّع أقرب صورة من المكتبة">${ic('rotate-ccw')}صورة من المكتبة بدلها</button>${common}`;
     } else if (o.t === 'image') {
       h = `<span class="lbl">صورة</span><button class="cb" data-a="replace">${ic('image-up')}استبدال</button><button class="cb ${Ed.tool === 'focus' ? 'on' : ''}" data-a="focus">${ic('move')}تحريك داخل الإطار</button>
         <button class="cb" data-a="z-">${ic('zoom-out')}</button><span class="cb v num">${Math.round((o.zoom || 1) * 100)}%</span><button class="cb" data-a="z+">${ic('zoom-in')}</button>
-        <button class="cb ${o.r ? 'on' : ''}" data-a="round">${ic('square-round-corner')}زوايا</button><button class="cb" data-a="gen">${ic('wand-sparkles')}صورة بالذكاء الاصطناعي</button>${common}`;
+        <button class="cb ${o.r ? 'on' : ''}" data-a="round">${ic('square-round-corner')}زوايا</button><button class="cb" data-a="tabPhotos">${ic('images')}بدائل</button><button class="cb" data-a="sug" title="حط إطار «صورة مقترحة» مكانها">${ic('lightbulb')}اقترح صورة</button><button class="cb" data-a="gen">${ic('wand-sparkles')}توليد</button>${common}`;
     } else if (o.t === 'icon') {
       h = `<span class="lbl">أيقونة</span><button class="cb" data-a="icon">${ic('replace')}تغيير</button>${sw([K.NAVY, K.BLUE, K.SKY, K.WHITE, K.MUTED], o.color, 'ic')}${common}`;
     } else if (o.t === 'chart') {
@@ -15572,9 +16051,30 @@ UI.renderCtx = function () {
       h = `<span class="lbl">خط</span>${sw([K.NAVY, K.BLUE, K.SKY, K.RULE, K.WHITE], o.color, 'lc')}<button class="cb ${o.dash ? 'on' : ''}" data-a="dash">${ic('ellipsis')}متقطع</button>${common}`;
     } else h = `<span class="lbl">${esc(o.name || '')}</span>${common}`;
   }
+  if (sel.length) h = dirBtn + h;
   bar.innerHTML = h;
-  bar.onclick = ctxClick;
+  bar.onclick = e => { const pb = e.target.closest('[data-pop]'); if (pb) return ctxPop(pb); ctxClick(e); };
+  // keep the text selection alive while using the bar during editing
+  bar.onmousedown = e => { if (Ed.editing && e.target.closest('button')) e.preventDefault(); };
+  const tsz = $('#txSize', bar), tw = $('#txW', bar);
+  const live = (fn, label) => { const s = cur(); sel.filter(o => o.t === 'text').forEach(fn); s.edited = true; sel.forEach(o => { if (o.t === 'text') Ed.refreshObj(o); }); Ed.drawOverlay(); clearTimeout(UI.txT); UI.txT = setTimeout(() => { PM.commit(label); scheduleThumb(); }, 350); };
+  if (tsz) tsz.oninput = () => { const k = +tsz.value; live(o => PM.TextTools.setScale(o, k), 'size'); const v = tsz.parentElement.querySelector('.num'); if (v && sel[0]) v.textContent = Math.round(sel[0].paras[0].size); };
+  if (tw) tw.oninput = () => live(o => PM.TextTools.setWeight(o, +tw.value), 'weight');
 };
+/* small pop-over menus of the context bar (colours, more actions) */
+function ctxPop(btn) {
+  $$('.menu.cpop').forEach(m => m.remove());
+  const m = document.createElement('div'); m.className = 'menu cpop';
+  const sel = Ed.selected(), o = sel[0];
+  if (btn.dataset.pop === 'sw') m.innerHTML = `<div class="swrow">${btn.dataset.list.split(',').map(c => `<span class="sw" style="background:#${c}" data-${btn.dataset.act}="${c}" title="#${c}"></span>`).join('')}</div>`;
+  else m.innerHTML = (btn.dataset.extra === 'text' ? `<button data-a="bul">${ic('list')}${o && o.paras.some(p => p.bullet) ? 'بدون نقاط' : 'نقاط'}</button>` : '')
+    + `<button data-a="pin">${ic('lock')}${o && o.pin ? 'فك التثبيت' : 'تثبيت مكانه'}</button><button data-a="dup">${ic('copy')}تكرار<span class="k">Ctrl+D</span></button><button data-a="front">${ic('bring-to-front')}للأمام<span class="k">]</span></button><button data-a="back">${ic('send-to-back')}للخلف<span class="k">[</span></button>`;
+  const r = btn.getBoundingClientRect();
+  m.style.position = 'fixed'; m.style.top = (r.bottom + 6) + 'px'; m.style.left = Math.max(8, Math.min(innerWidth - 240, r.left + r.width / 2 - 110)) + 'px'; m.style.insetInlineStart = 'auto'; m.style.minWidth = '200px';
+  document.body.appendChild(m);
+  m.onclick = e => { const b = e.target.closest('[data-a],[data-tc],[data-fc],[data-ic],[data-lc]'); if (!b) return; m.remove(); ctxClick({ target: b }); };
+  setTimeout(() => document.addEventListener('pointerdown', function h(ev) { if (!m.contains(ev.target)) { m.remove(); document.removeEventListener('pointerdown', h); } }), 0);
+}
 function ctxClick(e) {
   const b = e.target.closest('[data-a],[data-al],[data-tc],[data-fc],[data-ic],[data-lc],[data-ta],[data-ck],[data-tst]'); if (!b) return;
   const s = cur(), sel = Ed.selected();
@@ -15590,22 +16090,35 @@ function ctxClick(e) {
   if (ds.tst) { sel[0].style = ds.tst; return done('tablestyle'); }
   const a = ds.a;
   if (a === 'del') return Ed.del();
+  if (a === 'directive') return PM.Brain.directive();
+  if (a === 'pin') { sel.forEach(o => o.pin = !o.pin); s.edited = true; PM.commit('pin'); Ed.drawOverlay(); UI.renderCtx(); UI.toast(sel[0].pin ? 'ثبّته مكانه 🔒' : 'فكيت التثبيت'); return; }
+  if (a === 'paint') {
+    const src = sel[0]; const st = src.paras.map(p => ({ size: p.size, color: p.color, bold: p.bold, sw: p.sw || 0, al: p.al, font: p.font, lh: p.lh, track: p.track, caps: p.caps }));
+    document.body.classList.add('painting');
+    UI.toast('اضغط على النص اللي تبي تنسخ له التنسيق');
+    Ed.painter = (t) => { if (t.t !== 'text') return; t.paras.forEach((p, i) => Object.assign(p, st[Math.min(i, st.length - 1)])); t.align = src.align; PM.TextTools.fitH(t); cur().edited = true; PM.commit('paint'); ST.sel = new Set([t.id]); Ed.render(); UI.renderCtx(); UI.toast('نسخت التنسيق ✓'); };
+    return;
+  }
   if (a === 'dup') return Ed.pasteObjs(JSON.parse(JSON.stringify(sel)));
   if (a === 'front') return Ed.zorder('front');
   if (a === 'back') return Ed.zorder('back');
   if (a === 'edit') return Ed.startEdit(sel[0], true);
   if (a === 'fs+' || a === 'fs-') {
     const k = a === 'fs+' ? 1.08 : 1 / 1.08;
-    sel.forEach(o => { if (o.t === 'text') { o.paras.forEach(p => { p.size = Math.max(6, Math.round(p.size * k * 4) / 4); p.sa = (p.sa || 0) * k; p.sb = (p.sb || 0) * k; }); o.h = Math.max(o.h, PM.blockH(o.paras, o.w) + 1); } if (o.t === 'table') o.fs = Math.max(7, (o.fs || 11) * k); });
+    sel.forEach(o => { if (o.t === 'text') { PM.TextTools.setScale(o, PM.TextTools.scaleOf(o) * k); } if (o.t === 'table') o.fs = Math.max(7, (o.fs || 11) * k); });
     return done('size');
   }
-  if (a === 'bold') { const v = !sel[0].paras[0].bold; sel[0].paras.forEach(p => p.bold = v); return done('bold'); }
+  if (a === 'bold') { if (PM.TextTools.boldSelection()) return; const v = !sel[0].paras[0].bold; sel.filter(o => o.t === 'text').forEach(o => o.paras.forEach(p => p.bold = v)); sel.forEach(o => o.t === 'text' && PM.TextTools.fitH(o)); return done('bold'); }
+  if (a === 'txReset') { sel.filter(o => o.t === 'text').forEach(o => PM.TextTools.reset(o)); return done('txreset'); }
   if (a === 'bul') { const o = sel[0]; const on = o.paras.some(p => p.bullet); o.paras.forEach(p => { p.bullet = on ? null : 'dot'; p.bc = p.bc || K.BLUE; }); return done('bullets'); }
   if (a === 'replace') return pickImageFor(sel[0]);
   if (a === 'focus') { Ed.tool = Ed.tool === 'focus' ? null : 'focus'; UI.renderCtx(); if (Ed.tool) UI.toast('اسحب داخل الصورة لتحريكها في إطارها'); return; }
   if (a === 'z+' || a === 'z-') { const o = sel[0]; o.zoom = PM.clamp((o.zoom || 1) + (a === 'z+' ? 0.15 : -0.15), 1, 4); return done('zoom'); }
   if (a === 'round') { sel.forEach(o => o.r = o.r ? 0 : 14); return done('round'); }
-  if (a === 'gen') { UI.tab = 'gen'; $$('#tabs button').forEach(x => x.classList.toggle('on', x.dataset.t === 'gen')); UI.renderPane(); if (isPhone()) $('#side').classList.add('open'); return; }
+  if (a === 'tabPhotos') { UI.tab = 'photos'; $$('#tabs button').forEach(x => x.classList.toggle('on', x.dataset.t === 'photos')); UI.renderPane(); if (isPhone()) $('#side').classList.add('open'); return; }
+  if (a === 'sug') { const o = sel[0]; const i = o.bindImg ? +o.bindImg.split('.')[1] : 0; o.src = PM.suggestPhoto(deck(), s, i, null, PM.specText(s.spec)); if (o.bindImg) { s.spec.autoImgs = s.spec.autoImgs || []; s.spec.autoImgs[i] = o.src; } return done('sug'); }
+  if (a === 'unsug') { const o = sel[0]; const i = o.bindImg ? +o.bindImg.split('.')[1] : 0; const m = deck().photoSug; deck().photoSug = 'never'; const id = PM.photoPick(deck(), s, i); deck().photoSug = m; o.src = id; if (o.bindImg) { s.spec.autoImgs = s.spec.autoImgs || []; s.spec.autoImgs[i] = id; } return done('unsug'); }
+  if (a === 'gen') { if (sel[0] && sel[0].t === 'image') { const sa = deck().assets[sel[0].src]; PM.IG && (PM.IG.seed = sa && sa.kind === 'sug' ? sa.prompt : null); } UI.tab = 'gen'; $$('#tabs button').forEach(x => x.classList.toggle('on', x.dataset.t === 'gen')); UI.renderPane(); if (isPhone()) $('#side').classList.add('open'); return; }
   if (a === 'icon') return iconPicker(sel[0]);
   if (a === 'stroke') { sel.forEach(o => { o.stroke = o.stroke ? null : K.RULE; o.sw = 1; }); return done('stroke'); }
   if (a === 'dash') { sel.forEach(o => o.dash = !o.dash); return done('dash'); }
@@ -15799,7 +16312,10 @@ function checkDeck() {
   const body = issues.length
     ? issues.map(x => `<div class="issue"><i class="dot ${x.level}"></i><div><b>${esc(x.t)}</b><span>${esc(x.d || '')}</span></div><button class="btn sec" data-go="${x.i}" style="height:34px">افتح</button></div>`).join('')
     : `<div class="issue"><i class="dot ok"></i><div><b>كل شي سليم ✓</b><span>ما لقيت نصوص متراكبة ولا محتوى مخفي ولا مشاكل في الأسماء المعتمدة.</span></div></div>`;
-  UI.modal(`فحص العرض <span class="num" style="font-size:13px;color:var(--muted);font-weight:400">${issues.length}</span>`, body);
+  const term = issues.some(x => /الصالة الجنوبية|صالات الحج والعمرة/.test(x.t));
+  UI.modal(`فحص العرض <span class="num" style="font-size:13px;color:var(--muted);font-weight:400">${issues.length}</span>`, body, { foot: (term ? `<button class="btn pri" id="ckTerm">${ic('badge-check')}صحّح أسماء الصالات</button>` : '') + `<button class="btn sec" id="ckRev">${ic('scan-eye')}رأي الأداة في كل الشرائح</button>` });
+  const tb = $('#ckTerm'); if (tb) tb.onclick = () => { const n = PM.Brain.fixTerminals(); UI.closeModal(); UI.toast(`✓ صححت ${n} اسم حسب التوجيه`); };
+  $('#ckRev').onclick = () => { UI.closeModal(); PM.Brain.reviewAll(); };
   $$('#modal [data-go]').forEach(b => b.onclick = () => { UI.closeModal(); UI.select(+b.dataset.go); });
 }
 
@@ -16117,7 +16633,9 @@ let lastSlide = null;
 IG.mount = function (pane) {
   load();
   const s = PM.ST.deck.slides[PM.ST.cur];
-  if (lastSlide !== s.id) { lastSlide = s.id; ST.idea = slideIdea(); const f = frameSize(targetFrame()); if (f) { ST.size = 'custom'; ST.cw = String(f.w); ST.ch = String(f.h); } else ST.size = '169'; }
+  const fr = targetFrame(); const fa = fr && PM.ST.deck.assets[fr.src];
+  if (fa && fa.kind === 'sug' && IG.seedFor !== fr.id) { IG.seedFor = fr.id; lastSlide = s.id; ST.idea = fa.note + ' — ' + fa.prompt; const f = frameSize(fr); if (f) { ST.size = 'custom'; ST.cw = String(f.w); ST.ch = String(f.h); } }
+  else if (lastSlide !== s.id) { lastSlide = s.id; ST.idea = slideIdea(); const f = frameSize(targetFrame()); if (f) { ST.size = 'custom'; ST.cw = String(f.w); ST.ch = String(f.h); } else ST.size = '169'; }
   render(pane);
 };
 const ic = n => PM.UI.ic(n);
@@ -16176,6 +16694,812 @@ function render(pane){
   dz.addEventListener('dragleave', () => dz.classList.remove('on'));
   dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('on'); take(e.dataTransfer.files[0]); });
 }
+})(window.PM);
+
+/* ---- 38_dock.js ---- */
+/* ==========================================================================
+   صانع العروض 2 — layout dock (right side)
+   Every design that fits this slide, rendered with the slide's own content.
+   Hover magnifies like the macOS dock and previews the design on the stage;
+   a click applies it.
+   ========================================================================== */
+(function (PM) {
+'use strict';
+const ST = PM.ST;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const D = PM.Dock = { fam: '', tone: null, all: false, key: '' };
+const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { } };
+
+D.mount = function () {
+  const host = $('#dock'); if (!host) return;
+  host.innerHTML = `<div class="dk-h"><b>التصاميم</b><span class="num" id="dkN"></span><button class="dk-x" id="dkMin" title="إخفاء الدك">${PM.UI.ic('panel-right-close')}</button></div>
+    <div class="dk-f"><div class="seg sm" id="dkTone"><button data-v="light">فاتح</button><button data-v="dark">داكن</button></div><select id="dkFam" class="dk-sel"></select></div>
+    <label class="dk-all"><input type="checkbox" id="dkAll"> كل المكتبة</label>
+    <div class="dk-list" id="dkList"></div>`;
+  $('#dkMin').onclick = () => D.toggle(false);
+  $('#dkOpen').onclick = () => D.toggle(true);
+  $$('#dkTone button').forEach(b => b.onclick = () => { D.tone = b.dataset.v; D.key = ''; D.render(); });
+  $('#dkFam').onchange = e => { D.fam = e.target.value; D.key = ''; D.render(); };
+  $('#dkAll').onchange = e => { D.all = e.target.checked; D.key = ''; D.render(); };
+  const list = $('#dkList');
+  // macOS-dock magnification
+  list.addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse') return;
+    const tiles = $$('.dk-t', list);
+    for (const t of tiles) {
+      const r = t.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) continue;
+      const d = Math.abs(e.clientY - (r.top + r.height / 2));
+      const k = 1 + 0.42 * Math.max(0, 1 - d / 170);
+      t.style.transform = `scale(${k.toFixed(3)})`; t.style.zIndex = Math.round(k * 100);
+    }
+  });
+  list.addEventListener('pointerleave', () => { $$('.dk-t', list).forEach(t => { t.style.transform = ''; t.style.zIndex = ''; }); D.endPreview(); });
+  list.addEventListener('scroll', () => D.endPreview(), { passive: true });
+  D.toggle(lsGet('pm.dock') !== '0', true);
+};
+D.toggle = function (on, quiet) {
+  document.body.classList.toggle('dock-off', !on);
+  if (!quiet) lsSet('pm.dock', on ? '1' : '0');
+  setTimeout(() => { PM.Ed.fit(); if (on) { D.key = ''; D.render(); } }, 30);
+};
+
+function specKey(s, tone) { return s.id + '|' + tone + '|' + D.fam + '|' + D.all + '|' + JSON.stringify(s.spec).length + ':' + JSON.stringify(s.spec).slice(0, 400) + '|' + s.layout; }
+D.render = function () {
+  const host = $('#dock'); const d = ST.deck, s = d && d.slides[ST.cur];
+  if (!host || !s || document.body.classList.contains('dock-off') || innerWidth <= 860) return;
+  const tone = D.tone || s.tone || (d.dark ? 'dark' : 'light');
+  $$('#dkTone button').forEach(b => b.classList.toggle('on', b.dataset.v === tone));
+  const key = specKey(s, tone);
+  if (key === D.key) { $$('.dk-t', host).forEach(t => t.classList.toggle('on', t.dataset.id === s.layout)); return; }
+  D.key = key;
+  const c = PM.slideCtx(d, ST.cur); c.dark = tone === 'dark'; c.tone = PM.tone(c.dark, d.grey);
+  const sp = PM.shape(s.spec);
+  const kind = s.spec.kind;
+  const fits = L => { if (L.kinds ? !L.kinds.includes(kind) : kind !== 'content') return 0; try { return L.accepts(sp, c) || 0; } catch (e) { return 0; } };
+  let list = PM.LIB.filter(L => L.tones.includes(tone)).map(L => ({ L, f: fits(L) }));
+  if (!D.all) list = list.filter(x => x.f > 0);
+  const fams = {}; list.forEach(x => fams[x.L.fam] = (fams[x.L.fam] || 0) + 1);
+  $('#dkFam').innerHTML = `<option value="">كل الأنواع (${list.length})</option>` + Object.keys(fams).map(f => `<option value="${f}" ${D.fam === f ? 'selected' : ''}>${(PM.UI.FAM_AR[f] || f)} (${fams[f]})</option>`).join('');
+  if (D.fam && !fams[D.fam]) D.fam = '';
+  if (D.fam) list = list.filter(x => x.L.fam === D.fam);
+  list.sort((a, b) => (b.f > 0) - (a.f > 0) || b.f - a.f);
+  $('#dkN').textContent = list.length;
+  const box = $('#dkList');
+  box.innerHTML = '';
+  if (D.io) D.io.disconnect();
+  const W = 116;
+  D.io = new IntersectionObserver(ents => ents.forEach(en => {
+    if (!en.isIntersecting) return;
+    const el = en.target; D.io.unobserve(el);
+    const L = PM.layoutById(el.dataset.id);
+    const r = PM.UI.preview(el.querySelector('.h'), L, tone, W);
+    if (r && r.missing && r.missing.length) { el.classList.add('bad'); el.title = L.name + ' — يخفي جزءاً من المحتوى'; }
+  }), { root: box, rootMargin: '300px' });
+  for (const { L, f } of list) {
+    const el = document.createElement('div');
+    el.className = 'dk-t' + (L.id === s.layout ? ' on' : '') + (f ? '' : ' nf');
+    el.dataset.id = L.id; el.title = L.name;
+    el.innerHTML = `<div class="h" style="width:${W}px;height:${W * 9 / 16}px"></div><span class="cap">${PM.esc(L.name)}</span>`;
+    el.onclick = () => {
+      D.endPreview(true);
+      if (!f && !confirm('هذا التصميم مو مصمم لهذا النوع من المحتوى، ممكن يخفي جزءاً منه. تبيه؟')) return;
+      if (el.classList.contains('bad') && f && !confirm('هذا التصميم يخفي جزءاً من محتوى الشريحة. تبيه مع ذلك؟')) return;
+      const sl = ST.deck.slides[ST.cur]; sl.tone = tone;
+      PM.UI.applyLayoutId(L.id);
+    };
+    el.onpointerenter = e => { if (e.pointerType !== 'mouse') return; clearTimeout(D.pt); D.pt = setTimeout(() => D.preview(L, tone), 380); };
+    el.onpointerleave = () => clearTimeout(D.pt);
+    box.appendChild(el);
+    D.io.observe(el);
+  }
+  if (!list.length) box.innerHTML = '<p class="hint" style="padding:14px">ما فيه تصاميم بهذا الفلتر</p>';
+  const on = $('.dk-t.on', box); if (on) on.scrollIntoView({ block: 'center' });
+};
+/* hover → the stage shows the design with the slide's content (nothing is applied) */
+D.preview = function (L, tone) {
+  const d = ST.deck, s = d.slides[ST.cur], Ed = PM.Ed;
+  if (!s || Ed.editing) return;
+  const spec = JSON.parse(JSON.stringify(s.spec));
+  const c = PM.slideCtx(d, ST.cur); c.dark = tone === 'dark'; c.tone = PM.tone(c.dark, d.grey);
+  const fake = { id: s.id, spec }; c.photoFor = (sp, i) => PM.autoPhoto(d, fake, i);
+  const r = PM.renderLayout(L, spec, c);
+  PM.renderSlide(Ed.stage, PM.explodeText(r.objs), d.assets, {});
+  Ed.ov.innerHTML = `<div class="dk-pv">معاينة: ${PM.esc(L.name)} — اضغط لتطبيقه</div>`;
+  D.previewing = true;
+};
+D.endPreview = function (skipRender) {
+  clearTimeout(D.pt);
+  if (!D.previewing) return;
+  D.previewing = false;
+  if (!skipRender) PM.Ed.render();
+};
+})(window.PM);
+
+/* ---- 39_brain.js ---- */
+/* ==========================================================================
+   صانع العروض 2 — the tool's brain
+   · «توجيه»: select anything (or nothing = the whole slide), write what you
+     want; the tool does it itself, or prepares one Copilot paste for wording
+   · «رأي الأداة»: an honest review of the slide with one-click fixes
+   · «قصة العرض»: the deck as a story, and a better story for a stated goal
+   · find & replace, approved terminal names, format painter, pin
+   ========================================================================== */
+(function (PM) {
+'use strict';
+const ST = PM.ST, K = PM.K;
+const B = PM.Brain = {};
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = PM.esc;
+const deck = () => ST.deck;
+const cur = () => ST.deck && ST.deck.slides[ST.cur];
+const ic = n => PM.UI.ic(n);
+const plain = t => PM.plain(t);
+const words = t => PM.words(plain(t));
+const nrm = t => String(t || '').replace(/[ً-ْـ]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase();
+const en = () => deck() && deck().lang === 'en';
+
+/* ======================================================================
+   slide ⇄ plain text (what Copilot reads and writes back)
+   ====================================================================== */
+const SEC = { items: 'بنود', kpis: 'أرقام', steps: 'مراحل', timeline: 'خط زمني', bullets: 'نقاط', para: 'فقرة', quote: 'اقتباس', compare: 'مقارنة', table: 'جدول', chart: 'رسم بياني' };
+const SEC_EN = { items: 'items', kpis: 'numbers', steps: 'steps', timeline: 'timeline', bullets: 'bullets', para: 'paragraph', quote: 'quote', compare: 'compare', table: 'table', chart: 'chart' };
+PM.slideToText = function (spec) {
+  const L = [];
+  if (spec.title) L.push('العنوان: ' + plain(spec.title));
+  if (spec.sub) L.push('العنوان الفرعي: ' + plain(spec.sub));
+  for (const b of spec.blocks || []) {
+    L.push('[' + (SEC[b.k] || b.k) + ']' + (b.head ? ' ' + plain(b.head) : ''));
+    if (b.k === 'items') b.items.forEach(it => { L.push('- ' + [it.value, it.title].filter(Boolean).map(plain).join(' ') + (it.text ? ' :: ' + plain(it.text) : '')); (it.bullets || []).forEach(x => L.push('  * ' + plain(x))); });
+    else if (b.k === 'kpis') b.items.forEach(it => L.push('- ' + plain(it.value) + ' :: ' + plain(it.label || '') + (it.text ? ' :: ' + plain(it.text) : '')));
+    else if (b.k === 'steps') b.items.forEach((it, i) => L.push((i + 1) + '. ' + plain(it.title || '') + (it.text ? ' :: ' + plain(it.text) : '')));
+    else if (b.k === 'timeline') b.items.forEach(it => L.push('- ' + plain(it.date || '') + ' :: ' + plain(it.title || '') + (it.text ? ' :: ' + plain(it.text) : '')));
+    else if (b.k === 'bullets') b.items.forEach(t => L.push('- ' + plain(t)));
+    else if (b.k === 'para') L.push(plain(b.text));
+    else if (b.k === 'quote') L.push(plain(b.text) + (b.by ? ' :: ' + plain(b.by) : ''));
+    else if (b.k === 'compare') { L.push('# ' + plain(b.a.title || '')); b.a.items.forEach(t => L.push('- ' + plain(t))); L.push('# ' + plain(b.b.title || '')); b.b.items.forEach(t => L.push('- ' + plain(t))); }
+    else if (b.k === 'table') b.rows.forEach(r => L.push(r.map(plain).join(' | ')));
+    else if (b.k === 'chart') { const c = b.chart; L.push('الوحدة: ' + (c.unit || '')); c.cats.forEach((cat, i) => L.push(cat + ' | ' + c.series.map(x => x.vals[i]).join(' | '))); }
+  }
+  return L.join('\n');
+};
+PM.textToSpec = function (txt, base) {
+  const spec = JSON.parse(JSON.stringify(base || { kind: 'content', title: '', sub: '', blocks: [], imgs: [] }));
+  const lines = String(txt).replace(/\r/g, '').split('\n').map(l => l.replace(/\s+$/, '')).filter(l => l.trim() && !/^```/.test(l.trim()));
+  const kindOf = name => { const n = nrm(name).trim(); for (const [k, v] of Object.entries(SEC)) if (n.startsWith(nrm(v))) return k; for (const [k, v] of Object.entries(SEC_EN)) if (n.startsWith(v)) return k; return null; };
+  let blocks = [], b = null, cmpSide = null, title = null, sub = null;
+  const split = l => l.split(/\s*::\s*/);
+  for (const raw of lines) {
+    const l = raw.trim();
+    let m;
+    if ((m = l.match(/^(العنوان الفرعي|subtitle)\s*[:：]\s*(.*)$/i))) { sub = m[2].trim(); continue; }
+    if ((m = l.match(/^(العنوان|title)\s*[:：]\s*(.*)$/i))) { title = m[2].trim(); continue; }
+    if ((m = l.match(/^\[([^\]]+)\]\s*(.*)$/))) { const k = kindOf(m[1]); b = k ? { k } : { k: 'para', text: '' }; if (m[2]) b.head = m[2].trim(); blocks.push(b); cmpSide = null; continue; }
+    if (!b) { b = { k: 'para', text: '' }; blocks.push(b); }
+    const body = l.replace(/^(-|\*|•|\d+[.)])\s*/, '');
+    if (b.k === 'items') {
+      if (/^\s{2,}\*|^\*/.test(raw) && b.items && b.items.length) { const it = b.items[b.items.length - 1]; (it.bullets = it.bullets || []).push(body); continue; }
+      const [t, x] = split(body); (b.items = b.items || []).push({ title: t || '', text: x || '' });
+    } else if (b.k === 'kpis') { const [v, lab, x] = split(body); (b.items = b.items || []).push({ value: v || '', label: lab || '', text: x || '' }); }
+    else if (b.k === 'steps') { const [t, x] = split(body); (b.items = b.items || []).push({ title: t || '', text: x || '' }); }
+    else if (b.k === 'timeline') { const [dte, t, x] = split(body); (b.items = b.items || []).push({ date: dte || '', title: t || '', text: x || '' }); }
+    else if (b.k === 'bullets') (b.items = b.items || []).push(body);
+    else if (b.k === 'quote') { const [t, by] = split(body); b.text = t; if (by) b.by = by; }
+    else if (b.k === 'compare') {
+      if (/^#/.test(l)) { cmpSide = !b.a ? 'a' : 'b'; b[cmpSide] = { title: l.replace(/^#+\s*/, ''), items: [] }; continue; }
+      if (!cmpSide) { cmpSide = 'a'; b.a = { title: '', items: [] }; }
+      b[cmpSide].items.push(body);
+    } else if (b.k === 'table') (b.rows = b.rows || []).push(l.split(/\s*\|\s*/));
+    else if (b.k === 'chart') {
+      if ((m = l.match(/^(الوحدة|unit)\s*[:：]\s*(.*)$/i))) { b._unit = m[2]; continue; }
+      const parts = l.split(/\s*\|\s*/); (b._rows = b._rows || []).push(parts);
+    } else b.text = (b.text ? b.text + '\n' : '') + body;
+  }
+  blocks = blocks.map(x => {
+    if (x.k === 'chart') { const rows = x._rows || []; const ns = Math.max(1, ...rows.map(r => r.length - 1)); return { k: 'chart', head: x.head, chart: { kind: (base && base.blocks && (base.blocks.find(bb => bb.k === 'chart') || {}).chart || {}).kind || 'col', cats: rows.map(r => r[0]), series: Array.from({ length: ns }, (_, si) => ({ name: '', vals: rows.map(r => parseFloat(PM.digits(r[si + 1] || '0').replace(/,/g, '')) || 0) })), unit: x._unit || '' } }; }
+    if (x.k === 'compare') { x.a = x.a || { title: '', items: [] }; x.b = x.b || { title: '', items: [] }; }
+    return x;
+  }).filter(x => (x.items && x.items.length) || x.text || x.rows || x.chart || x.a);
+  if (title != null) spec.title = title;
+  if (sub != null) spec.sub = sub;
+  if (blocks.length) spec.blocks = blocks;
+  return spec;
+};
+
+/* ======================================================================
+   Copilot: one copy, one paste
+   ====================================================================== */
+B.copy = async function (txt) {
+  try { await navigator.clipboard.writeText(txt); } catch (e) { const t = document.createElement('textarea'); t.value = txt; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
+  PM.UI.toast('نسخت الطلب ✓ الصقه في Copilot');
+};
+const RULES = `قواعد مطارات جدة: لا تذكر «الصالة الشمالية». «الصالة الجنوبية» اسمها «الصالة 4». «صالات الحج والعمرة» اسمها «الصالة 3ب (مجمع صالات الحج والعمرة)». حافظ على كل الأرقام كما هي إلا لو طلب التوجيه غير ذلك.`;
+B.copilotModal = function (title, prompt, placeholder, onApply) {
+  const body = `<div class="note">${ic('sparkles')} نسخة وحدة ولصقة وحدة. الرد يرجع بنفس الصيغة وتطبّقه الأداة بنفسها.</div>
+    <h4 style="margin:14px 0 8px">١ · انسخ الطلب والصقه في Copilot</h4>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" id="bcCopy">${ic('copy')}نسخ الطلب</button><a class="btn sec" href="https://m365.cloud.microsoft/chat" target="_blank" rel="noopener" data-needs-online>${ic('external-link')}افتح Copilot</a><button class="btn sec" id="bcShow">${ic('eye')}اعرض الطلب</button></div>
+    <pre class="bc-pre hide" id="bcPre">${esc(prompt)}</pre>
+    <h4 style="margin:16px 0 8px">٢ · الصق رد Copilot هنا</h4>
+    <textarea class="inp" id="bcIn" style="min-height:160px" placeholder="${esc(placeholder || '')}"></textarea>`;
+  PM.UI.modal(title, body, { foot: '<button class="btn pri" id="bcApply">طبّق الرد</button>' });
+  $('#bcCopy').onclick = () => B.copy(prompt);
+  $('#bcShow').onclick = () => $('#bcPre').classList.toggle('hide');
+  $('#bcApply').onclick = () => { const v = $('#bcIn').value.trim(); if (!v) { PM.UI.toast('الصق رد Copilot أولاً'); return; } const ok = onApply(v); if (ok !== false) PM.UI.closeModal(); };
+};
+
+/* ======================================================================
+   «توجيه» — instructions in plain Arabic (or English)
+   ====================================================================== */
+const has = (t, re) => re.test(t);
+const COLORS = [[/كحلي|navy/, K.NAVY], [/سماوي|ازرق فاتح|sky|light blue/, K.SKY], [/ازرق|blue/, K.BLUE], [/ابيض|white/, K.WHITE], [/رمادي|grey|gray/, K.MUTED], [/اسود|black/, K.INK]];
+const FORMS = [[/ارقام|مؤشرات|kpi|numbers/, 'kpis'], [/خط زمني|جدول زمني|timeline/, 'timeline'], [/مراحل|خطوات|steps|process/, 'steps'], [/نقاط|bullet/, 'bullets'], [/بطاقات|بنود|كروت|cards|items/, 'items'], [/فقره|نص متصل|paragraph/, 'para'], [/شارت|رسم بياني|chart|graph/, 'chart']];
+function targetsFor(t, sel, s) {
+  if (sel.length) return sel;
+  const texts = s.objs.filter(o => o.t === 'text' && !o.pageNum && o.role !== 'chrome');
+  if (has(t, /عنوان|title/)) return texts.filter(o => o.paras.some(p => p.bind === 'title'));
+  if (has(t, /ارقام|الرقم|numbers?/)) return texts.filter(o => o.paras.some(p => p.font === 'num'));
+  if (has(t, /الايقونات|ايقونه|icons?/)) return s.objs.filter(o => o.t === 'icon');
+  if (has(t, /الصور|صوره|photo|image/)) return s.objs.filter(o => o.t === 'image' && o.role !== 'tplbg');
+  if (has(t, /النص|الكلام|text/)) return texts.filter(o => !o.paras.some(p => p.bind === 'title'));
+  return texts;
+}
+const AI_RE = /اختصر|لخص|صياغ|صيغ|اعد كتابه|اكتب|حسن الكلام|حسن النص|ترجم|زود|اضف نقطه|اضف بند|وضح|بسط|rewrite|shorten|summar|translate|improve the text|add a point|simplify/;
+B.local = function (raw, sel) {
+  const d = deck(), s = cur(); if (!s) return { ok: false };
+  const t = nrm(raw).replace(/\s+/g, ' ').trim();
+  const Ed = PM.Ed, UI = PM.UI;
+  const done = (msg, label, relaid) => { s.edited = !relaid; PM.commit(label || 'directive'); if (relaid) UI.renderAll(); else { Ed.render(); UI.renderCtx(); PM.emit('change'); } return { ok: true, msg }; };
+  if (AI_RE.test(t)) return { ok: false, ai: true };
+  // title text: «العنوان: …» / «غير العنوان إلى …»
+  let m = raw.match(/^\s*(?:العنوان|title)\s*[:：]\s*(.+)$/i) || raw.match(/(?:غير|غيّر|خل|خلي|اجعل)\s+العنوان\s+(?:إلى|الى|ل|يكون)?\s*[«"']?(.+?)[»"']?\s*$/);
+  if (m) { s.spec.title = m[1].trim(); s.objs.forEach(o => { if (o.t === 'text') o.paras.forEach(p => { if (p.bind === 'title') p.t = s.spec.title; }); }); return done('غيّرت العنوان', 'title'); }
+  const much = has(t, /كثير|جدا|مره|اكثر بكثير|much|a lot/) ? 1.3 : has(t, /شوي|قليل|بسيط|شوية|slightly|a bit|little/) ? 1.06 : 1.15;
+  const tg = targetsFor(t, sel, s);
+  const tx = tg.filter(o => o.t === 'text');
+  if (has(t, /صوره مقترحه|اقترح صوره|suggest(ed)? (a )?photo/)) {
+    const imgs = s.objs.filter(o => o.t === 'image' && o.role !== 'tplbg' && (!sel.length || sel.includes(o)));
+    if (!imgs.length) return B.photoLayout(true);
+    imgs.forEach((o, k) => { o.src = PM.suggestPhoto(d, s, o.bindImg ? +o.bindImg.split('.')[1] : k, null, PM.specText(s.spec)); });
+    return done('حطيت «صورة مقترحة» مكان الصور', 'sug');
+  }
+  if (has(t, /(اضف|حط|ابي|ابغى|ابغا|مع|بدون|add|with|use).{0,12}(صوره|photo|image)/) && !has(t, /بدون صوره|without/)) return B.photoLayout(false);
+  if (has(t, /(كبر|اكبر|تكبير|bigger|larger|increase|enlarge)/) && tx.length) { tx.forEach(o => PM.TextTools.setScale(o, PM.TextTools.scaleOf(o) * much)); return done('كبّرت ' + (tx.length > 1 ? tx.length + ' نصوص' : 'النص'), 'size'); }
+  if (has(t, /(صغر|اصغر|تصغير|smaller|decrease|reduce)/) && tx.length) { tx.forEach(o => PM.TextTools.setScale(o, PM.TextTools.scaleOf(o) / much)); return done('صغّرت ' + (tx.length > 1 ? tx.length + ' نصوص' : 'النص'), 'size'); }
+  if (has(t, /(اسمك|اثقل|اعرض الخط|ثخن|thicker|heavier)/) && tx.length) { tx.forEach(o => PM.TextTools.setWeight(o, Math.min(2, (o.paras[0].sw || 0) + 0.5))); return done('زدت سماكة الخط', 'weight'); }
+  if (has(t, /(انحف|اخف|thinner|lighter weight)/) && tx.length) { tx.forEach(o => PM.TextTools.setWeight(o, Math.max(0, (o.paras[0].sw || 0) - 0.5))); return done('خففت سماكة الخط', 'weight'); }
+  if (has(t, /(بدون|شيل|ازل).{0,6}(عريض|bold)/) && tx.length) { tx.forEach(o => o.paras.forEach(p => { p.bold = false; p.t = plain(p.t); })); return done('شلت العريض', 'bold'); }
+  if (has(t, /(عريض|bold)/) && tx.length) { tx.forEach(o => o.paras.forEach(p => p.bold = true)); tx.forEach(o => PM.TextTools.fitH(o)); return done('خليته عريض', 'bold'); }
+  const col = COLORS.find(([re]) => re.test(t));
+  if (col && has(t, /(لون|خل|خلي|اجعل|colou?r|make)/) && tg.length && !has(t, /(الشريحه|الخلفيه|slide|background)/)) {
+    tg.forEach(o => { if (o.t === 'text') o.paras.forEach(p => p.color = col[1]); else if (o.t === 'icon' || o.t === 'line') o.color = col[1]; else if (o.t === 'rect' || o.t === 'ellipse') { o.fill = col[1]; o.grad = null; } });
+    return done('غيّرت اللون', 'color');
+  }
+  if (has(t, /(داكن|غامق|كحلي|dark)/) && !has(t, /(نص|لون|text|colou?r)/)) return B.setTone('dark');
+  if (has(t, /(فاتح|ابيض|light)/) && has(t, /(خل|خلي|اجعل|خليها|الشريحه|make|slide)/) && !has(t, /(نص|لون|text|colou?r)/)) return B.setTone('light');
+  if (has(t, /(يمين|right)/) && has(t, /(محاذا|اليمين|align|خل)/) && tx.length) { tx.forEach(o => { o.align = 'start'; o.paras.forEach(p => p.al = 'r'); }); return done('حاذيت لليمين', 'align'); }
+  if (has(t, /(يسار|left)/) && has(t, /(محاذا|اليسار|align|خل)/) && tx.length) { tx.forEach(o => { o.align = 'start'; o.paras.forEach(p => p.al = 'l'); }); return done('حاذيت لليسار', 'align'); }
+  if (has(t, /(وسط|توسيط|center|centre)/) && tx.length) { tx.forEach(o => { o.align = 'center'; o.paras.forEach(p => p.al = 'c'); }); return done('وسّطت النص', 'align'); }
+  const form = FORMS.find(([re]) => re.test(t));
+  if (form && has(t, /(حول|خل|خلي|اعرض|اجعل|بشكل|ك|convert|make|show|as)/)) {
+    const before = JSON.stringify(s.spec);
+    if (!PM.reshape(s.spec, form[1])) return { ok: true, msg: 'هذا المحتوى ما يتحول لهذا الشكل بدون تغيير الكلام — جرّب «اسأل كوبايلوت»', warn: true };
+    s.layout = null; PM.autoSlide(d, ST.cur); PM.renumber(d);
+    if (JSON.stringify(s.spec) === before) return { ok: true, msg: 'المحتوى أصلاً بهذا الشكل' };
+    return done('حوّلت المحتوى', 'reshape', true);
+  }
+  if (has(t, /(قسم|قسمها|افصل|split)/)) return B.split(ST.cur);
+  if (has(t, /(تصميم ثاني|تصميم اخر|غير التصميم|بديل|another|different)/)) { PM.UI.cycle(1); return { ok: true, msg: 'غيّرت التصميم' }; }
+  if (has(t, /(رتب|نظم|وزع|توزيع|tidy|arrange|clean)/)) {
+    if (sel.length > 1) { B.tidy(sel); return done('رتّبت المحاذاة', 'tidy'); }
+    PM.autoSlide(d, ST.cur); PM.renumber(d); return done('أعدت توزيع الشريحة', 'auto', true);
+  }
+  if (has(t, /(احذف|امسح|شيل|delete|remove)/) && sel.length) { PM.Ed.del(); return { ok: true, msg: 'حذفت' }; }
+  const mv = has(t, /(فوق|اعلى|ارفع|up)/) ? [0, -16] : has(t, /(تحت|اسفل|نزل|down)/) ? [0, 16] : has(t, /(يمين|right)/) ? [16, 0] : has(t, /(يسار|left)/) ? [-16, 0] : null;
+  if (mv && has(t, /(حرك|ارفع|نزل|ودي|move)/) && sel.length) { sel.forEach(o => { o.x += mv[0]; o.y += mv[1]; }); return done('حرّكت', 'nudge'); }
+  return { ok: false };
+};
+B.setTone = function (tone) {
+  const d = deck(), s = cur();
+  s.tone = tone;
+  const L = PM.layoutById(s.layout);
+  if (L && L.tones.includes(tone)) PM.applyLayout(d, ST.cur, L); else PM.autoSlide(d, ST.cur);
+  PM.renumber(d); PM.commit('tone'); PM.UI.renderAll();
+  return { ok: true, msg: tone === 'dark' ? 'خليت الشريحة داكنة' : 'خليت الشريحة فاتحة' };
+};
+/* switch to the best design that carries a photo */
+B.photoLayout = function (suggest) {
+  const d = deck(), s = cur();
+  const list = PM.UI.candList().filter(L => /photo|صورة|صور/.test(L.id + ' ' + (L.tags || []).join(' ') + ' ' + L.name));
+  if (!list.length) return { ok: true, msg: 'ما فيه تصميم بصورة يناسب هذا المحتوى — اسحب صورة على الشريحة مباشرة', warn: true };
+  const keep = d.photoSug;
+  if (suggest) d.photoSug = 'always';
+  s.spec.autoImgs = [];
+  for (const L of list) { const r = PM.applyLayout(d, ST.cur, L); if (!r.missing || !r.missing.length) break; }
+  if (suggest) { s.objs.filter(o => o.t === 'image' && o.bindImg).forEach(o => { const i = +o.bindImg.split('.')[1]; o.src = PM.suggestPhoto(d, s, i, null, PM.specText(s.spec)); s.spec.autoImgs[i] = o.src; }); }
+  d.photoSug = keep;
+  PM.renumber(d); PM.commit('photo'); PM.UI.renderAll();
+  return { ok: true, msg: suggest ? 'حطيت تصميماً بصورة مقترحة — اضغط عليها واصنعها' : 'حطيت تصميماً فيه صورة من مكتبة مطارات جدة' };
+};
+/* split a dense slide into two */
+B.split = function (i) {
+  const d = deck(), s = d.slides[i];
+  const bl = s.spec.blocks || [];
+  let a, b;
+  if (bl.length >= 2) { const h = Math.ceil(bl.length / 2); a = bl.slice(0, h); b = bl.slice(h); }
+  else if (bl[0] && Array.isArray(bl[0].items) && bl[0].items.length >= 4) { const it = bl[0].items, h = Math.ceil(it.length / 2); a = [Object.assign({}, bl[0], { items: it.slice(0, h) })]; b = [Object.assign({}, bl[0], { items: it.slice(h) })]; }
+  else if (bl[0] && bl[0].k === 'para') { const ss = bl[0].text.split(/(?<=[.!؟?])\s+/); if (ss.length < 2) return { ok: true, msg: 'المحتوى قصير على التقسيم', warn: true }; const h = Math.ceil(ss.length / 2); a = [{ k: 'para', text: ss.slice(0, h).join(' ') }]; b = [{ k: 'para', text: ss.slice(h).join(' ') }]; }
+  else return { ok: true, msg: 'ما لقيت طريقة نظيفة لتقسيم هذي الشريحة', warn: true };
+  s.spec.blocks = a; s.layout = null;
+  const n = PM.addSlide(d, Object.assign({}, JSON.parse(JSON.stringify(s.spec)), { blocks: JSON.parse(JSON.stringify(b)), title: s.spec.title + (en() ? ' (cont.)' : ' (تابع)'), autoImgs: [] }), i + 1);
+  void n;
+  PM.autoSlide(d, i); PM.autoSlide(d, i + 1); PM.renumber(d); PM.commit('split'); PM.UI.renderAll();
+  return { ok: true, msg: 'قسّمتها لشريحتين' };
+};
+/* snap near-equal edges and equalise gaps */
+B.tidy = function (list) {
+  const xs = []; list.forEach(o => { [o.x, o.x + o.w].forEach(v => { const c = xs.find(g => Math.abs(g.v - v) < 10); if (c) c.n++; else xs.push({ v, n: 1 }); }); });
+  list.forEach(o => {
+    const L = xs.filter(g => g.n > 1).find(g => Math.abs(g.v - o.x) < 10 && g.v !== o.x); if (L) o.x = L.v;
+    const R = xs.filter(g => g.n > 1).find(g => Math.abs(g.v - (o.x + o.w)) < 10); if (R && o.t !== 'text') o.w = R.v - o.x;
+  });
+};
+/* ask Copilot to do the wording */
+B.copilotDirective = function (raw, sel) {
+  const s = cur(); const lang = en() ? 'English' : 'العربية';
+  const texts = sel.filter(o => o.t === 'text');
+  if (texts.length) {
+    const content = texts.map((o, i) => `[${i + 1}]\n` + o.paras.map(p => plain(p.t)).join('\n')).join('\n');
+    const prompt = `أنت محرر محتوى عروض مطارات جدة (JEDCO). نفّذ التوجيه على النصوص المرقّمة.
+التوجيه: «${raw}»
+${RULES}
+- اللغة: ${lang}. لا تضيف مقدمة ولا شرح.
+- رد بنفس الصيغة بالضبط: رقم النص بين قوسين في سطر لحاله، وتحته أسطره (كل فقرة في سطر).
+
+<<<
+${content}
+>>>`;
+    B.copilotModal('توجيه عبر كوبايلوت', prompt, '[1]\n…', reply => {
+      const parts = {}; let k = null;
+      reply.replace(/\r/g, '').split('\n').forEach(l => { const m = l.trim().match(/^\[(\d+)\]\s*(.*)$/); if (m) { k = +m[1]; parts[k] = m[2] ? [m[2]] : []; } else if (k && l.trim()) parts[k].push(l.trim()); });
+      let n = 0;
+      texts.forEach((o, i) => {
+        const L = parts[i + 1]; if (!L || !L.length) return;
+        const old = o.paras;
+        o.paras = L.map((t, j) => Object.assign({}, old[Math.min(j, old.length - 1)], { t, bind: j < old.length ? old[j].bind : null }));
+        o.paras.forEach(p => { if (p.bind) PM.writeBind(s.spec, p.bind, p.t); });
+        PM.TextTools.fitH(o); n++;
+      });
+      if (!n) { PM.UI.toast('ما لقيت نصوصاً مرقّمة في الرد', 3500); return false; }
+      s.edited = true; PM.commit('copilot-text'); PM.Ed.render(); PM.emit('change'); PM.UI.toast(`عدّلت ${n} نص ✓ تقدر تتراجع بـ Ctrl+Z`);
+    });
+    return;
+  }
+  const prompt = `أنت محرر محتوى عروض مطارات جدة (JEDCO). نفّذ التوجيه على محتوى الشريحة.
+التوجيه: «${raw}»
+${RULES}
+- اللغة: ${lang}. لا تضيف مقدمة ولا شرح.
+- رد بنفس الصيغة بالضبط (العنوان، ثم الأقسام بين أقواس مربعة، وكل بند في سطر يبدأ بـ - ويفصل العنوان عن الشرح بـ :: ). تقدر تغيّر نوع القسم لو التوجيه يطلب.
+- الأقسام المتاحة: [بنود] [أرقام] [مراحل] [خط زمني] [نقاط] [فقرة] [اقتباس] [مقارنة] [جدول] [رسم بياني]
+
+<<<
+${PM.slideToText(s.spec)}
+>>>`;
+  B.copilotModal('توجيه عبر كوبايلوت', prompt, 'العنوان: …\n[بنود]\n- … :: …', reply => {
+    const nu = PM.textToSpec(reply, s.spec);
+    if (JSON.stringify(nu.blocks) === JSON.stringify(s.spec.blocks) && nu.title === s.spec.title) { PM.UI.toast('ما تغيّر شي — تأكد إنك لصقت الرد كامل', 3500); return false; }
+    s.spec = nu; s.layout = null; s.spec.autoImgs = [];
+    PM.autoSlide(deck(), ST.cur); PM.renumber(deck()); PM.commit('copilot-slide'); PM.UI.renderAll();
+    PM.UI.toast('طبّقت رد Copilot على الشريحة ✓ تقدر تتراجع بـ Ctrl+Z', 3500);
+  });
+};
+/* the instruction box */
+B.directive = function (prefill) {
+  const sel = PM.Ed.selected();
+  const scope = sel.length ? (sel.length === 1 ? 'العنصر المحدد' : `${sel.length} عناصر محددة`) : 'الشريحة كاملة';
+  const ex = sel.length ? ['كبّر شوي', 'خلّه عريض', 'لونه سماوي', 'وسّطه', 'اختصر الكلام'] : ['حوّلها لأرقام', 'خلّها داكنة', 'أضف صورة', 'اقترح صورة', 'قسّمها لشريحتين', 'كبّر العنوان', 'اختصر الكلام وخلّه أقوى'];
+  const body = `<div class="dir-scope">${ic('crosshair')}التوجيه على: <b>${scope}</b>${sel.length ? '' : ' <span class="hint">(حدد عنصراً قبلها لو تبي التوجيه عليه فقط)</span>'}</div>
+    <textarea class="inp" id="dirIn" style="min-height:84px" placeholder="اكتب ايش تبي… مثل: كبّر الأرقام شوي وخلّ العنوان كحلي">${esc(prefill || '')}</textarea>
+    <div class="chips" style="margin-top:8px">${ex.map(x => `<button class="chip" data-ex="${esc(x)}">${esc(x)}</button>`).join('')}</div>
+    <p class="hint" style="margin-top:10px">الأداة تنفّذ بنفسها: الأحجام، السماكة، الألوان، المحاذاة، الفاتح والداكن، تحويل الشكل (أرقام، مراحل، خط زمني، نقاط، بطاقات، شارت)، الصور، التقسيم، التحريك. وللصياغة (اختصار، تحسين، ترجمة، إضافة نقاط) تجهز لك طلب Copilot بلصقة وحدة.</p>`;
+  PM.UI.modal('توجيه', body, { foot: `<button class="btn sec" id="dirAi">${ic('sparkles')}اسأل كوبايلوت</button><button class="btn pri" id="dirGo">${ic('wand-sparkles')}نفّذ</button>` });
+  const inp = $('#dirIn'); setTimeout(() => inp.focus(), 30);
+  $$('[data-ex]').forEach(b => b.onclick = () => { inp.value = b.dataset.ex; inp.focus(); });
+  const run = () => {
+    const v = inp.value.trim(); if (!v) return;
+    const r = B.local(v, sel);
+    if (r.ok) { PM.UI.closeModal(); PM.UI.toast((r.warn ? '' : '✓ ') + r.msg, 3200); return; }
+    PM.UI.closeModal();
+    B.copilotDirective(v, sel);
+    if (!r.ai) PM.UI.toast('هذا التوجيه يحتاج صياغة — جهزت لك طلب Copilot', 3200);
+  };
+  $('#dirGo').onclick = run;
+  $('#dirAi').onclick = () => { const v = inp.value.trim(); if (!v) return; PM.UI.closeModal(); B.copilotDirective(v, sel); };
+  inp.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); run(); } e.stopPropagation(); };
+};
+
+/* ======================================================================
+   «رأي الأداة» — slide review
+   ====================================================================== */
+const PALETTE = new Set([K.NAVY, K.BLUE, K.SKY, K.WHITE, K.BODY, K.MUTED, K.INK, K.FAINT, K.BODY_D, K.MUTED_D, '0E1E36', '3D4A5C', '7A8699'].map(x => String(x).toUpperCase()));
+function metrics(objs, d) {
+  const texts = objs.filter(o => o.t === 'text' && !o.hidden && !o.pageNum && o.role !== 'chrome' && o.paras.some(p => plain(p.t).trim()));
+  const sizes = texts.flatMap(o => o.paras.filter(p => plain(p.t).trim()).map(p => p.size));
+  const wordsN = texts.reduce((a, o) => a + o.paras.reduce((b, p) => b + words(p.t), 0), 0);
+  // visual weight → balance; content cover → emptiness
+  let mx = 0, mw = 0, area = 0;
+  const content = objs.filter(o => !o.hidden && o.role !== 'tplbg' && o.role !== 'chrome' && o.role !== 'veil' && !o.pageNum && !(o.w > 900 && o.h > 500) && o.t !== 'logo');
+  for (const o of content) {
+    let wgt = o.w * o.h;
+    if (o.t === 'text') wgt = o.w * Math.min(o.h, PM.blockH(o.paras, o.w)) * 1.4;
+    else if (o.t === 'rect' || o.t === 'ellipse') wgt *= (o.fill ? 0.35 : 0.08);
+    else if (o.t === 'line') wgt = (o.w + o.h) * 2;
+    else if (o.t === 'icon') wgt *= 0.8;
+    mx += (o.x + o.w / 2) * wgt; mw += wgt;
+    if (o.t !== 'line') area += Math.min(o.w * o.h, 900 * 460);
+  }
+  const fullPhoto = objs.some(o => o.t === 'image' && o.w > 900 && o.h > 500);
+  const bal = mw ? (mx / mw - 480) / 960 : 0;
+  return { texts, sizes, minS: sizes.length ? Math.min(...sizes) : 0, maxS: sizes.length ? Math.max(...sizes) : 0, words: wordsN, bal, fill: Math.min(1, area / (840 * 438)), fullPhoto };
+}
+/* try the designs that fit and keep the one with the best numbers */
+B.bestLayout = function (goal) {
+  const d = deck(), s = cur();
+  const list = PM.UI.candList().slice(0, 30);
+  let best = null;
+  for (const L of list) {
+    const c = PM.slideCtx(d, ST.cur);
+    const spec = JSON.parse(JSON.stringify(s.spec));
+    const fake = { id: s.id, spec }; c.photoFor = (sp, i) => PM.autoPhoto(d, fake, i);
+    let r; try { r = PM.renderLayout(L, spec, c); } catch (e) { continue; }
+    if ((r.missing && r.missing.length) || r.overflow) continue;
+    const m = metrics(r.objs, d);
+    let sc = goal === 'font' ? m.minS * 2 - Math.abs(m.bal) * 20 : goal === 'balance' ? -Math.abs(m.bal) * 100 + m.minS * 0.3 : goal === 'fill' ? -Math.abs(m.fill - 0.5) * 40 + m.minS * 0.3 - Math.abs(m.bal) * 10 : m.minS - Math.abs(m.bal) * 20;
+    if (L.id === s.layout) sc -= 0.5;
+    if (!best || sc > best.sc) best = { L, sc };
+  }
+  if (!best) return { ok: true, msg: 'ما لقيت تصميماً أفضل لهذا المحتوى', warn: true };
+  PM.UI.applyLayoutId(best.L.id);
+  return { ok: true, msg: 'طبّقت «' + best.L.name + '»' };
+};
+PM.critique = function (d, i) {
+  const s = d.slides[i]; const out = []; let score = 10;
+  const add = (lv, t, dd, fix, pen) => { out.push({ lv, t, d: dd || '', fix }); score -= pen != null ? pen : (lv === 'bad' ? 2 : lv === 'warn' ? 1 : 0); };
+  const m = metrics(s.objs, d);
+  const kind = s.spec.kind;
+  const issues = PM.checkIssues(d).filter(x => x.i === i);
+  if (kind !== 'content') {
+    add('good', kind === 'cover' ? 'غلاف رسمي بهوية مطارات جدة' : kind === 'closing' ? 'ختام يطابق الغلاف' : kind === 'divider' ? 'فاصل قسم بعنوان فقط — حسب التوجيه' : 'جدول أعمال من القالب الرسمي', '');
+    if (s.spec.title && words(s.spec.title) > 9) add('warn', 'العنوان طويل لشريحة ' + (kind === 'divider' ? 'فاصل' : 'رئيسية'), `${words(s.spec.title)} كلمة — الأقوى ٣ إلى ٦ كلمات`, { label: 'اختصره عبر كوبايلوت', run: () => B.copilotDirective('اختصر العنوان إلى ٣–٦ كلمات بدون ما يضيع معناه', s.objs.filter(o => o.t === 'text' && o.paras.some(p => p.bind === 'title'))) });
+  } else {
+    // density
+    if (m.words > 110) add('bad', 'الشريحة مزدحمة', `${m.words} كلمة — الجمهور ما يقرأ ويسمع بنفس الوقت`, { label: 'قسّمها لشريحتين', run: () => B.split(i) }, 2.5);
+    else if (m.words > 75) add('warn', 'كلام كثير شوي', `${m.words} كلمة — جرّب تختصر أو تقسم`, { label: 'اختصر عبر كوبايلوت', run: () => B.copilotDirective('اختصر الكلام بحوالي ٣٠٪ وخلّه أقوى، وحافظ على كل الأرقام', []) });
+    else if (m.words > 0) add('good', 'كمية الكلام مريحة', `${m.words} كلمة`);
+    // readability
+    if (m.minS && m.minS < 11) add('bad', 'فيه خط صغير يصعب قراءته', `أصغر خط ${Math.round(m.minS)} — الحد المريح ١٣ وفوق`, { label: 'جرّب تصميماً بخط أكبر', run: () => B.bestLayout('font') });
+    else if (m.minS && m.minS < 13) add('warn', 'بعض النصوص صغيرة', `أصغر خط ${Math.round(m.minS)}`, { label: 'جرّب تصميماً بخط أكبر', run: () => B.bestLayout('font') });
+    else if (m.minS) add('good', 'الخطوط مقروءة', `أصغر خط ${Math.round(m.minS)}`);
+    // hierarchy
+    const tt = s.objs.find(o => o.t === 'text' && o.paras.some(p => p.bind === 'title'));
+    const body = m.sizes.filter(z => !tt || z < tt.paras[0].size - 0.5).sort((a, b) => a - b);
+    const med = body.length ? body[Math.floor(body.length / 2)] : 0;
+    if (!s.spec.title) add('warn', 'بدون عنوان', 'العنوان يساعد الجمهور يفهم الشريحة بنظرة', { label: 'اكتب عنواناً عبر التوجيه', run: () => B.directive('العنوان: ') });
+    else {
+      if (tt && med && tt.paras[0].size / med < 1.3) add('warn', 'العنوان قريب من حجم النص', 'التسلسل البصري ضعيف — كبّر العنوان', { label: 'كبّر العنوان', run: () => { PM.TextTools.setScale(tt, PM.TextTools.scaleOf(tt) * 1.2); s.edited = true; PM.commit('size'); PM.Ed.render(); return { ok: true, msg: 'كبّرت العنوان' }; } });
+      else add('good', 'تسلسل واضح بين العنوان والنص', '');
+      if (words(s.spec.title) > 12) add('warn', 'العنوان طويل', `${words(s.spec.title)} كلمة — الأفضل أقل من ١٠`, { label: 'اختصره عبر كوبايلوت', run: () => B.copilotDirective('اختصر العنوان لأقل من ٨ كلمات بدون ما يضيع معناه', tt ? [tt] : []) });
+    }
+    // balance & space (a full-bleed photo carries its own weight)
+    if (!m.fullPhoto) {
+      if (Math.abs(m.bal) > 0.15) add('warn', 'الثقل مايل لجهة وحدة', `المحتوى متركز ${m.bal > 0 ? 'يمين' : 'يسار'} الشريحة والجهة الثانية فاضية`, { label: 'جرّب تصميماً متوازناً', run: () => B.bestLayout('balance') });
+      else add('good', 'توزيع متوازن', '');
+      if (m.fill < 0.22 && m.words < 40) add('warn', 'فراغ كبير', 'المحتوى قليل على مساحة الشريحة', { label: 'جرّب تصميماً يعبّي المساحة', run: () => B.bestLayout('fill') });
+    }
+    // numbers that deserve to be seen
+    const sp = PM.shape(s.spec);
+    const nums = (PM.specText(s.spec).match(/[\d٠-٩][\d٠-٩.,٫%٪]*/g) || []).filter(x => x.replace(/\D/g, '').length >= 2 && !/^(19|20)\d\d$/.test(PM.digits(x)));
+    if (nums.length >= 3 && !['kpis', 'chart', 'table'].includes(sp.form) && !sp.valued) add('warn', 'فيه أرقام مدفونة في الكلام', `${nums.length} أرقام — الأرقام لما تبرز تقنع أكثر`, { label: 'حوّلها لأرقام بارزة', run: () => B.local('حوّلها لأرقام', []) });
+    // photos
+    const imgs = s.objs.filter(o => o.t === 'image' && o.role !== 'tplbg');
+    const sugs = imgs.filter(o => d.assets[o.src] && d.assets[o.src].kind === 'sug');
+    if (sugs.length) add('warn', 'فيها صورة مقترحة لازم تتصنع', d.assets[sugs[0].src].note, { label: 'افتح صانع الصور', run: () => { ST.sel = new Set([sugs[0].id]); PM.Ed.drawOverlay(); PM.UI.renderCtx(); const b = document.querySelector('#ctx [data-a="gen"]'); if (b) b.click(); return { ok: true, msg: 'جهزت صانع الصور بوصف الصورة' }; } }, 0.5);
+    else if (!imgs.length && m.words < 70) {
+      const near = d.slides.slice(Math.max(0, i - 3), i + 3).filter(x => x !== s && x.objs.some(o => o.t === 'image' && o.role !== 'tplbg')).length;
+      if (!near) add('info', 'ممكن صورة تعطيها حياة', 'الشرائح اللي حولها كلها بدون صور', { label: 'حط تصميماً بصورة', run: () => B.photoLayout(false) }, 0.3);
+    }
+    // alignment after manual edits
+    if (s.edited) {
+      const xs = m.texts.map(o => o.dir === 'rtl' ? o.x + o.w : o.x);
+      let near = 0; for (let a = 0; a < xs.length; a++) for (let b2 = a + 1; b2 < xs.length; b2++) { const dd = Math.abs(xs[a] - xs[b2]); if (dd > 0.6 && dd < 9) near++; }
+      if (near) add('warn', 'محاذاة غير دقيقة', `${near} نصوص قريبة من بعض بس مو على نفس الخط`, { label: 'رتّب المحاذاة', run: () => { B.tidy(m.texts); s.edited = true; PM.commit('tidy'); PM.Ed.render(); return { ok: true, msg: 'رتّبت المحاذاة' }; } });
+    }
+  }
+  // problems the checker found
+  issues.forEach(x => add(x.level === 'e' ? 'bad' : 'warn', x.t.replace(/^الشريحة \d+: /, ''), x.d, null, x.level === 'e' ? 2 : 0.7));
+  // brand colours
+  const off = new Set(); s.objs.forEach(o => { if (o.t === 'text') o.paras.forEach(p => { const c = String(p.color || '').toUpperCase(); if (c && !PALETTE.has(c)) off.add(c); }); });
+  if (off.size) add('warn', 'ألوان خارج هوية مطارات جدة', [...off].map(c => '#' + c).join('، '), { label: 'رجّعها لألوان الهوية', run: () => { s.objs.forEach(o => { if (o.t === 'text') o.paras.forEach(p => { if (!PALETTE.has(String(p.color).toUpperCase())) p.color = (s.tone === 'dark' || (!s.tone && d.dark)) ? K.WHITE : K.BODY; }); }); s.edited = true; PM.commit('brand'); PM.Ed.render(); return { ok: true, msg: 'رجّعت الألوان للهوية' }; } });
+  else add('good', 'ألوان وخطوط الهوية', 'Tajawal للعربي و Sequel للأرقام');
+  // consistency of the title position with the deck
+  if (kind === 'content') {
+    const ty = o => { const t = o.objs.find(x => x.t === 'text' && x.paras.some(p => p.bind === 'title')); return t ? t.y : null; };
+    const ys = d.slides.filter(x => x !== s && x.spec.kind === 'content').map(ty).filter(v => v != null).sort((a, b) => a - b);
+    const my = ty(s);
+    if (ys.length >= 3 && my != null) { const med = ys[Math.floor(ys.length / 2)]; if (Math.abs(my - med) > 30) add('info', 'مكان العنوان يختلف عن باقي العرض', 'العين تتعود على مكان ثابت للعنوان', null, 0.3); }
+  }
+  score = Math.max(0, Math.min(10, Math.round(score * 2) / 2));
+  return { score, items: out };
+};
+B.review = function () {
+  const d = deck(); if (!d) return;
+  PM.Ed.endEdit();
+  const r = PM.critique(d, ST.cur);
+  const label = r.score >= 9 ? 'ممتازة' : r.score >= 7 ? 'جيدة' : r.score >= 5 ? 'تحتاج لمسات' : 'تحتاج شغل';
+  const col = r.score >= 9 ? '#0E8A5F' : r.score >= 7 ? '#004EAA' : r.score >= 5 ? '#B7791F' : '#C2410C';
+  const order = { bad: 0, warn: 1, info: 2, good: 3 };
+  const items = r.items.slice().sort((a, b) => order[a.lv] - order[b.lv]);
+  const body = `<div class="rv-top"><div class="rv-ring" style="--c:${col};--p:${r.score * 10}"><b class="num">${r.score}</b><span>من 10</span></div><div><h3 style="margin:0 0 4px;color:${col}">${label}</h3><p class="hint" style="margin:0">رأي الأداة في الشريحة <span class="num">${ST.cur + 1}</span>: الكثافة، الوضوح، التوازن، الهوية، والتناسق مع باقي العرض.</p></div></div>
+    <div class="rv-list">${items.map((x, k) => `<div class="issue rv-${x.lv}"><i class="dot ${x.lv === 'bad' ? 'e' : x.lv === 'warn' ? 'w' : x.lv === 'good' ? 'ok' : 'i'}"></i><div><b>${esc(x.t)}</b><span>${esc(x.d || '')}</span></div>${x.fix ? `<button class="btn sec" data-fix="${k}" style="height:34px">${esc(x.fix.label)}</button>` : ''}</div>`).join('')}</div>`;
+  PM.UI.modal('رأي الأداة', body, { foot: `<button class="btn sec" id="rvAll">${ic('scan-eye')}راجع كل الشرائح</button><button class="btn sec" id="rvDir">${ic('wand-sparkles')}توجيه</button>` });
+  $$('#modal [data-fix]').forEach(b => b.onclick = () => {
+    const x = items[+b.dataset.fix]; PM.UI.closeModal();
+    const res = x.fix.run();
+    if (res && res.msg) PM.UI.toast((res.warn ? '' : '✓ ') + res.msg, 3000);
+  });
+  $('#rvDir').onclick = () => { PM.UI.closeModal(); B.directive(); };
+  $('#rvAll').onclick = () => { PM.UI.closeModal(); B.reviewAll(); };
+};
+B.reviewAll = function () {
+  const d = deck();
+  const rows = d.slides.map((s, i) => ({ i, r: PM.critique(d, i), s })).filter(x => !x.s.hidden);
+  const avg = rows.reduce((a, x) => a + x.r.score, 0) / Math.max(1, rows.length);
+  const body = `<p class="hint">متوسط العرض: <b class="num">${avg.toFixed(1)}</b> من 10. الشرائح مرتبة من الأضعف.</p>` + rows.sort((a, b) => a.r.score - b.r.score).map(x => {
+    const top = x.r.items.filter(y => y.lv === 'bad' || y.lv === 'warn').slice(0, 2).map(y => y.t).join(' · ') || 'سليمة';
+    return `<div class="issue"><i class="dot ${x.r.score >= 8 ? 'ok' : x.r.score >= 6 ? 'w' : 'e'}"></i><div><b>الشريحة <span class="num">${x.i + 1}</span> — <span class="num">${x.r.score}</span>/10</b><span>${esc(top)}</span></div><button class="btn sec" data-go="${x.i}" style="height:34px">افتح</button></div>`;
+  }).join('');
+  PM.UI.modal('رأي الأداة في كل العرض', body);
+  $$('#modal [data-go]').forEach(b => b.onclick = () => { PM.UI.closeModal(); PM.UI.select(+b.dataset.go); setTimeout(B.review, 120); });
+};
+
+/* ======================================================================
+   «قصة العرض»
+   ====================================================================== */
+const ROLE = { cover: 'افتتاح', agenda: 'أجندة', divider: 'فصل', closing: 'ختام', kpis: 'أرقام', chart: 'أرقام', table: 'أرقام', steps: 'خطة', timeline: 'خطة', quote: 'اقتباس', compare: 'مقارنة', para: 'رسالة', statement: 'رسالة', items: 'تفاصيل', bullets: 'تفاصيل', mix: 'تفاصيل', photo: 'صورة' };
+const ROLE_C = { 'افتتاح': '#002657', 'أجندة': '#3C4C64', 'فصل': '#004EAA', 'ختام': '#002657', 'أرقام': '#0E8A5F', 'خطة': '#7C3AED', 'اقتباس': '#B7791F', 'مقارنة': '#C2410C', 'رسالة': '#0891B2', 'تفاصيل': '#6B7A90', 'صورة': '#62B6F3' };
+PM.slideRole = function (s) {
+  const k = s.spec.kind;
+  if (k !== 'content') return ROLE[k];
+  const sp = PM.shape(s.spec);
+  const f = sp.others && sp.others.length ? (['kpis', 'chart', 'table'].includes(sp.form) ? sp.form : 'mix') : sp.form;
+  return ROLE[f] || 'تفاصيل';
+};
+PM.storyOf = function (d) {
+  const vis = d.slides.map((s, i) => ({ s, i, role: PM.slideRole(s), words: metrics(s.objs, d).words })).filter(x => !x.s.hidden);
+  const notes = []; let score = 10;
+  const add = (lv, t, dd, fix, pen) => { notes.push({ lv, t, d: dd || '', fix }); score -= pen != null ? pen : (lv === 'bad' ? 2 : lv === 'warn' ? 1 : 0); };
+  const content = vis.filter(x => x.s.spec.kind === 'content');
+  const sections = []; let curSec = { title: 'البداية', items: [] };
+  vis.forEach(x => { if (x.s.spec.kind === 'divider') { sections.push(curSec); curSec = { title: plain(x.s.spec.title), items: [] }; } else if (x.s.spec.kind === 'content') curSec.items.push(x); });
+  sections.push(curSec);
+  const secs = sections.filter(x => x.items.length || x.title !== 'البداية');
+  // opening
+  const firstContent = content.slice(0, 3).map(x => x.role);
+  if (content.length >= 5 && !firstContent.some(r => r === 'رسالة' || r === 'أرقام')) add('warn', 'البداية ما فيها رسالة واضحة', 'أول شرائح تفاصيل — الجمهور يحتاج يعرف «ليش هو هنا» من البداية', { label: 'أضف شريحة «الرسالة الرئيسية»', run: () => B.addSlideAt(B.introIndex(), { kind: 'content', title: en() ? 'The key message' : 'الرسالة الرئيسية', blocks: [{ k: 'para', text: en() ? 'In one sentence: what should the audience remember?' : 'بجملة وحدة: ايش الشي اللي لازم يتذكره الجمهور من هذا العرض؟' }] }) });
+  else if (content.length) add('good', 'بداية تدخل في الموضوع', '');
+  // agenda
+  const dividers = vis.filter(x => x.s.spec.kind === 'divider');
+  if (content.length >= 8 && dividers.length >= 2 && !vis.some(x => x.s.spec.kind === 'agenda')) add('warn', 'عرض طويل بدون جدول أعمال', `${dividers.length} أقسام — جدول الأعمال يعطي الجمهور الخريطة`, { label: 'أضف جدول أعمال من عناوين الأقسام', run: () => B.addSlideAt(1, { kind: 'agenda', title: en() ? 'Agenda' : 'جدول الأعمال', items: dividers.map(x => ({ title: plain(x.s.spec.title) })) }) });
+  // numbers placement
+  const firstNum = vis.findIndex(x => x.role === 'أرقام');
+  if (firstNum > 0 && firstNum / vis.length > 0.6 && content.length >= 6) add('warn', 'الأرقام جاية متأخرة', `أول شريحة أرقام رقمها ${firstNum + 1} من ${vis.length} — الأرقام تشد الانتباه بدري`, { label: 'قدّم شريحة الأرقام', run: () => B.moveSlide(vis[firstNum].i, B.introIndex()) });
+  else if (firstNum >= 0) add('good', 'الأرقام في مكان يشد الانتباه', '');
+  // monotony
+  let run = 1, worst = 1, worstAt = 0;
+  for (let k = 1; k < content.length; k++) { if (content[k].role === content[k - 1].role) { run++; if (run > worst) { worst = run; worstAt = k; } } else run = 1; }
+  if (worst >= 4) add('warn', 'تكرار نفس النوع', `${worst} شرائح «${content[worstAt].role}» ورا بعض — نوّع بين أرقام وصور ورسائل`, { label: 'وزّع التصاميم من جديد بتنويع أكبر', run: () => { const d2 = deck(); d2.slides.forEach((x, i) => { if (!x.edited) { x.layout = null; PM.autoSlide(d2, i); } }); PM.renumber(d2); PM.commit('story-variety'); PM.UI.renderAll(); return { ok: true, msg: 'وزّعت التصاميم بتنويع أكبر' }; } }, 0.7);
+  // dense slides
+  const dense = content.filter(x => x.words > 110);
+  if (dense.length) add(dense.length > 2 ? 'bad' : 'warn', `${dense.length} شرائح مزدحمة`, 'الشرائح المزدحمة تكسر إيقاع القصة', { label: 'افتح أزحمها', run: () => { PM.UI.select(dense.sort((a, b) => b.words - a.words)[0].i); return { ok: true, msg: 'افتح «رأي الأداة» لتقسيمها' }; } });
+  // sections balance
+  const lone = secs.filter(x => x.title !== 'البداية' && x.items.length === 0);
+  if (lone.length) add('warn', 'أقسام بدون محتوى', lone.map(x => x.title).join('، '));
+  // ending
+  const lastC = content[content.length - 1];
+  if (lastC && !/خطو|التالي|القادم|المطلوب|التوصي|next|recommend|ask|decision|قرار/i.test(PM.specText(lastC.s.spec))) add('warn', 'النهاية ما فيها مطلوب أو خطوة جاية', 'الختام الأقوى: ايش تبي من الجمهور بعد العرض؟', { label: 'أضف «الخطوات القادمة» قبل الختام', run: () => B.addSlideAt(B.closingIndex(), { kind: 'content', title: en() ? 'Next steps' : 'الخطوات القادمة', blocks: [{ k: 'steps', items: (en() ? ['Decision needed', 'Owner and date', 'Follow-up'] : ['القرار المطلوب', 'المسؤول والموعد', 'المتابعة']).map(t => ({ title: t, text: '' })) }] }) });
+  else if (lastC) add('good', 'نهاية فيها خطوة واضحة', '');
+  if (vis.length > 30) add('warn', 'العرض طويل', `${vis.length} شريحة — لو الجمهور تنفيذي، ٱنقل التفاصيل لملحق`, null, 0.5);
+  score = Math.max(0, Math.min(10, Math.round(score * 2) / 2));
+  return { vis, sections: secs, notes, score };
+};
+B.introIndex = function () { const d = deck(); let i = 0; while (i < d.slides.length && ['cover', 'agenda'].includes(d.slides[i].spec.kind)) i++; return i; };
+B.closingIndex = function () { const d = deck(); const k = d.slides.findIndex(x => x.spec.kind === 'closing'); return k < 0 ? d.slides.length : k; };
+B.addSlideAt = function (at, spec) { const d = deck(); PM.addSlide(d, spec, at); PM.autoSlide(d, at); ST.cur = at; PM.renumber(d); PM.commit('story-add'); PM.UI.renderAll(); return { ok: true, msg: 'أضفت الشريحة — عدّل نصها بضغطتين' }; };
+B.moveSlide = function (from, to) { const d = deck(); const [s] = d.slides.splice(from, 1); d.slides.splice(to > from ? to - 1 : to, 0, s); ST.cur = d.slides.indexOf(s); PM.renumber(d); PM.commit('story-move'); PM.UI.renderAll(); return { ok: true, msg: 'نقلت الشريحة' }; };
+
+/* a better order for a stated goal (local plan) */
+B.planStory = function (purpose, audience) {
+  const d = deck();
+  const exec = /تنفيذي|مجلس|الادار|الإدار|ceo|board|exec/i.test(audience || '');
+  const list = d.slides.map((s, i) => ({ s, i, role: PM.slideRole(s), words: metrics(s.objs, d).words })).filter(x => !x.s.hidden);
+  const cover = list.filter(x => x.s.spec.kind === 'cover');
+  const agenda = list.filter(x => x.s.spec.kind === 'agenda');
+  const closing = list.filter(x => x.s.spec.kind === 'closing');
+  const body = list.filter(x => !['cover', 'agenda', 'closing'].includes(x.s.spec.kind));
+  const steps = [];
+  cover.forEach(x => steps.push({ type: 'keep', x }));
+  agenda.forEach(x => steps.push({ type: 'keep', x }));
+  const hasMsg = body.slice(0, 3).some(x => x.role === 'رسالة');
+  if (purpose && !hasMsg) steps.push({ type: 'new', spec: { kind: 'content', title: en() ? 'The key message' : 'الرسالة الرئيسية', blocks: [{ k: 'para', text: purpose }] }, why: 'تبدأ القصة بالهدف' });
+  const firstNum = body.find(x => x.role === 'أرقام');
+  const moved = new Set();
+  if (exec && firstNum && body.indexOf(firstNum) > 2) { steps.push({ type: 'move', x: firstNum, why: 'الجمهور التنفيذي يبي الأرقام بدري' }); moved.add(firstNum); }
+  const appendix = [];
+  for (const x of body) {
+    if (moved.has(x)) continue;
+    if (exec && x.words > 120 && x.role === 'تفاصيل') { appendix.push(x); continue; }
+    steps.push({ type: 'keep', x });
+  }
+  const lastC = body[body.length - 1];
+  if (purpose && lastC && !/خطو|التالي|القادم|المطلوب|next|decision|قرار/i.test(PM.specText(lastC.s.spec))) steps.push({ type: 'new', spec: { kind: 'content', title: en() ? 'What we need' : 'المطلوب', blocks: [{ k: 'steps', items: (en() ? ['The decision', 'Owner and date', 'Follow-up'] : ['القرار المطلوب', 'المسؤول والموعد', 'المتابعة']).map(t => ({ title: t, text: '' })) }] }, why: 'تنتهي القصة بالمطلوب من الجمهور' });
+  if (appendix.length) { steps.push({ type: 'new', spec: { kind: 'divider', title: en() ? 'Appendix' : 'ملحق' }, why: 'التفاصيل الثقيلة تنتقل للملحق' }); appendix.forEach(x => steps.push({ type: 'appendix', x })); }
+  closing.forEach(x => steps.push({ type: 'keep', x }));
+  return steps;
+};
+B.applyPlan = function (steps) {
+  const d = deck(); const nu = [];
+  for (const st of steps) {
+    if (st.x) nu.push(st.x.s);
+    else if (st.spec) { const tmp = { id: 's' + Math.random().toString(36).slice(2, 9), spec: Object.assign({ kind: 'content', title: '', sub: '', eyebrow: '', blocks: [], imgs: [] }, st.spec), layout: null, tone: null, objs: [], edited: false }; nu.push(tmp); }
+  }
+  d.slides.filter(s => s.hidden).forEach(s => nu.push(s));
+  d.slides = nu;
+  d.slides.forEach((s, i) => { if (!s.layout) PM.autoSlide(d, i); });
+  ST.cur = 0; PM.renumber(d); PM.commit('story'); PM.UI.renderAll();
+};
+B.story = function () {
+  const d = deck(); if (!d) return;
+  PM.Ed.endEdit();
+  const st = PM.storyOf(d);
+  const flow = st.vis.map(x => `<button class="sf" data-go="${x.i}" title="${esc(plain(x.s.spec.title || ''))}" style="--rc:${ROLE_C[x.role] || '#6B7A90'}"><span class="num">${x.i + 1}</span><i>${x.role}</i></button>`).join('');
+  const roles = {}; st.vis.forEach(x => roles[x.role] = (roles[x.role] || 0) + 1);
+  const notes = st.notes.slice().sort((a, b) => ({ bad: 0, warn: 1, info: 2, good: 3 })[a.lv] - ({ bad: 0, warn: 1, info: 2, good: 3 })[b.lv]);
+  const body = `<div class="rv-top"><div class="rv-ring" style="--c:${st.score >= 8 ? '#0E8A5F' : st.score >= 6 ? '#004EAA' : '#B7791F'};--p:${st.score * 10}"><b class="num">${st.score}</b><span>من 10</span></div><div><h3 style="margin:0 0 4px">قصة العرض</h3><p class="hint" style="margin:0"><span class="num">${st.vis.length}</span> شريحة · <span class="num">${st.sections.filter(x => x.title !== 'البداية').length}</span> أقسام · ${Object.entries(roles).map(([k, v]) => `${k} <span class="num">${v}</span>`).join(' · ')}</p></div></div>
+    <div class="sflow">${flow}</div>
+    <div class="ssecs">${st.sections.map(x => `<div class="ssec"><b>${esc(x.title)}</b><span>${x.items.map(y => esc(plain(y.s.spec.title || '—'))).join(' ← ') || '<em>بدون شرائح</em>'}</span></div>`).join('')}</div>
+    <div class="rv-list">${notes.map((x, k) => `<div class="issue"><i class="dot ${x.lv === 'bad' ? 'e' : x.lv === 'warn' ? 'w' : x.lv === 'good' ? 'ok' : 'i'}"></i><div><b>${esc(x.t)}</b><span>${esc(x.d)}</span></div>${x.fix ? `<button class="btn sec" data-fix="${k}" style="height:34px">${esc(x.fix.label)}</button>` : ''}</div>`).join('')}</div>
+    <div class="sbetter hide" id="sBetter">
+      <h4>${ic('target')}ايش الهدف من العرض؟</h4>
+      <textarea class="inp" id="sGoal" style="min-height:70px" placeholder="مثل: إقناع الإدارة التنفيذية باعتماد ميزانية خطة جاهزية موسم العمرة قبل نهاية الشهر">${esc(d.goal || '')}</textarea>
+      <h4 style="margin-top:12px">${ic('users')}الجمهور</h4>
+      <div class="chips" id="sAud">${['الرئيس التنفيذي', 'مجلس الإدارة', 'الإدارة التنفيذية', 'فريق العمل', 'جهات خارجية', 'الموظفين'].map(a => `<button class="chip ${d.audience === a ? 'on' : ''}" data-a="${a}">${a}</button>`).join('')}</div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button class="btn pri" id="sPlan">${ic('wand-sparkles')}اقترح قصة أفضل</button><button class="btn sec" id="sCop">${ic('sparkles')}اطلبها من كوبايلوت</button></div>
+      <div id="sPlanOut"></div>
+    </div>`;
+  PM.UI.modal('قصة العرض', body, { wide: true, foot: `<button class="btn pri" id="sOpen">${ic('lightbulb')}كيف تكون القصة أفضل؟</button>` });
+  $$('#modal [data-go]').forEach(b => b.onclick = () => { PM.UI.closeModal(); PM.UI.select(+b.dataset.go); });
+  $$('#modal [data-fix]').forEach(b => b.onclick = () => { const x = notes[+b.dataset.fix]; PM.UI.closeModal(); const r = x.fix.run(); if (r && r.msg) PM.UI.toast('✓ ' + r.msg, 3000); });
+  $('#sOpen').onclick = () => { $('#sBetter').classList.remove('hide'); $('#sOpen').classList.add('hide'); $('#sGoal').focus(); $('#sBetter').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  $$('#sAud .chip').forEach(b => b.onclick = () => { $$('#sAud .chip').forEach(x => x.classList.toggle('on', x === b)); d.audience = b.dataset.a; });
+  $('#sGoal').oninput = e => { d.goal = e.target.value; };
+  $('#sPlan').onclick = () => {
+    const goal = $('#sGoal').value.trim();
+    const steps = B.planStory(goal, d.audience);
+    const lab = { keep: '', new: 'جديدة', move: 'منقولة', appendix: 'للملحق' };
+    const changes = steps.filter(x => x.type !== 'keep').length;
+    $('#sPlanOut').innerHTML = `<h4 style="margin-top:16px">${ic('route')}القصة المقترحة ${changes ? `<span class="hint">(${changes} تغيير)</span>` : ''}</h4>
+      <ol class="splan">${steps.map(x => `<li class="sp-${x.type}"><span>${esc(plain(x.x ? (x.x.s.spec.title || '—') : x.spec.title))}</span>${lab[x.type] ? `<em>${lab[x.type]}</em>` : ''}${x.why ? `<small>${esc(x.why)}</small>` : ''}</li>`).join('')}</ol>
+      ${changes ? `<button class="btn pri" id="sApply">${ic('check')}طبّق القصة المقترحة</button> <span class="hint">تقدر تتراجع بـ Ctrl+Z</span>` : '<p class="hint">ترتيبك الحالي يخدم الهدف. لتحسين الصياغة نفسها جرّب «اطلبها من كوبايلوت».</p>'}`;
+    const ap = $('#sApply'); if (ap) ap.onclick = () => { PM.UI.closeModal(); B.applyPlan(steps); PM.UI.toast('✓ طبّقت القصة المقترحة — الشرائح الجديدة جاهزة لنصك', 3500); };
+  };
+  $('#sCop').onclick = () => {
+    const goal = $('#sGoal').value.trim();
+    if (!goal) { PM.UI.toast('اكتب الهدف من العرض أولاً'); $('#sGoal').focus(); return; }
+    const vis = d.slides.map((s, i) => ({ s, i })).filter(x => !x.s.hidden);
+    const list = vis.map(x => `S${x.i + 1} | ${PM.slideRole(x.s)} | ${plain(x.s.spec.title || '—')} | ${plain(PM.specText(x.s.spec)).replace(/\s+/g, ' ').slice(0, 140)}`).join('\n');
+    const prompt = `أنت مستشار قصص عروض تنفيذية لمطارات جدة (JEDCO).
+الهدف من العرض: «${goal}»
+الجمهور: ${d.audience || 'غير محدد'}
+${RULES}
+هذي شرائح العرض بالترتيب (رقم | دور | عنوان | مختصر المحتوى):
+${list}
+
+اقترح قصة أقوى تخدم الهدف. رد بهذه الصيغة فقط، بدون أي شرح:
+ORDER: S1, S2, N1, S5, ...   (الترتيب الجديد، تقدر تحذف شرائح ما تخدم الهدف بعدم ذكرها)
+N1 | النوع | العنوان | محتوى قصير   (لكل شريحة جديدة؛ النوع واحد من: رسالة، أرقام، مراحل، نقاط، بنود، فاصل)
+TITLE S4 | عنوان أقوى   (اختياري لتحسين عنوان شريحة موجودة)`;
+    PM.UI.closeModal();
+    B.copilotModal('قصة أفضل عبر كوبايلوت', prompt, 'ORDER: S1, S2, N1, …\nN1 | رسالة | … | …', reply => B.applyCopilotStory(reply));
+  };
+};
+B.applyCopilotStory = function (reply) {
+  const d = deck();
+  const L = reply.replace(/\r/g, '').split('\n').map(x => x.trim()).filter(Boolean);
+  const ord = L.find(x => /^ORDER\s*[:：]/i.test(x));
+  if (!ord) { PM.UI.toast('ما لقيت سطر ORDER في الرد', 3500); return false; }
+  const news = {};
+  L.forEach(x => { const m = x.match(/^(N\d+)\s*\|\s*([^|]+)\|\s*([^|]+)\|?\s*(.*)$/i); if (m) news[m[1].toUpperCase()] = { type: m[2].trim(), title: m[3].trim(), text: m[4].trim() }; });
+  L.forEach(x => { const m = x.match(/^TITLE\s+S(\d+)\s*\|\s*(.+)$/i); if (m) { const s = d.slides[+m[1] - 1]; if (s) { s.spec.title = m[2].trim(); s.layout = s.layout; PM.relayout(d, +m[1] - 1); } } });
+  const typeSpec = (n) => {
+    const t = nrm(n.type);
+    if (/فاصل|divider/.test(t)) return { kind: 'divider', title: n.title };
+    if (/ارقام|numbers/.test(t)) return { kind: 'content', title: n.title, blocks: [{ k: 'kpis', items: n.text.split(/[،,;]\s*/).filter(Boolean).slice(0, 4).map(x => { const mm = x.match(/^([\d٠-٩.,%٪+]+\s*\S*)\s+(.*)$/); return mm ? { value: mm[1], label: mm[2] } : { value: '—', label: x }; }) }] };
+    if (/مراحل|steps/.test(t)) return { kind: 'content', title: n.title, blocks: [{ k: 'steps', items: n.text.split(/[،,;]\s*/).filter(Boolean).map(x => ({ title: x, text: '' })) }] };
+    if (/نقاط|bullets/.test(t)) return { kind: 'content', title: n.title, blocks: [{ k: 'bullets', items: n.text.split(/[،,;]\s*/).filter(Boolean) }] };
+    if (/بنود|items/.test(t)) return { kind: 'content', title: n.title, blocks: [{ k: 'items', items: n.text.split(/[،,;]\s*/).filter(Boolean).map(x => ({ title: x, text: '' })) }] };
+    return { kind: 'content', title: n.title, blocks: [{ k: 'para', text: n.text || n.title }] };
+  };
+  const toks = ord.replace(/^ORDER\s*[:：]\s*/i, '').split(/[,،\s]+/).filter(Boolean);
+  const steps = [];
+  const seen = new Set();
+  for (const tk of toks) {
+    const up = tk.toUpperCase();
+    let m;
+    if ((m = up.match(/^S(\d+)$/))) { const i = +m[1] - 1; const s = d.slides[i]; if (s && !seen.has(i)) { seen.add(i); steps.push({ type: 'keep', x: { s } }); } }
+    else if (news[up]) steps.push({ type: 'new', spec: typeSpec(news[up]) });
+  }
+  if (!steps.length) { PM.UI.toast('ما قدرت أقرأ الترتيب من الرد', 3500); return false; }
+  // the cover and closing always stay in place
+  const cov = d.slides.find(s => s.spec.kind === 'cover'), clo = d.slides.find(s => s.spec.kind === 'closing');
+  if (cov && !steps.some(x => x.x && x.x.s === cov)) steps.unshift({ type: 'keep', x: { s: cov } });
+  if (clo && !steps.some(x => x.x && x.x.s === clo)) steps.push({ type: 'keep', x: { s: clo } });
+  const dropped = d.slides.filter(s => !steps.some(x => x.x && x.x.s === s) && !s.hidden);
+  dropped.forEach(s => { s.hidden = true; steps.push({ type: 'keep', x: { s } }); });
+  B.applyPlan(steps);
+  PM.UI.toast(`✓ طبّقت قصة Copilot${dropped.length ? ` وأخفيت ${dropped.length} شريحة (موجودة لو تبيها)` : ''}`, 4000);
+};
+
+/* ======================================================================
+   find & replace · approved terminal names
+   ====================================================================== */
+function replaceIn(val, find, rep) {
+  if (typeof val === 'string') return val.split(find).join(rep);
+  if (Array.isArray(val)) return val.map(v => replaceIn(v, find, rep));
+  if (val && typeof val === 'object') { const o = {}; for (const [k, v] of Object.entries(val)) o[k] = /^(k|kind|icon|bind)$/.test(k) ? v : replaceIn(v, find, rep); return o; }
+  return val;
+}
+B.count = function (find) {
+  const d = deck(); let n = 0; const where = new Set();
+  d.slides.forEach((s, i) => s.objs.forEach(o => { if (o.t === 'text') o.paras.forEach(p => { const c = plain(p.t).split(find).length - 1; if (c) { n += c; where.add(i); } }); if (o.t === 'table') o.rows.forEach(r => r.forEach(c2 => { const c = String(c2).split(find).length - 1; if (c) { n += c; where.add(i); } })); }));
+  return { n, where: [...where] };
+};
+B.replaceAll = function (find, rep) {
+  const d = deck(); if (!find) return 0;
+  const { n } = B.count(find);
+  d.slides.forEach(s => {
+    ['title', 'sub', 'eyebrow', 'notes'].forEach(k => { if (typeof s.spec[k] === 'string') s.spec[k] = s.spec[k].split(find).join(rep); });
+    if (s.spec.blocks) s.spec.blocks = replaceIn(s.spec.blocks, find, rep);
+    if (s.spec.items) s.spec.items = replaceIn(s.spec.items, find, rep);
+    s.objs.forEach(o => {
+      if (o.t === 'text') { let ch = false; o.paras.forEach(p => { if (!p.t.includes(find) && plain(p.t).includes(find)) p.t = plain(p.t); if (p.t.includes(find)) { p.t = p.t.split(find).join(rep); ch = true; if (p.bind) PM.writeBind(s.spec, p.bind, p.t); } }); if (ch) PM.TextTools.fitH(o); }
+      if (o.t === 'table') o.rows = o.rows.map(r => r.map(c => String(c).split(find).join(rep)));
+    });
+  });
+  if (n) { PM.commit('replace'); PM.UI.renderAll(); }
+  return n;
+};
+B.findReplace = function () {
+  const d = deck(); if (!d) return;
+  PM.Ed.endEdit();
+  const body = `<label class="f">ابحث عن</label><input class="inp" id="frF" placeholder="كلمة أو جملة">
+    <label class="f" style="margin-top:10px">استبدلها بـ</label><input class="inp" id="frR" placeholder="اتركها فاضية للحذف">
+    <p class="hint" id="frN" style="margin-top:10px"></p><div id="frW" class="chips"></div>`;
+  PM.UI.modal('بحث واستبدال في كل العرض', body, { foot: `<button class="btn pri" id="frGo">${ic('replace')}استبدل الكل</button>` });
+  const upd = () => { const f = $('#frF').value; if (!f) { $('#frN').textContent = ''; $('#frW').innerHTML = ''; return; } const r = B.count(f); $('#frN').innerHTML = r.n ? `لقيتها <b class="num">${r.n}</b> مرة في <b class="num">${r.where.length}</b> شريحة` : 'ما لقيتها'; $('#frW').innerHTML = r.where.map(i => `<button class="chip" data-go="${i}">الشريحة <span class="num">${i + 1}</span></button>`).join(''); $$('#frW [data-go]').forEach(b => b.onclick = () => { PM.UI.closeModal(); PM.UI.select(+b.dataset.go); }); };
+  $('#frF').oninput = upd; setTimeout(() => $('#frF').focus(), 30);
+  $('#frGo').onclick = () => { const f = $('#frF').value; if (!f) return; const n = B.replaceAll(f, $('#frR').value); PM.UI.closeModal(); PM.UI.toast(n ? `✓ استبدلت ${n} مرة` : 'ما لقيت الكلمة'); };
+};
+B.fixTerminals = function () {
+  const d = deck(); let n = 0;
+  n += B.replaceAll('الصالة الجنوبية', 'الصالة 4');
+  n += B.replaceAll('South Terminal', 'Terminal 4');
+  // «صالات الحج والعمرة» → the approved name (once, never twice)
+  const T3 = 'الصالة 3ب (مجمع صالات الحج والعمرة)';
+  d.slides.forEach(s => s.objs.forEach(o => { if (o.t === 'text') o.paras.forEach(p => { if (p.t.includes('صالات الحج والعمرة') && !p.t.includes('3ب')) { p.t = p.t.replace(/(مجمع\s+)?صالات الحج والعمرة/g, T3); n++; if (p.bind) PM.writeBind(s.spec, p.bind, p.t); PM.TextTools.fitH(o); } }); }));
+  PM.commit('terminals'); PM.UI.renderAll();
+  return n;
+};
 })(window.PM);
 
 

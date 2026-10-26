@@ -17,10 +17,10 @@ PM.importFile = async function (file, opts = {}) {
   let res;
   if (zip.file('word/document.xml')) {
     const d = await parseDocx(zip, {});
-    res = PM.analyzeDocx(d);
+    res = PM.analyzeDocx(d, { keep: !!opts.keep });
   } else if (zip.file('ppt/presentation.xml')) {
     const p = await parsePptx(zip, {});
-    res = await PM.analyzePptx(p);
+    res = await PM.analyzePptx(p, { keep: !!opts.keep });
     res.warnings = p.warnings || [];
   } else throw new Error('الملف ما فيه محتوى Word أو PowerPoint');
   const lang = opts.lang && opts.lang !== 'auto' ? opts.lang : (res.lang || 'ar');

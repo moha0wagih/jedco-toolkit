@@ -27,7 +27,7 @@ for i in range(len(stock)):
 data = 'window.PM = window.PM || {};\nPM.LOGO = ' + logo + ';\nPM.BG = ' + json.dumps(bg) + ';\nPM.STOCK = ' + json.dumps(stock) + ';\nPM.STOCK_SIZE = ' + json.dumps(sizes) + ';\n'
 mods = [NEW + f for f in ['/00_core.js', '/01_analyze.js', '/02_layout.js', '/04_render.js', '/05_chart.js']]
 mods += sorted(glob.glob(NEW + '/lib/*.js'))
-mods += [NEW + f for f in ['/30_state.js', '/31_editor.js', '/33_import.js', '/34_export.js', '/32_ui.js', '/35_imagegen.js']]
+mods += [NEW + f for f in ['/30_state.js', '/31_editor.js', '/36_text.js', '/37_photos.js', '/33_import.js', '/34_export.js', '/32_ui.js', '/35_imagegen.js', '/38_dock.js', '/39_brain.js']]
 app = '\n'.join(f'/* ---- {os.path.relpath(p, NEW)} ---- */\n' + rd(p) for p in mods)
 boot = r'''
 (function () {
@@ -68,6 +68,7 @@ page = f'''<!doctype html>
 </script>
 <script src="tpl_ar.js"></script>
 <script src="tpl_en.js"></script>
+<script src="photos/lib.js"></script>
 <script>
 {data}
 </script>

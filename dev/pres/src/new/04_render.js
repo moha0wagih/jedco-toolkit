@@ -31,12 +31,12 @@ function paraHTML(p, o) {
   const boxR = o.dir === 'rtl';
   let al = p.al ? ({ l: 'left', c: 'center', r: 'right' })[p.al] : (o.align === 'center' ? 'center' : o.align === 'end' ? (boxR ? 'left' : 'right') : (boxR ? 'right' : 'left'));
   const t = p.caps ? String(p.t).toUpperCase() : String(p.t);
-  const runs = PM.runs(t, p).map(r => `<span style="font-family:${r.f};${r.k !== 1 ? `font-size:${(p.size * r.k).toFixed(2)}px;` : ''}">${esc(r.t)}</span>`).join('');
+  const runs = PM.runs(t, p).map(r => `<span${r.b ? ' data-b="1"' : ''} style="font-family:${r.f};${r.k !== 1 ? `font-size:${(p.size * r.k).toFixed(2)}px;` : ''}${r.b ? 'font-weight:700;' : ''}">${esc(r.t)}</span>`).join('');
   const ind = p.bullet ? p.size * 1.25 : 0;
   const bpos = boxR ? 'right:0;' : 'left:0;';
   const bul = p.bullet === 'dot' ? `<span class="pmb" style="${bpos}width:${ind}px;color:#${p.bc || '004EAA'};">●</span>` : p.bullet === 'num' ? `<span class="pmb" style="${bpos}width:${ind}px;font-family:SanSeq;font-size:${p.size * 0.8}px;color:#${p.bc || '62B6F3'}">${o.n}</span>` : p.bullet === 'dash' ? `<span class="pmb" style="${bpos}width:${ind}px;color:#${p.bc || '62B6F3'}">—</span>` : '';
   const fw = p.bold ? 700 : 400;
-  return `<div class="pmp" dir="${dir}" data-bind="${p.bind || ''}" style="font-size:${p.size}px;line-height:${(p.size * (p.lh || 1.2)).toFixed(2)}px;color:#${p.color};font-weight:${fw};text-align:${al};margin-top:${(p.sb || 0).toFixed(2)}px;margin-bottom:${(p.sa || 0).toFixed(2)}px;${ind ? (boxR ? `padding-right:${ind}px;` : `padding-left:${ind}px;`) : ''}${p.track ? `letter-spacing:${(p.track * p.size).toFixed(2)}px;` : ''}">${bul}${runs || '&#8203;'}</div>`;
+  return `<div class="pmp" dir="${dir}" data-bind="${p.bind || ''}" style="font-size:${p.size}px;line-height:${(p.size * (p.lh || 1.2)).toFixed(2)}px;color:#${p.color};font-weight:${fw};text-align:${al};margin-top:${(p.sb || 0).toFixed(2)}px;margin-bottom:${(p.sa || 0).toFixed(2)}px;${ind ? (boxR ? `padding-right:${ind}px;` : `padding-left:${ind}px;`) : ''}${p.track ? `letter-spacing:${(p.track * p.size).toFixed(2)}px;` : ''}${p.sw ? `-webkit-text-stroke:${(p.sw * p.size * 0.025).toFixed(2)}px currentColor;` : ''}">${bul}${runs || '&#8203;'}</div>`;
 }
 PM.textHTML = function (o) {
   let n = 0;
@@ -74,6 +74,14 @@ PM.objEl = function (o, assets) {
       break;
     }
     case 'image': {
+      const sa = assets && assets[o.src];
+      if (sa && sa.kind === 'sug') {
+        el.classList.add('pm-sug');
+        const sm = Math.min(o.w, o.h) < 150;
+        el.innerHTML = `<div class="pm-sugi"><svg viewBox="0 0 24 24" fill="none" stroke="#004EAA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="width:${sm ? 22 : 30}px;height:${sm ? 22 : 30}px"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg><b>صورة مقترحة</b>${sm ? '' : `<span>${esc(sa.note || '')}</span>`}</div>`;
+        if (o.r) st.borderRadius = o.r + 'px';
+        break;
+      }
       const url = PM.imgURL(assets, o.src);
       if (url) { st.backgroundImage = `url("${url}")`; st.backgroundSize = 'cover'; st.backgroundPosition = `${(o.fx * 100).toFixed(1)}% ${(o.fy * 100).toFixed(1)}%`; if (o.zoom && o.zoom > 1) { st.backgroundSize = (o.zoom * 100).toFixed(0) + '%'; imgZoom(st, o, assets); } }
       else { st.background = '#DCE5F0'; el.innerHTML = '<div class="pm-ph">＋</div>'; }
@@ -121,7 +129,10 @@ PM.injectRenderCSS = function () {
 .pmp{white-space:pre-wrap;word-break:normal;overflow-wrap:normal;position:relative;font-feature-settings:"kern" 1}
 .pmb{position:absolute;top:0;display:inline-block;text-align:start;font-size:.62em;line-height:inherit;font-family:Arial,sans-serif}
 .pm-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#7A8BA3;font-size:26px}
-.pm-image{background-repeat:no-repeat}`;
+.pm-image{background-repeat:no-repeat}
+.pm-sug{background:#E8F0FA;box-shadow:inset 0 0 0 1.5px #62B6F3;background-image:repeating-linear-gradient(135deg,rgba(98,182,243,.10) 0 10px,transparent 10px 20px)}
+.pm-sugi{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px;text-align:center;direction:rtl;font-family:SanTaj,sans-serif;color:#3D4A5C}
+.pm-sugi b{font-size:14px;color:#004EAA;font-weight:700}.pm-sugi span{font-size:11.5px;line-height:1.5;max-width:300px}`;
   document.head.appendChild(st);
 };
 })(window.PM);

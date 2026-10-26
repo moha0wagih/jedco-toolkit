@@ -22,7 +22,8 @@ function runXml(r, p) {
   const sz = Math.round(p.size * (r.k || 1) * 100);
   const spc = p.track ? ` spc="${Math.round(p.track * p.size * 100)}"` : '';
   const txt = p.caps ? String(r.t).toUpperCase() : r.t;
-  return `<a:r><a:rPr lang="${ar ? 'ar-SA' : 'en-US'}" altLang="en-US" sz="${sz}" b="${p.bold && !r.num ? 1 : 0}"${spc} dirty="0"><a:solidFill><a:srgbClr val="${p.color}"/></a:solidFill><a:latin typeface="${esc(face)}"/><a:ea typeface="${esc(face)}"/><a:cs typeface="${esc(r.num ? FONTS.num : FONTS.ar)}"/></a:rPr><a:t>${esc(txt)}</a:t></a:r>`;
+  const ln = p.sw ? `<a:ln w="${Math.round(p.sw * p.size * 0.025 * 12700)}"><a:solidFill><a:srgbClr val="${p.color}"/></a:solidFill></a:ln>` : '';
+  return `<a:r><a:rPr lang="${ar ? 'ar-SA' : 'en-US'}" altLang="en-US" sz="${sz}" b="${(p.bold || r.b) && !r.num ? 1 : 0}"${spc} dirty="0">${ln}<a:solidFill><a:srgbClr val="${p.color}"/></a:solidFill><a:latin typeface="${esc(face)}"/><a:ea typeface="${esc(face)}"/><a:cs typeface="${esc(r.num ? FONTS.num : FONTS.ar)}"/></a:rPr><a:t>${esc(txt)}</a:t></a:r>`;
 }
 function paraXml(p, box) {
   const boxR = box.dir === 'rtl';
@@ -246,6 +247,7 @@ const maxId = xml => { let m = 1; for (const x of xml.matchAll(/ id="(\d+)"/g)) 
 
 /* ---------- build the deck ---------- */
 PM.exportPptx = async function (deck, onProgress) {
+  if (PM.ensurePhotos) await PM.ensurePhotos(deck);
   const lang = deck.lang === 'en' ? 'en' : 'ar';
   const tplB64 = lang === 'en' ? (window.__TPL_EN || '') : (window.__TPL_AR || '');
   if (!tplB64) throw new Error('ملف التمبلت الرسمي غير موجود بجانب الأداة (tpl_ar.js / tpl_en.js)');
@@ -311,7 +313,18 @@ PM.exportPptx = async function (deck, onProgress) {
       else if (o.t === 'rect' || o.t === 'ellipse') sb.shape(o);
       else if (o.t === 'line') sb.line(o);
       else if (o.t === 'image') {
-        const a = deck.assets[o.src]; const b = PM.assetBytes(a);
+        const a = deck.assets[o.src];
+        if (a && a.kind === 'sug') {
+          // suggested photo: a marked frame the team replaces later
+          const rtl = deck.lang !== 'en';
+          sb.shape(Object.assign({}, o, { t: 'rect', fill: 'E8F0FA', fa: 100, stroke: '62B6F3', sw: 1.25, r: o.r || 0, grad: null, name: 'Suggested photo' }));
+          const ps = [PM.P(rtl ? 'صورة مقترحة' : 'Suggested photo', 13, { bold: true, color: '004EAA', al: 'c' }), PM.P(rtl ? a.note : a.prompt, 10.5, { color: '3D4A5C', al: 'c', sb: 4 })];
+          const t = PM.T(o.x + 16, o.y + 16, Math.max(40, o.w - 32), Math.max(30, o.h - 32), ps, { va: 'm', align: 'center', minK: 0.5 });
+          if (rtl) t.dir = 'rtl';
+          sb.text(t);
+          continue;
+        }
+        const b = PM.assetBytes(a);
         if (!b) continue;
         let ext = (a.ext || 'jpeg').replace('jpg', 'jpeg');
         let bytes = b;
@@ -336,7 +349,8 @@ PM.exportPptx = async function (deck, onProgress) {
       xml = sb.xml();
       relsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${REL('slideLayout')}" Target="../slideLayouts/${T.contentLayout.split('/').pop()}"/>${sb.rels.map(r => `<Relationship Id="${r.id}" Type="${REL(r.type)}" Target="${r.target}"/>`).join('')}</Relationships>`;
     }
-    out.push({ xml, relsXml, notes: s.spec.notes || '' });
+    const sugs = s.objs.filter(o => o.t === 'image' && deck.assets[o.src] && deck.assets[o.src].kind === 'sug').map(o => deck.assets[o.src]);
+    out.push({ xml, relsXml, notes: [s.spec.notes || '', ...sugs.map(a => (deck.lang !== 'en' ? 'صورة مقترحة: ' + a.note + '\n' : '') + 'Image prompt: ' + a.prompt)].filter(Boolean).join('\n') });
   }
   let sldIds = '';
   out.forEach((s, i) => {

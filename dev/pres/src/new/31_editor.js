@@ -82,7 +82,7 @@ Ed.drawOverlay = function (guides) {
   let h = '';
   const inv = 1 / Ed.scale;
   for (const o of sel) h += `<div class="sel-box${sel.length > 1 ? ' multi' : ''}" style="left:${o.x}px;top:${o.y}px;width:${o.w}px;height:${o.h}px;border-width:${1.5 * inv}px"></div>`;
-  if (sel.length === 1 && !Ed.editing) {
+  if (sel.length === 1 && !Ed.editing && !sel[0].pin) {
     const o = sel[0];
     const hs = 10 * inv;
     const dirs = o.t === 'line' ? (Math.abs(o.h) < 1 ? ['w', 'e'] : ['n', 's']) : o.t === 'icon' || o.t === 'logo' ? ['nw', 'ne', 'sw', 'se'] : ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
@@ -143,6 +143,7 @@ function onDown(e) {
     Ed.drawOverlay(); PM.emit('sel');
     return;
   }
+  if (Ed.painter) { const f = Ed.painter; Ed.painter = null; document.body.classList.remove('painting'); f(o); return; }
   // image focus mode: drag inside the frame to move the photo
   if (Ed.tool === 'focus' && o.t === 'image' && ST.sel.has(o.id)) { startFocus(e, o, p); return; }
   if (e.shiftKey || e.ctrlKey || e.metaKey) { if (ST.sel.has(o.id)) ST.sel.delete(o.id); else ST.sel.add(o.id); }
@@ -178,7 +179,7 @@ function onMove(e) {
     const b0 = bounds(drag.start.map(s => Object.assign({}, objById(s.id), { x: s.x, y: s.y })));
     const sn = snap({ x: b0.x + dx, y: b0.y + dy, w: b0.w, h: b0.h }, ids, e.altKey);
     dx += sn.dx; dy += sn.dy;
-    for (const s of drag.start) { const o = objById(s.id); o.x = s.x + dx; o.y = s.y + dy; const el = elFor(o.id); if (el) { el.style.left = o.x + 'px'; el.style.top = o.y + 'px'; } }
+    for (const s of drag.start) { const o = objById(s.id); if (o.pin) continue; o.x = s.x + dx; o.y = s.y + dy; const el = elFor(o.id); if (el) { el.style.left = o.x + 'px'; el.style.top = o.y + 'px'; } }
     Ed.drawOverlay(sn.guides);
     return;
   }
@@ -398,13 +399,13 @@ Ed.endEdit = function () {
   const kids = [...ed.inner.childNodes];
   for (const k of kids) {
     if (k.nodeType === 3) { if (k.textContent.trim()) lines.push(k.textContent); continue; }
-    if (k.classList && k.classList.contains('pmp')) { const b = k.querySelector('.pmb'); const t = (k.innerText || '').replace(b ? b.innerText : '', '').replace(/​/g, ''); lines.push(t.replace(/\n+$/, '')); }
-    else lines.push(k.innerText || '');
+    if (k.classList && k.classList.contains('pmp')) lines.push(PM.readRich(k).replace(/\n+$/, ''));
+    else lines.push(PM.readRich(k));
   }
   const flat = [];
   lines.forEach(l => String(l).split('\n').forEach(x => flat.push(x)));
   const texts = flat.map(t => t.replace(/\s+$/g, ''));
-  while (texts.length > 1 && !texts[texts.length - 1].trim()) texts.pop();
+  while (texts.length > 1 && !PM.plain(texts[texts.length - 1]).trim()) texts.pop();
   const s = slide();
   const old = o.paras;
   if (o.joinBind) {
@@ -423,12 +424,12 @@ Ed.endEdit = function () {
         nu.forEach((p, i) => p.bind = 'blocks.' + bi + '.items.' + i);
       }
     }
-    o.paras = nu.filter((p, i) => p.t.trim() || i === 0);
+    o.paras = nu.filter((p, i) => PM.plain(p.t).trim() || i === 0);
     o.paras.forEach(p => { if (p.bind) PM.writeBind(s.spec, p.bind, p.t); });
     if (o.paras.some(p => !p.bind)) s.edited = true;
   }
-  o.h = Math.max(o.h, PM.blockH(o.paras, o.w) + 1);
-  o.overflow = false;
+  o.h = o.autoH ? PM.blockH(o.paras, o.w) + 1 : Math.max(o.h, PM.blockH(o.paras, o.w) + 1);
+  o.overflow = false; delete o.base;
   if (JSON.stringify(o.paras) !== ed.before) PM.commit('text');
   Ed.render();
   PM.emit('change');

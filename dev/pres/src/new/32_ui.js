@@ -53,10 +53,11 @@ UI.init = function () {
   $('#sLogo').innerHTML = PM.logoSVG('FFFFFF');
   Ed.mount($('#stageHost'));
   bindTop(); bindStart(); bindStrip(); bindLaybar(); bindTabs();
+  if (PM.Dock) PM.Dock.mount();
   PM.on(what => {
     if (what === 'all') { UI.renderAll(); }
     else if (what === 'sel') { UI.renderCtx(); if (UI.tab === 'design') UI.renderPane(); }
-    else if (what === 'change') { UI.renderCtx(); scheduleThumb(); UI.renderLaybar(); }
+    else if (what === 'change') { UI.renderCtx(); scheduleThumb(); UI.renderLaybar(); if (PM.Dock) { clearTimeout(UI.dkT); UI.dkT = setTimeout(() => PM.Dock.render(), 400); } }
     else if (what === 'saved') { const l = $('#savedLbl'); if (l) l.textContent = 'محفوظ ✓'; }
     else if (what === 'go') { }
   });
@@ -87,7 +88,7 @@ PM.emit = function (what, arg) {
 function segVal(id) { const b = $(`#${id} button.on`); return b ? b.dataset.v : null; }
 function segBind(id, fn) { $$(`#${id} button`).forEach(b => b.onclick = () => { $$(`#${id} button`).forEach(x => x.classList.toggle('on', x === b)); if (fn) fn(b.dataset.v); }); }
 function bindStart() {
-  segBind('stLang'); segBind('stBg'); segBind('stTone');
+  segBind('stLang'); segBind('stBg'); segBind('stTone'); segBind('stRead');
   const drop = $('#stDrop');
   $('#fIn').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) importFile(f); };
   drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('on'); });
@@ -117,7 +118,7 @@ async function importFile(f) {
   UI.progress('جاري قراءة الملف…', f.name);
   await new Promise(r => setTimeout(r, 30));
   try {
-    const opt = { lang, grey: segVal('stBg') === 'grey', dark: segVal('stTone') === 'dark' };
+    const opt = { lang, grey: segVal('stBg') === 'grey', dark: segVal('stTone') === 'dark', keep: segVal('stRead') === 'keep' };
     const r = await PM.importFile(f, opt);
     if (r.report.kind === 'project') { UI.progress(false); openDeck(r.deck, { built: true }); UI.toast('فتحت المشروع'); return; }
     UI.progress('أحلل المحتوى وأوزّع التصاميم…', `${r.deck.slides.length} شريحة`);
@@ -154,10 +155,16 @@ function bindTop() {
   segBind('segBg', v => { deck().grey = v === 'grey'; relayoutAll('bg'); });
   segBind('segTone', v => { deck().dark = v === 'dark'; deck().slides.forEach(s => s.tone = null); relayoutAll('tone'); });
   $('#bExport').onclick = exportPptx;
-  $('#bPdf').onclick = () => { if (!deck()) return; Ed.endEdit(); PM.printPdf(deck()); };
-  $('#bShow').onclick = () => { if (!deck()) return; Ed.endEdit(); PM.present(deck(), ST.cur); };
+  $('#bPdf').onclick = async () => { if (!deck()) return; Ed.endEdit(); UI.progress('أجهّز الصور…'); await PM.ensurePhotos(deck()); UI.progress(false); PM.printPdf(deck()); };
+  $('#bShow').onclick = async () => { if (!deck()) return; Ed.endEdit(); UI.progress('أجهّز الصور…'); await PM.ensurePhotos(deck()); UI.progress(false); PM.present(deck(), ST.cur); };
   $('#bCheck').onclick = checkDeck;
   $('#bCopilot').onclick = copilot;
+  $('#bStory').onclick = () => PM.Brain.story();
+  document.addEventListener('keydown', e => {
+    if (!deck() || UI.modalOpen() || (e.target && (e.target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)))) return;
+    if (e.key === '/' ) { e.preventDefault(); PM.Brain.directive(); }
+    if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'f' || e.key.toLowerCase() === 'h')) { e.preventDefault(); PM.Brain.findReplace(); }
+  });
 }
 function relayoutAll(label) {
   const d = deck();
@@ -175,6 +182,7 @@ async function fileAction(a) {
   if (a === 'saveProj') saveProject();
   if (a === 'openProj') { const i = document.createElement('input'); i.type = 'file'; i.accept = '.json'; i.onchange = () => i.files[0] && importFile(i.files[0]); i.click(); }
   if (a === 'recent') showStart();
+  if (a === 'find') PM.Brain.findReplace();
 }
 function fileName(ext) { const d = deck(); const n = (d.name || (d.slides[0] && d.slides[0].spec.title) || 'عرض').replace(/[\\/:*?"<>|]+/g, ' ').trim().slice(0, 60); return n + '.' + ext; }
 function saveProject() {
@@ -205,15 +213,21 @@ UI.renderAll = function () {
   $$('#segTone button').forEach(b => b.classList.toggle('on', b.dataset.v === (d.dark ? 'dark' : 'light')));
   document.documentElement.dir = 'rtl';
   renderThumbs(); Ed.render(); UI.renderCtx(); UI.renderLaybar(); UI.renderPane();
+  if (PM.Dock) PM.Dock.render();
   $('#bUndo').disabled = ST.undo.length < 2; $('#bRedo').disabled = !ST.redo.length;
 };
 function go(delta) {
   const d = deck(); if (!d) return;
   Ed.endEdit();
   ST.cur = PM.clamp(ST.cur + delta, 0, d.slides.length - 1);
-  ST.sel.clear(); UI.renderAll(); scrollThumb();
+  ST.sel.clear(); UI.renderCur(); scrollThumb();
 }
-UI.select = function (i) { Ed.endEdit(); ST.cur = i; ST.sel.clear(); UI.renderAll(); scrollThumb(); };
+UI.renderCur = function () {
+  $$('#thumbs .th').forEach(t => t.classList.toggle('cur', +t.dataset.i === ST.cur));
+  Ed.render(); UI.renderCtx(); UI.renderLaybar(); UI.renderPane();
+  if (PM.Dock) PM.Dock.render();
+};
+UI.select = function (i) { Ed.endEdit(); ST.cur = i; ST.sel.clear(); if ($$('#thumbs .th').length === deck().slides.length) UI.renderCur(); else UI.renderAll(); scrollThumb(); };
 
 /* ---------- thumbnails ---------- */
 let thumbRaf = null;
@@ -321,6 +335,7 @@ function bindLaybar() {
     if (L && L.tones.includes(s.tone)) PM.applyLayout(d, ST.cur, L); else PM.autoSlide(d, ST.cur);
     PM.commit('tone'); UI.renderAll();
   };
+  $('#bReview').onclick = () => PM.Brain.review();
   $('#bAuto').onclick = () => { const d = deck(); PM.autoSlide(d, ST.cur); PM.renumber(d); PM.commit('auto'); UI.renderAll(); UI.toast('أعدت توزيع الشريحة'); };
   $('#bPanel').onclick = () => $('#side').classList.toggle('open');
 }
@@ -336,6 +351,7 @@ function cycle(dir) {
   }
   ST.sel.clear(); PM.renumber(d); PM.commit('layout'); UI.renderAll();
 }
+UI.cycle = cycle;
 UI.applyLayoutId = function (id) {
   const d = deck(), L = PM.layoutById(id); if (!L) return;
   Ed.endEdit();
@@ -383,6 +399,7 @@ function paneDesign(p) {
     <h4 style="margin-top:18px">${ic('sparkles')}تصاميم مقترحة لهذه الشريحة</h4>
     <div class="sugg" id="sugg"></div>
     <button class="bigbtn" id="pLib">${ic('layout-grid')}افتح مكتبة التصاميم كاملة</button>
+    ${kind === 'content' && s.layout ? `<button class="bigbtn ghost" id="pSame" style="margin-top:8px">${ic('copy-check')}نفس التصميم لكل الشرائح المشابهة</button>` : ''}
     <div class="note" style="margin-top:14px">اضغط مرتين على أي نص لتعديله · اسحب أي عنصر لتحريكه · Shift للتحديد المتعدد · اسحب الصور من جهازك مباشرة على الشريحة</div>`;
   const list = candList().slice(0, 12);
   const g = $('#sugg', p);
@@ -395,6 +412,23 @@ function paneDesign(p) {
     el.onclick = () => UI.applyLayoutId(L.id);
   });
   $('#pLib', p).onclick = openLibrary;
+  const same = $('#pSame', p);
+  if (same) same.onclick = () => {
+    const d = deck(), L = PM.layoutById(s.layout); if (!L) return;
+    let n = 0;
+    d.slides.forEach((x, i) => {
+      if (x === s || x.spec.kind !== 'content' || x.edited || x.hidden) return;
+      const sx = PM.shape(x.spec); if (sx.form !== sp.form || (sx.others.length > 0) !== (sp.others.length > 0)) return;
+      const tone = x.tone || (d.dark ? 'dark' : 'light'); if (!L.tones.includes(tone)) return;
+      const c = PM.slideCtx(d, i); let ok = 0; try { ok = L.accepts(sx, c); } catch (e) { ok = 0; }
+      if (!ok) return;
+      const r = PM.renderLayout(L, JSON.parse(JSON.stringify(x.spec)), c);
+      if ((r.missing && r.missing.length) || r.overflow) return;
+      PM.applyLayout(d, i, L); n++;
+    });
+    PM.renumber(d); PM.commit('same-layout'); UI.renderAll();
+    UI.toast(n ? `✓ طبّقت «${L.name}» على ${n} شريحة مشابهة` : 'ما فيه شرائح مشابهة يناسبها نفس التصميم بدون ما يخفي محتوى');
+  };
   $$('[data-conv]', p).forEach(b => b.onclick = () => {
     const d = deck(), s2 = cur();
     const before = JSON.stringify(s2.spec);
@@ -460,12 +494,53 @@ function insert(kind) {
   if (isPhone()) $('#side').classList.remove('open');
 }
 async function panePhotos(p) {
-  const d = deck();
-  p.innerHTML = `<label class="dropz" id="phUp"><input type="file" accept="image/*" multiple hidden>${ic('upload')}<div>أضف صورك (تنحفظ في مكتبتك على هذا الجهاز)</div></label>
-    <h4>${ic('folder-heart')}مكتبتي</h4><div class="phgrid" id="phLib"></div>
+  const d = deck(), s = cur();
+  const LIBN = Object.keys(PM.PHOTOLIB || {}).length;
+  const subjCount = {};
+  Object.values(PM.PHOTOLIB || {}).forEach(m => { subjCount[m.subj] = (subjCount[m.subj] || 0) + 1; });
+  const SUBJ_AR = { aircraft: 'طائرات', terminal: 'صالات', passengers: 'مسافرون', architecture: 'عمارة', tower: 'البرج', vehicles: 'مركبات', apron: 'ساحة الطائرات', gate: 'بوابات', hq: 'المقر', lounge: 'صالات انتظار', art: 'فن', retail: 'أسواق', runway: 'المدرج', 'check-in': 'تسجيل', marshaller: 'موجّه الطائرات', aquarium: 'الحوض المائي', security: 'أمن', crew: 'طاقم', maintenance: 'صيانة', boarding: 'صعود', road: 'طرق', helicopter: 'مروحية' };
+  const subs = Object.entries(subjCount).filter(([k, n]) => SUBJ_AR[k] && n >= 2).sort((a, b) => b[1] - a[1]);
+  const mode = d.photoSug || 'auto';
+  p.innerHTML = `<div class="phhead"><input class="inp" id="phq" placeholder="ابحث: طائرة، صالة، غروب، مسافرين، البرج…"><span class="hint"><span class="num">${LIBN}</span> صورة</span></div>
+    <div class="chips" id="phSubj"><button class="chip on" data-sj="">المناسبة للشريحة</button>${subs.map(([k, n]) => `<button class="chip" data-sj="${k}">${SUBJ_AR[k]} <span class="num" style="opacity:.6">${n}</span></button>`).join('')}</div>
+    <div class="phgrid big" id="phLibG"></div>
+    <h4 style="margin-top:16px">${ic('lightbulb')}الصور المقترحة</h4>
+    <div class="seg" id="phSug" style="margin-bottom:6px"><button data-v="auto" class="${mode === 'auto' ? 'on' : ''}">تلقائي</button><button data-v="always" class="${mode === 'always' ? 'on' : ''}">كل صورة ما تطابق</button><button data-v="never" class="${mode === 'never' ? 'on' : ''}">بدون اقتراحات</button></div>
+    <p class="hint">لو موضوع الشريحة ما له صورة في المكتبة (حج، عمرة، قطار…) تحط الأداة إطاراً مكتوب فيه وصف الصورة المقترحة، وتقدر تصنعها من «توليد صورة».</p>
+    <h4 style="margin-top:16px">${ic('folder-heart')}مكتبتي</h4>
+    <label class="dropz" id="phUp"><input type="file" accept="image/*" multiple hidden>${ic('upload')}<div>أضف صورك (تنحفظ في مكتبتك على هذا الجهاز)</div></label>
+    <div class="phgrid" id="phLib"></div>
     <h4>${ic('file-image')}صور من الملف</h4><div class="phgrid" id="phFile"></div>
-    <h4>${ic('plane')}صور مطارات جدة</h4><div class="phgrid" id="phStock"></div>
     <p class="hint" style="margin-top:12px">اسحب أي صورة على الشريحة. لو سحبتها فوق صورة موجودة تستبدلها.</p>`;
+  const tile = (id, del) => { const a = d.assets[id]; const m = a && a.pid && PM.PHOTOLIB[a.pid]; return `<div class="ph" draggable="true" data-asset="${id}" title="${esc(m ? m.note : '')}" style="background-image:url('${PM.imgURL(d.assets, id)}')">${del ? `<button class="x" data-del="${id}">×</button>` : ''}</div>`; };
+  let subj = '';
+  const drawLib = () => {
+    const q = $('#phq', p).value.trim();
+    let ids;
+    if (q) ids = PM.photoSearch(q, 90);
+    else if (subj) ids = Object.entries(PM.PHOTOLIB).filter(([, m]) => m.subj === subj).sort((a, b) => b[1].hero - a[1].hero).map(([k]) => 'ph:' + k);
+    else ids = s ? PM.photoAlternatives(d, s, 24) : [];
+    $('#phLibG', p).innerHTML = ids.length ? ids.filter(id => d.assets[id]).map(id => tile(id)).join('') : '<p class="hint" style="grid-column:1/-1">ما لقيت صوراً بهذه الكلمة. جرّب كلمة ثانية، أو اصنعها من «توليد صورة».</p>';
+    wire($('#phLibG', p));
+  };
+  const wire = (box) => $$('.ph', box).forEach(el => {
+    el.ondragstart = e => e.dataTransfer.setData('application/x-pm-asset', el.dataset.asset);
+    el.onclick = e => {
+      if (e.target.closest('[data-del]')) { e.stopPropagation(); PM.photoLib.del(e.target.dataset.del).then(() => panePhotos(p)); return; }
+      const sel = Ed.selected();
+      Ed.placeImage(el.dataset.asset, { x: 480, y: 270 }, sel.length === 1 && sel[0].t === 'image' ? sel[0] : null);
+      if (isPhone()) $('#side').classList.remove('open');
+    };
+  });
+  let qt; $('#phq', p).oninput = () => { clearTimeout(qt); qt = setTimeout(drawLib, 180); };
+  $$('#phSubj .chip', p).forEach(b => b.onclick = () => { subj = b.dataset.sj; $$('#phSubj .chip', p).forEach(x => x.classList.toggle('on', x === b)); $('#phq', p).value = ''; drawLib(); });
+  $$('#phSug button', p).forEach(b => b.onclick = () => {
+    d.photoSug = b.dataset.v; $$('#phSug button', p).forEach(x => x.classList.toggle('on', x === b));
+    // re-pick photos that were chosen automatically
+    d.slides.forEach((sl, i) => { if (sl.spec.autoImgs && sl.spec.autoImgs.length && !sl.edited) { sl.spec.autoImgs = []; PM.relayout(d, i); } });
+    PM.commit('photosug'); UI.renderAll(); UI.toast(b.dataset.v === 'never' ? 'رجّعت صور المكتبة مكان الاقتراحات' : 'حدّثت الصور حسب الاختيار');
+  });
+  drawLib();
   const up = $('#phUp', p);
   $('input', up).onchange = async e => {
     for (const f of e.target.files) {
@@ -480,20 +555,10 @@ async function panePhotos(p) {
   up.addEventListener('drop', async e => { e.preventDefault(); up.classList.remove('on'); const dt = new DataTransfer(); [...e.dataTransfer.files].forEach(f => dt.items.add(f)); $('input', up).files = dt.files; $('input', up).onchange({ target: $('input', up) }); });
   const lib = await PM.photoLib.all();
   lib.forEach(r => { if (!d.assets[r.id]) d.assets[r.id] = { kind: 'image', ext: r.ext, b64: r.b64, size: r.size, lib: true }; });
-  const tile = (id, del) => `<div class="ph" draggable="true" data-asset="${id}" style="background-image:url('${PM.imgURL(d.assets, id)}')">${del ? `<button class="x" data-del="${id}">×</button>` : ''}</div>`;
   $('#phLib', p).innerHTML = lib.length ? lib.map(r => tile(r.id, true)).join('') : '<p class="hint" style="grid-column:1/-1">ما فيه صور بعد.</p>';
   const fromFile = Object.keys(d.assets).filter(k => d.assets[k].fromFile);
   $('#phFile', p).innerHTML = fromFile.length ? fromFile.map(k => tile(k)).join('') : '<p class="hint" style="grid-column:1/-1">الملف ما فيه صور.</p>';
-  $('#phStock', p).innerHTML = Object.keys(d.assets).filter(k => d.assets[k].stock).map(k => tile(k)).join('');
-  $$('.ph', p).forEach(el => {
-    el.ondragstart = e => e.dataTransfer.setData('application/x-pm-asset', el.dataset.asset);
-    el.onclick = e => {
-      if (e.target.closest('[data-del]')) { e.stopPropagation(); PM.photoLib.del(e.target.dataset.del).then(() => panePhotos(p)); return; }
-      const sel = Ed.selected();
-      Ed.placeImage(el.dataset.asset, { x: 480, y: 270 }, sel.length === 1 && sel[0].t === 'image' ? sel[0] : null);
-      if (isPhone()) $('#side').classList.remove('open');
-    };
-  });
+  wire($('#phLib', p)); wire($('#phFile', p));
 }
 UI.panePhotos = () => { if (UI.tab === 'photos') UI.renderPane(); };
 function paneNotes(p) {
@@ -509,9 +574,10 @@ UI.renderCtx = function () {
   const bar = $('#ctx'); if (!bar || !deck()) return;
   const sel = Ed.selected();
   let h = '';
-  const sw = (list, cur2, act) => list.map(c => `<span class="sw ${cur2 === c ? 'on' : ''}" style="background:#${c}" data-${act}="${c}"></span>`).join('');
+  const sw = (list, cur2, act) => `<button class="cb clr" data-pop="sw" data-list="${list.join(',')}" data-act="${act}" title="اللون"><span class="sw" style="background:#${cur2 || list[0]}"></span>${ic('chevron-down')}</button>`;
+  const dirBtn = `<button class="cb dirb" data-a="directive" title="اكتب ايش تبي والأداة تنفذ ( / )">${ic('wand-sparkles')}توجيه</button><span class="cbs"></span>`;
   if (!sel.length) {
-    h = `<span class="lbl">اختر عنصراً لتعديله، أو:</span><button class="cb" data-a="addText">${ic('type')}نص</button><button class="cb" data-a="addImg">${ic('image-plus')}صورة</button><button class="cb" data-a="tabIcons">${ic('shapes')}أيقونة</button><button class="cb" data-a="tabGen">${ic('wand-sparkles')}توليد صورة</button><span class="cbs"></span><button class="cb" data-a="selAll">${ic('mouse-pointer-2')}تحديد الكل</button>`;
+    h = dirBtn + `<span class="lbl">اختر عنصراً لتعديله، أو:</span><button class="cb" data-a="addText">${ic('type')}نص</button><button class="cb" data-a="addImg">${ic('image-plus')}صورة</button><button class="cb" data-a="tabIcons">${ic('shapes')}أيقونة</button><button class="cb" data-a="tabGen">${ic('wand-sparkles')}توليد صورة</button><span class="cbs"></span><button class="cb" data-a="selAll">${ic('mouse-pointer-2')}تحديد الكل</button>`;
   } else if (sel.length > 1) {
     h = `<span class="lbl"><span class="num">${sel.length}</span> عناصر</span>
       <button class="cb" data-al="r" title="محاذاة لليمين">${ic('align-horizontal-justify-end')}</button><button class="cb" data-al="c" title="توسيط أفقي">${ic('align-horizontal-justify-center')}</button><button class="cb" data-al="l" title="محاذاة لليسار">${ic('align-horizontal-justify-start')}</button>
@@ -521,18 +587,24 @@ UI.renderCtx = function () {
       <span class="cbs"></span><button class="cb" data-a="dup">${ic('copy')}تكرار</button><button class="cb danger" data-a="del">${ic('trash-2')}حذف</button>`;
   } else {
     const o = sel[0];
-    const common = `<span class="cbs"></span><button class="cb" data-a="front" title="للأمام">${ic('bring-to-front')}</button><button class="cb" data-a="back" title="للخلف">${ic('send-to-back')}</button><button class="cb" data-a="dup" title="تكرار (Ctrl+D)">${ic('copy')}</button><button class="cb danger" data-a="del" title="حذف">${ic('trash-2')}</button>`;
+    const more = (extra) => `<button class="cb" data-pop="more" data-extra="${extra || ''}" title="المزيد">${ic('ellipsis')}</button>`;
+    const common = `<span class="cbs"></span>${o.pin ? `<button class="cb on" data-a="pin" title="فك التثبيت">${ic('lock')}</button>` : ''}${more(o.t === 'text' ? 'text' : '')}<button class="cb danger" data-a="del" title="حذف">${ic('trash-2')}</button>`;
     if (o.t === 'text') {
       const p0 = o.paras[0] || {};
+      const painter = `<button class="cb" data-a="paint" title="ناسخ التنسيق: اضغط هنا ثم على نص ثاني">${ic('paintbrush')}</button>`;
       const al = p0.al || (o.align === 'center' ? 'c' : '');
-      h = `<span class="lbl">نص</span><button class="cb" data-a="edit">${ic('pencil')}تعديل</button><button class="cb" data-a="fs-" title="تصغير">A−</button><span class="cb v num">${Math.round(p0.size || 0)}</span><button class="cb" data-a="fs+" title="تكبير">A+</button>
-        <button class="cb ${p0.bold ? 'on' : ''}" data-a="bold" title="عريض">${ic('bold')}</button>${sw(SW_TEXT, p0.color, 'tc')}<span class="cbs"></span>
-        <button class="cb ${al === 'r' ? 'on' : ''}" data-ta="r" title="يمين">${ic('align-right')}</button><button class="cb ${al === 'c' ? 'on' : ''}" data-ta="c" title="وسط">${ic('align-center')}</button><button class="cb ${al === 'l' ? 'on' : ''}" data-ta="l" title="يسار">${ic('align-left')}</button>
-        <button class="cb ${o.paras.some(p => p.bullet) ? 'on' : ''}" data-a="bul" title="نقاط">${ic('list')}</button>${common}`;
+      const TX = PM.TextTools, k = TX.scaleOf(o), wv = p0.sw || 0;
+      h = `<span class="lbl">نص</span><button class="cb" data-a="edit">${ic('pencil')}تعديل</button><span class="cbs"></span>
+        <button class="cb" data-a="fs-" title="تصغير">A−</button><span class="rng" title="حجم هذا النص"><input type="range" id="txSize" min="0.5" max="2.2" step="0.01" value="${k.toFixed(2)}"><span class="num">${Math.round(p0.size || 0)}</span></span><button class="cb" data-a="fs+" title="تكبير">A+</button>
+        <span class="rng" title="سماكة الخط"><span class="rl">سماكة</span><input type="range" id="txW" min="0" max="2" step="0.05" value="${wv}"></span>
+        <button class="cb ${p0.bold ? 'on' : ''}" data-a="bold" title="عريض — وأثناء الكتابة: حدد كلمات واضغط B أو ⌘B">${ic('bold')}</button><button class="cb" data-a="txReset" title="إرجاع الحجم والسماكة الأصلية">${ic('rotate-ccw')}</button>${sw(SW_TEXT, p0.color, 'tc')}<span class="cbs"></span>
+        <button class="cb" data-ta="${al === 'r' || !al ? 'c' : al === 'c' ? 'l' : 'r'}" title="المحاذاة (اضغط للتبديل)">${ic(al === 'c' ? 'align-center' : al === 'l' ? 'align-left' : 'align-right')}</button>${painter}${common}`;
+    } else if (o.t === 'image' && deck().assets[o.src] && deck().assets[o.src].kind === 'sug') {
+      h = `<span class="lbl">صورة مقترحة</span><button class="cb on" data-a="gen">${ic('wand-sparkles')}اصنعها بصانع الصور</button><button class="cb" data-a="tabPhotos">${ic('images')}اختر من المكتبة</button><button class="cb" data-a="replace">${ic('image-up')}من جهازي</button><button class="cb" data-a="unsug" title="رجّع أقرب صورة من المكتبة">${ic('rotate-ccw')}صورة من المكتبة بدلها</button>${common}`;
     } else if (o.t === 'image') {
       h = `<span class="lbl">صورة</span><button class="cb" data-a="replace">${ic('image-up')}استبدال</button><button class="cb ${Ed.tool === 'focus' ? 'on' : ''}" data-a="focus">${ic('move')}تحريك داخل الإطار</button>
         <button class="cb" data-a="z-">${ic('zoom-out')}</button><span class="cb v num">${Math.round((o.zoom || 1) * 100)}%</span><button class="cb" data-a="z+">${ic('zoom-in')}</button>
-        <button class="cb ${o.r ? 'on' : ''}" data-a="round">${ic('square-round-corner')}زوايا</button><button class="cb" data-a="gen">${ic('wand-sparkles')}صورة بالذكاء الاصطناعي</button>${common}`;
+        <button class="cb ${o.r ? 'on' : ''}" data-a="round">${ic('square-round-corner')}زوايا</button><button class="cb" data-a="tabPhotos">${ic('images')}بدائل</button><button class="cb" data-a="sug" title="حط إطار «صورة مقترحة» مكانها">${ic('lightbulb')}اقترح صورة</button><button class="cb" data-a="gen">${ic('wand-sparkles')}توليد</button>${common}`;
     } else if (o.t === 'icon') {
       h = `<span class="lbl">أيقونة</span><button class="cb" data-a="icon">${ic('replace')}تغيير</button>${sw([K.NAVY, K.BLUE, K.SKY, K.WHITE, K.MUTED], o.color, 'ic')}${common}`;
     } else if (o.t === 'chart') {
@@ -548,9 +620,30 @@ UI.renderCtx = function () {
       h = `<span class="lbl">خط</span>${sw([K.NAVY, K.BLUE, K.SKY, K.RULE, K.WHITE], o.color, 'lc')}<button class="cb ${o.dash ? 'on' : ''}" data-a="dash">${ic('ellipsis')}متقطع</button>${common}`;
     } else h = `<span class="lbl">${esc(o.name || '')}</span>${common}`;
   }
+  if (sel.length) h = dirBtn + h;
   bar.innerHTML = h;
-  bar.onclick = ctxClick;
+  bar.onclick = e => { const pb = e.target.closest('[data-pop]'); if (pb) return ctxPop(pb); ctxClick(e); };
+  // keep the text selection alive while using the bar during editing
+  bar.onmousedown = e => { if (Ed.editing && e.target.closest('button')) e.preventDefault(); };
+  const tsz = $('#txSize', bar), tw = $('#txW', bar);
+  const live = (fn, label) => { const s = cur(); sel.filter(o => o.t === 'text').forEach(fn); s.edited = true; sel.forEach(o => { if (o.t === 'text') Ed.refreshObj(o); }); Ed.drawOverlay(); clearTimeout(UI.txT); UI.txT = setTimeout(() => { PM.commit(label); scheduleThumb(); }, 350); };
+  if (tsz) tsz.oninput = () => { const k = +tsz.value; live(o => PM.TextTools.setScale(o, k), 'size'); const v = tsz.parentElement.querySelector('.num'); if (v && sel[0]) v.textContent = Math.round(sel[0].paras[0].size); };
+  if (tw) tw.oninput = () => live(o => PM.TextTools.setWeight(o, +tw.value), 'weight');
 };
+/* small pop-over menus of the context bar (colours, more actions) */
+function ctxPop(btn) {
+  $$('.menu.cpop').forEach(m => m.remove());
+  const m = document.createElement('div'); m.className = 'menu cpop';
+  const sel = Ed.selected(), o = sel[0];
+  if (btn.dataset.pop === 'sw') m.innerHTML = `<div class="swrow">${btn.dataset.list.split(',').map(c => `<span class="sw" style="background:#${c}" data-${btn.dataset.act}="${c}" title="#${c}"></span>`).join('')}</div>`;
+  else m.innerHTML = (btn.dataset.extra === 'text' ? `<button data-a="bul">${ic('list')}${o && o.paras.some(p => p.bullet) ? 'بدون نقاط' : 'نقاط'}</button>` : '')
+    + `<button data-a="pin">${ic('lock')}${o && o.pin ? 'فك التثبيت' : 'تثبيت مكانه'}</button><button data-a="dup">${ic('copy')}تكرار<span class="k">Ctrl+D</span></button><button data-a="front">${ic('bring-to-front')}للأمام<span class="k">]</span></button><button data-a="back">${ic('send-to-back')}للخلف<span class="k">[</span></button>`;
+  const r = btn.getBoundingClientRect();
+  m.style.position = 'fixed'; m.style.top = (r.bottom + 6) + 'px'; m.style.left = Math.max(8, Math.min(innerWidth - 240, r.left + r.width / 2 - 110)) + 'px'; m.style.insetInlineStart = 'auto'; m.style.minWidth = '200px';
+  document.body.appendChild(m);
+  m.onclick = e => { const b = e.target.closest('[data-a],[data-tc],[data-fc],[data-ic],[data-lc]'); if (!b) return; m.remove(); ctxClick({ target: b }); };
+  setTimeout(() => document.addEventListener('pointerdown', function h(ev) { if (!m.contains(ev.target)) { m.remove(); document.removeEventListener('pointerdown', h); } }), 0);
+}
 function ctxClick(e) {
   const b = e.target.closest('[data-a],[data-al],[data-tc],[data-fc],[data-ic],[data-lc],[data-ta],[data-ck],[data-tst]'); if (!b) return;
   const s = cur(), sel = Ed.selected();
@@ -566,22 +659,35 @@ function ctxClick(e) {
   if (ds.tst) { sel[0].style = ds.tst; return done('tablestyle'); }
   const a = ds.a;
   if (a === 'del') return Ed.del();
+  if (a === 'directive') return PM.Brain.directive();
+  if (a === 'pin') { sel.forEach(o => o.pin = !o.pin); s.edited = true; PM.commit('pin'); Ed.drawOverlay(); UI.renderCtx(); UI.toast(sel[0].pin ? 'ثبّته مكانه 🔒' : 'فكيت التثبيت'); return; }
+  if (a === 'paint') {
+    const src = sel[0]; const st = src.paras.map(p => ({ size: p.size, color: p.color, bold: p.bold, sw: p.sw || 0, al: p.al, font: p.font, lh: p.lh, track: p.track, caps: p.caps }));
+    document.body.classList.add('painting');
+    UI.toast('اضغط على النص اللي تبي تنسخ له التنسيق');
+    Ed.painter = (t) => { if (t.t !== 'text') return; t.paras.forEach((p, i) => Object.assign(p, st[Math.min(i, st.length - 1)])); t.align = src.align; PM.TextTools.fitH(t); cur().edited = true; PM.commit('paint'); ST.sel = new Set([t.id]); Ed.render(); UI.renderCtx(); UI.toast('نسخت التنسيق ✓'); };
+    return;
+  }
   if (a === 'dup') return Ed.pasteObjs(JSON.parse(JSON.stringify(sel)));
   if (a === 'front') return Ed.zorder('front');
   if (a === 'back') return Ed.zorder('back');
   if (a === 'edit') return Ed.startEdit(sel[0], true);
   if (a === 'fs+' || a === 'fs-') {
     const k = a === 'fs+' ? 1.08 : 1 / 1.08;
-    sel.forEach(o => { if (o.t === 'text') { o.paras.forEach(p => { p.size = Math.max(6, Math.round(p.size * k * 4) / 4); p.sa = (p.sa || 0) * k; p.sb = (p.sb || 0) * k; }); o.h = Math.max(o.h, PM.blockH(o.paras, o.w) + 1); } if (o.t === 'table') o.fs = Math.max(7, (o.fs || 11) * k); });
+    sel.forEach(o => { if (o.t === 'text') { PM.TextTools.setScale(o, PM.TextTools.scaleOf(o) * k); } if (o.t === 'table') o.fs = Math.max(7, (o.fs || 11) * k); });
     return done('size');
   }
-  if (a === 'bold') { const v = !sel[0].paras[0].bold; sel[0].paras.forEach(p => p.bold = v); return done('bold'); }
+  if (a === 'bold') { if (PM.TextTools.boldSelection()) return; const v = !sel[0].paras[0].bold; sel.filter(o => o.t === 'text').forEach(o => o.paras.forEach(p => p.bold = v)); sel.forEach(o => o.t === 'text' && PM.TextTools.fitH(o)); return done('bold'); }
+  if (a === 'txReset') { sel.filter(o => o.t === 'text').forEach(o => PM.TextTools.reset(o)); return done('txreset'); }
   if (a === 'bul') { const o = sel[0]; const on = o.paras.some(p => p.bullet); o.paras.forEach(p => { p.bullet = on ? null : 'dot'; p.bc = p.bc || K.BLUE; }); return done('bullets'); }
   if (a === 'replace') return pickImageFor(sel[0]);
   if (a === 'focus') { Ed.tool = Ed.tool === 'focus' ? null : 'focus'; UI.renderCtx(); if (Ed.tool) UI.toast('اسحب داخل الصورة لتحريكها في إطارها'); return; }
   if (a === 'z+' || a === 'z-') { const o = sel[0]; o.zoom = PM.clamp((o.zoom || 1) + (a === 'z+' ? 0.15 : -0.15), 1, 4); return done('zoom'); }
   if (a === 'round') { sel.forEach(o => o.r = o.r ? 0 : 14); return done('round'); }
-  if (a === 'gen') { UI.tab = 'gen'; $$('#tabs button').forEach(x => x.classList.toggle('on', x.dataset.t === 'gen')); UI.renderPane(); if (isPhone()) $('#side').classList.add('open'); return; }
+  if (a === 'tabPhotos') { UI.tab = 'photos'; $$('#tabs button').forEach(x => x.classList.toggle('on', x.dataset.t === 'photos')); UI.renderPane(); if (isPhone()) $('#side').classList.add('open'); return; }
+  if (a === 'sug') { const o = sel[0]; const i = o.bindImg ? +o.bindImg.split('.')[1] : 0; o.src = PM.suggestPhoto(deck(), s, i, null, PM.specText(s.spec)); if (o.bindImg) { s.spec.autoImgs = s.spec.autoImgs || []; s.spec.autoImgs[i] = o.src; } return done('sug'); }
+  if (a === 'unsug') { const o = sel[0]; const i = o.bindImg ? +o.bindImg.split('.')[1] : 0; const m = deck().photoSug; deck().photoSug = 'never'; const id = PM.photoPick(deck(), s, i); deck().photoSug = m; o.src = id; if (o.bindImg) { s.spec.autoImgs = s.spec.autoImgs || []; s.spec.autoImgs[i] = id; } return done('unsug'); }
+  if (a === 'gen') { if (sel[0] && sel[0].t === 'image') { const sa = deck().assets[sel[0].src]; PM.IG && (PM.IG.seed = sa && sa.kind === 'sug' ? sa.prompt : null); } UI.tab = 'gen'; $$('#tabs button').forEach(x => x.classList.toggle('on', x.dataset.t === 'gen')); UI.renderPane(); if (isPhone()) $('#side').classList.add('open'); return; }
   if (a === 'icon') return iconPicker(sel[0]);
   if (a === 'stroke') { sel.forEach(o => { o.stroke = o.stroke ? null : K.RULE; o.sw = 1; }); return done('stroke'); }
   if (a === 'dash') { sel.forEach(o => o.dash = !o.dash); return done('dash'); }
@@ -775,7 +881,10 @@ function checkDeck() {
   const body = issues.length
     ? issues.map(x => `<div class="issue"><i class="dot ${x.level}"></i><div><b>${esc(x.t)}</b><span>${esc(x.d || '')}</span></div><button class="btn sec" data-go="${x.i}" style="height:34px">افتح</button></div>`).join('')
     : `<div class="issue"><i class="dot ok"></i><div><b>كل شي سليم ✓</b><span>ما لقيت نصوص متراكبة ولا محتوى مخفي ولا مشاكل في الأسماء المعتمدة.</span></div></div>`;
-  UI.modal(`فحص العرض <span class="num" style="font-size:13px;color:var(--muted);font-weight:400">${issues.length}</span>`, body);
+  const term = issues.some(x => /الصالة الجنوبية|صالات الحج والعمرة/.test(x.t));
+  UI.modal(`فحص العرض <span class="num" style="font-size:13px;color:var(--muted);font-weight:400">${issues.length}</span>`, body, { foot: (term ? `<button class="btn pri" id="ckTerm">${ic('badge-check')}صحّح أسماء الصالات</button>` : '') + `<button class="btn sec" id="ckRev">${ic('scan-eye')}رأي الأداة في كل الشرائح</button>` });
+  const tb = $('#ckTerm'); if (tb) tb.onclick = () => { const n = PM.Brain.fixTerminals(); UI.closeModal(); UI.toast(`✓ صححت ${n} اسم حسب التوجيه`); };
+  $('#ckRev').onclick = () => { UI.closeModal(); PM.Brain.reviewAll(); };
   $$('#modal [data-go]').forEach(b => b.onclick = () => { UI.closeModal(); UI.select(+b.dataset.go); });
 }
 

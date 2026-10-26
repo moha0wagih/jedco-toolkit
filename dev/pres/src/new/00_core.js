@@ -62,7 +62,20 @@ function fam(p, t) {
 PM.fam = fam;
 /* digits inside Arabic text are set in Sequel (brand rule: every number in Sequel) */
 const NUMRUN = /([0-9٠-٩][0-9٠-٩.,٫٬:%٪+\-/]*[0-9٠-٩%٪+]?|[0-9٠-٩])/g;
+/* bold words inside a paragraph are wrapped in two private-use markers (kept in the text so they survive edits and re-layouts) */
+const BO = '\uE010', BC = '\uE011';
+PM.BO = BO; PM.BC = BC;
+PM.plain = t => String(t == null ? '' : t).replace(/[\uE010\uE011]/g, '');
 function runs(t, p) {
+  t = String(t);
+  if (t.indexOf(BO) < 0 && t.indexOf(BC) < 0) return runs0(t, p);
+  const out = []; let b = false, buf = '';
+  const flush = () => { if (buf) runs0(buf, p).forEach(r => { if (b) r.b = true; out.push(r); }); buf = ''; };
+  for (const ch of t) { if (ch === BO) { flush(); b = true; } else if (ch === BC) { flush(); b = false; } else buf += ch; }
+  flush();
+  return out;
+}
+function runs0(t, p) {
   if (p.font === 'num') {
     // a number with an Arabic word ("12 مليون"): digits in Sequel, the word in Tajawal
     // a unit word next to the figure ("53.3 million", "12 مليون") is set smaller in the text face
@@ -82,9 +95,11 @@ PM.runs = runs;
 function textW(t, p, size) {
   let w = 0;
   for (const r of runs(t, p)) {
-    mc.font = `${p.bold && r.f === PM.FONT.ar ? 700 : 400} ${size * r.k}px ${r.f}`;
+    const bold = p.bold || r.b;
+    mc.font = `${bold && r.f === PM.FONT.ar ? 700 : 400} ${size * r.k}px ${r.f}`;
     let x = mc.measureText(r.t).width;
-    if (p.bold && r.f !== PM.FONT.ar) x *= 1.045;
+    if (bold && r.f !== PM.FONT.ar) x *= 1.045;
+    if (p.sw) x += r.t.length * p.sw * size * 0.012;
     if (p.track) x += r.t.length * p.track * size;
     w += x;
   }

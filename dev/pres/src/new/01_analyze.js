@@ -185,7 +185,9 @@ PM.chartFromRows = chartFromRows;
 /* ======================================================================
    PowerPoint → specs
    ====================================================================== */
-async function analyzePptx(parsed) {
+async function analyzePptx(parsed, opt = {}) {
+  const KEEP = !!opt.keep;
+  const tc = t => KEEP ? t : titleCase(t);
   const S = parsed.slides;
   const assets = {};
   // texts repeated across many slides at the same spot are chrome (progress strips, footers, confidentiality lines)
@@ -445,7 +447,7 @@ async function analyzePptx(parsed) {
     }
     const AXIS = /^((19|20)\d\d|now|today|الآن|اليوم|q[1-4]|h[12])$/i;
     const axisOnly = b => b.items && b.items.length >= 2 && b.items.every(it => { const parts = (typeof it === 'string' ? [it] : [it.value, it.date, it.title, it.label, it.text]).filter(Boolean).map(t => clean(t)); return parts.length && parts.every(t => t.split(/\n/).every(x => AXIS.test(x.trim()))); });
-    let bl = blocks.filter(b => b.k !== '_col' && b.k !== '_hdr' && !axisOnly(b) && !(b.k === 'para' && clean(b.text).split(/\n/).every(x => AXIS.test(x.trim()))));
+    let bl = blocks.filter(b => b.k !== '_col' && b.k !== '_hdr' && (KEEP || (!axisOnly(b) && !(b.k === 'para' && clean(b.text).split(/\n/).every(x => AXIS.test(x.trim()))))));
     // the same list twice (a list and its diagram) → keep the richer one
     bl = bl.filter((b, i) => {
       if (!b.items) return true;
@@ -465,7 +467,7 @@ async function analyzePptx(parsed) {
     bl.sort((a, b) => (Math.abs(a.y - b.y) < 30 ? (rtl ? b.x - a.x : a.x - b.x) : a.y - b.y));
     // figures repeated as chart labels ("31.6" over a drawn bar) are already in a KPI
     const figs = new Set(bl.filter(b => b.k === 'kpis').flatMap(b => b.items.map(it => norm(it.value))).filter(Boolean));
-    bl = bl.filter(b => !(b.k === 'para' && figs.has(norm(b.text))));
+    if (!KEEP) bl = bl.filter(b => !(b.k === 'para' && figs.has(norm(b.text))));
     bl.forEach(b => {
       if (b.k === 'para' && b.text.includes('\n')) { const ls = b.text.split('\n'); if (figs.has(norm(ls[0]))) b.text = ls.slice(1).join('\n'); }
       if (b.k === 'bullets' && b.items.length > 2 && figs.has(norm(b.items[0]))) b.items.shift();
@@ -487,15 +489,28 @@ async function analyzePptx(parsed) {
     {
       const capsT = t => /[A-Z]{2}/.test(t) && t === t.toUpperCase() && wc(t) <= 6;
       const flat = bl.flatMap(b => b.k === 'para' ? b.text.split('\n') : b.k === 'bullets' ? b.items : b.k === 'items' && b.items.every(it => !it.text && !it.bullets && !it.value) ? b.items.map(it => it.title) : [null]);
-      if (bl.length && flat.length >= 2 && flat.every(t => t && capsT(t))) bl = [{ k: 'items', items: flat.map(t => ({ title: titleCase(t), text: '' })) }];
+      if (bl.length && flat.length >= 2 && flat.every(t => t && capsT(t))) bl = [{ k: 'items', items: flat.map(t => ({ title: tc(t), text: '' })) }];
     }
     spec.blocks.push(...mergeBlocks(bl, spec));
     spec.blocks = spec.blocks.map(b => { if (b.k !== 'para' || b.head) return b; const ls = b.text.split('\n'); return ls.length === 2 && isNumLike(ls[0]) && !/^(19|20)\d\d$/.test(PM.digits(ls[0]).trim()) && wc(ls[1]) <= 12 ? { k: 'kpis', items: [{ value: ls[0], label: ls[1], text: '' }] } : b; });
     if (!spec.title) {
       const b0 = spec.blocks[0];
-      if (b0 && b0.head) { spec.title = titleCase(b0.head); delete b0.head; }
+      if (b0 && b0.head) { spec.title = tc(b0.head); delete b0.head; }
       else if (b0 && b0.k === 'para' && wc(b0.text) <= 10) { spec.title = b0.text; spec.blocks.shift(); }
       else if (b0 && b0.k === 'para' && b0.text.includes('\n') && wc(b0.text.split('\n')[0]) <= 6) { spec.title = b0.text.split('\n')[0]; b0.text = b0.text.split('\n').slice(1).join('\n'); }
+    }
+    // nothing from the source may silently disappear: lines the structure did not place are added back
+    {
+      const have = norm([spec.title, spec.sub, spec.eyebrow, PM.specText ? PM.specText(spec) : JSON.stringify(spec.blocks)].join(' '));
+      const lost = [];
+      for (const g of segs) for (const p of g.paras) {
+        const t = paraText(p); if (!t) continue;
+        const k = norm(t); if (!k || have.includes(k)) continue;
+        if (!KEEP && (wc(t) < 3 || isNumLike(t) || /^((19|20)\d\d|now|today)$/i.test(t.trim()))) continue;
+        if (lost.some(x => norm(x) === k)) continue;
+        lost.push(t);
+      }
+      if (lost.length) spec.blocks.push(lost.length > 1 ? { k: 'bullets', items: lost } : { k: 'para', text: lost[0] });
     }
     specs.push(spec);
   }

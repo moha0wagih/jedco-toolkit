@@ -9,6 +9,7 @@
         <hr>
         <button data-a="saveProj"><svg class="i" data-ic="download"></svg>حفظ ملف المشروع<span class="k">Ctrl+S</span></button>
         <button data-a="openProj"><svg class="i" data-ic="folder-open"></svg>فتح ملف مشروع…</button>
+        <button data-a="find"><svg class="i" data-ic="search"></svg>بحث واستبدال<span class="k">Ctrl+F</span></button>
         <button data-a="recent"><svg class="i" data-ic="history"></svg>ملفاتي…</button>
         <hr>
         <button data-a="home"><svg class="i" data-ic="house"></svg>شاشة البداية</button>
@@ -21,6 +22,7 @@
     <div class="seg wide" id="segBg" title="لون الصفحات"><button data-v="white">أبيض</button><button data-v="grey">رمادي فاتح</button></div>
     <div class="seg wide" id="segTone" title="نمط العرض"><button data-v="light">فاتح</button><button data-v="dark">داكن</button></div>
     <button class="tbb ghost" id="bCopilot" title="تحسين التوزيع بكوبايلوت — اختياري" data-needs-online><svg class="i" data-ic="sparkles"></svg><span class="t">كوبايلوت</span></button>
+    <button class="tbb" id="bStory" title="قصة العرض وكيف تكون أفضل"><svg class="i" data-ic="book-open"></svg><span class="t">القصة</span></button>
     <button class="tbb" id="bCheck" title="فحص العرض"><svg class="i" data-ic="shield-check"></svg><span class="t">فحص</span></button>
     <button class="tbb" id="bShow" title="عرض الشرائح"><svg class="i" data-ic="play"></svg><span class="t">عرض</span></button>
     <button class="tbb" id="bPdf" title="حفظ PDF"><svg class="i" data-ic="file-text"></svg><span class="t">PDF</span></button>
@@ -35,13 +37,15 @@
     </aside>
     <section class="center">
       <div class="ctxbar" id="ctx"></div>
-      <div id="stageHost"></div>
+      <div class="stagerow"><aside class="dock" id="dock"></aside><div id="stageHost"></div></div>
       <div class="laybar">
         <button class="lb-arr" id="lbPrev" title="التصميم السابق"><svg class="i" data-ic="chevron-right"></svg></button>
         <div class="lb-name"><b id="lbName"></b><span id="lbInfo"></span></div>
         <button class="lb-arr" id="lbNext" title="التصميم التالي"><svg class="i" data-ic="chevron-left"></svg></button>
+        <button class="pill" id="dkOpen" title="أظهر دك التصاميم"><svg class="i" data-ic="panel-right-open"></svg>الدك</button>
         <button class="pill acc" id="bLib"><svg class="i" data-ic="layout-grid"></svg>مكتبة التصاميم</button>
         <button class="pill" id="bTone" title="هذه الشريحة فاتحة أو داكنة"><svg class="i" data-ic="contrast"></svg><span id="toneLbl">داكن</span></button>
+        <button class="pill" id="bReview" title="رأي الأداة في هذه الشريحة"><svg class="i" data-ic="scan-eye"></svg>رأي الأداة</button>
         <button class="pill" id="bAuto" title="أعد توزيع هذه الشريحة"><svg class="i" data-ic="wand-sparkles"></svg>توزيع ذكي</button>
         <button class="pill phoneBtn" id="bPanel"><svg class="i" data-ic="panel-bottom-open"></svg>الأدوات</button>
       </div>
@@ -72,6 +76,7 @@
     <div class="st-opts">
       <label>لغة العرض <div class="seg" id="stLang"><button data-v="auto" class="on">تلقائي</button><button data-v="ar">عربي</button><button data-v="en">English</button></div></label>
       <label>لون الصفحات <div class="seg" id="stBg"><button data-v="white" class="on">أبيض</button><button data-v="grey">رمادي فاتح</button></div></label>
+      <label>قراءة الملف <div class="seg" id="stRead"><button data-v="smart" class="on" title="الأداة تفهم المحتوى وتوزّعه، وتنقل ملاحظات المراجعة للملاحظات">توزيع ذكي</button><button data-v="keep" title="كل سطر في الملف يبقى كما هو بدون أي تعديل، والأداة توزّعه بس">النص كما هو</button></div></label>
       <label>النمط <div class="seg" id="stTone"><button data-v="light" class="on">فاتح</button><button data-v="dark">داكن</button></div></label>
     </div>
     <div class="st-row">
@@ -80,6 +85,6 @@
       <button class="st-btn hide" id="stBack"><svg class="i" data-ic="arrow-right"></svg>رجوع للعرض الحالي</button>
     </div>
     <div class="st-recent hide" id="stRecent"><h5>ملفاتي (محفوظة تلقائياً على هذا الجهاز)</h5><div id="stRecentList"></div></div>
-    <div class="credit">Designed by Mohammed Wagih · 2026 · v2.0</div>
+    <div class="credit">Designed by Mohammed Wagih · 2026 · v2.1</div>
   </div>
 </div>

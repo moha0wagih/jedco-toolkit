@@ -104,7 +104,7 @@ PM.applyLayout = function (deck, si, L, opt = {}) {
   const c = PM.slideCtx(deck, si);
   const r = PM.renderLayout(L, s.spec, c);
   s.layout = L.id;
-  s.objs = r.objs;
+  s.objs = PM.explodeText ? PM.explodeText(r.objs) : r.objs;
   s.edited = false;
   s.overflow = r.overflow;
   s.missing = r.missing;
@@ -201,7 +201,8 @@ PM.serialize = function (deck) {
   const used = new Set();
   deck.slides.forEach(s => { (s.objs || []).forEach(o => { if (o.src) used.add(o.src); }); (s.spec.imgs || []).forEach(id => used.add(id)); (s.spec.autoImgs || []).forEach(id => used.add(id)); });
   for (const [k, a] of Object.entries(deck.assets)) {
-    if (a.stock || a.tplbg) continue;
+    if (a.stock || a.tplbg || a.libph) continue;
+    if (a.kind === 'sug') { if (used.has(k)) assets[k] = { kind: 'sug', note: a.note, prompt: a.prompt, size: a.size }; continue; }
     if (!used.has(k) && !a.lib) continue;
     const b = PM.assetBytes(a);
     if (b) assets[k] = { kind: a.kind, ext: a.ext, b64: PM.bytesToB64(b), size: a.size, lib: a.lib || false, tags: a.tags || '' };

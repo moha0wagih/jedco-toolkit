@@ -303,16 +303,39 @@ function overlapCount(objs) {
 }
 PM.overlapCount = overlapCount;
 /* best layout for a slide: the top candidates are tried and the first that fits cleanly wins */
+/* how good a rendered slide reads: body text size, balance, use of space (1 = fine) */
+PM.layoutQuality = function (objs, c) {
+  const plain = t => PM.plain ? PM.plain(t) : t;
+  const body = [];
+  let mx = 0, mw = 0, area = 0, full = false;
+  for (const o of objs) {
+    if (o.hidden || o.role === 'tplbg' || o.role === 'chrome' || o.role === 'veil' || o.pageNum || o.t === 'logo') continue;
+    if (o.t === 'image' && o.w > 900 && o.h > 500) { full = true; continue; }
+    if (o.w > 900 && o.h > 500) continue;
+    let wgt = o.w * o.h;
+    if (o.t === 'text') { o.paras.forEach(p => { if (PM.words(plain(p.t)) >= 4) body.push(p.size); }); wgt = o.w * Math.min(o.h, PM.blockH(o.paras, o.w)) * 1.4; }
+    else if (o.t === 'rect' || o.t === 'ellipse') wgt *= (o.fill ? 0.35 : 0.08);
+    else if (o.t === 'line') wgt = (o.w + o.h) * 2;
+    mx += (o.x + o.w / 2) * wgt; mw += wgt;
+    if (o.t !== 'line') area += Math.min(o.w * o.h, 900 * 460);
+  }
+  const minB = body.length ? Math.min(...body) : 16;
+  const comfy = c && c.lang === 'en' ? 12.5 : 13.5;
+  let q = Math.pow(PM.clamp(minB / comfy, 0.55, 1), 1.6);
+  if (!full) { const bal = mw ? Math.abs(mx / mw - 480) / 960 : 0; q *= 1 - Math.min(0.3, Math.max(0, bal - 0.06) * 1.6); const fill = area / (840 * 438); if (fill < 0.2) q *= 0.88; }
+  return q;
+};
 PM.autoLayout = function (spec, c, avoid = []) {
   const cand = PM.candidates(spec, c);
   let best = null;
-  for (const { L, s } of cand.slice(0, 18)) {
+  for (const { L, s } of cand.slice(0, 14)) {
     const r = PM.renderLayout(L, spec, c);
     if (r.missing && r.missing.length) continue;
     const pen = (r.overflow ? 0.35 : 1) * (avoid.includes(L.fam) ? 0.82 : 1) * (avoid.includes(L.id) ? 0.5 : 1);
-    const sc = s * pen;
+    const q = PM.layoutQuality(r.objs, c);
+    const sc = s * pen * (0.45 + 0.55 * q);
     if (!best || sc > best.sc) best = { L, sc, r };
-    if (!r.overflow && sc >= cand[0].s * 0.95) break;
+    if (!r.overflow && q > 0.97 && s >= cand[0].s * 0.97) break;
   }
   return best;
 };

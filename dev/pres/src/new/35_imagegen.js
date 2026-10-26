@@ -282,7 +282,9 @@ let lastSlide = null;
 IG.mount = function (pane) {
   load();
   const s = PM.ST.deck.slides[PM.ST.cur];
-  if (lastSlide !== s.id) { lastSlide = s.id; ST.idea = slideIdea(); const f = frameSize(targetFrame()); if (f) { ST.size = 'custom'; ST.cw = String(f.w); ST.ch = String(f.h); } else ST.size = '169'; }
+  const fr = targetFrame(); const fa = fr && PM.ST.deck.assets[fr.src];
+  if (fa && fa.kind === 'sug' && IG.seedFor !== fr.id) { IG.seedFor = fr.id; lastSlide = s.id; ST.idea = fa.note + ' — ' + fa.prompt; const f = frameSize(fr); if (f) { ST.size = 'custom'; ST.cw = String(f.w); ST.ch = String(f.h); } }
+  else if (lastSlide !== s.id) { lastSlide = s.id; ST.idea = slideIdea(); const f = frameSize(targetFrame()); if (f) { ST.size = 'custom'; ST.cw = String(f.w); ST.ch = String(f.h); } else ST.size = '169'; }
   render(pane);
 };
 const ic = n => PM.UI.ic(n);
