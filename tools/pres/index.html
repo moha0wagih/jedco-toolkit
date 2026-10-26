@@ -14609,6 +14609,8 @@ PM.toPng = function (bytes, type) {
 };
 function placeImage(id, p, target) {
   const s = slide();
+  // a photo dropped on a cover / divider / closing (not on another photo) becomes its background
+  if (!target && PM.Brain && PM.Brain.isBgSlide(s) && !s.objs.some(o => o.t === 'image' && o.bindImg && !o.lock)) { PM.Brain.setBackground(id); return; }
   if (target && target.t === 'image') {
     target.src = id; target.fx = 0.5; target.fy = 0.5; target.zoom = 1;
     if (target.bindImg) { const i = +target.bindImg.split('.')[1]; s.spec.imgs = s.spec.imgs || []; s.spec.imgs[i] = id; }
@@ -15959,6 +15961,7 @@ async function panePhotos(p) {
     el.onclick = e => {
       if (e.target.closest('[data-del]')) { e.stopPropagation(); PM.photoLib.del(e.target.dataset.del).then(() => panePhotos(p)); return; }
       const sel = Ed.selected();
+      if (!sel.length && PM.Brain.isBgSlide(cur())) { PM.Brain.setBackground(el.dataset.asset); if (isPhone()) $('#side').classList.remove('open'); return; }
       Ed.placeImage(el.dataset.asset, { x: 480, y: 270 }, sel.length === 1 && sel[0].t === 'image' ? sel[0] : null);
       if (isPhone()) $('#side').classList.remove('open');
     };
@@ -16008,7 +16011,8 @@ UI.renderCtx = function () {
   const sw = (list, cur2, act) => `<button class="cb clr" data-pop="sw" data-list="${list.join(',')}" data-act="${act}" title="اللون"><span class="sw" style="background:#${cur2 || list[0]}"></span>${ic('chevron-down')}</button>`;
   const dirBtn = `<button class="cb dirb" data-a="directive" title="اكتب ايش تبي والأداة تنفذ ( / )">${ic('wand-sparkles')}توجيه</button><span class="cbs"></span>`;
   if (!sel.length) {
-    h = dirBtn + `<span class="lbl">اختر عنصراً لتعديله، أو:</span><button class="cb" data-a="addText">${ic('type')}نص</button><button class="cb" data-a="addImg">${ic('image-plus')}صورة</button><button class="cb" data-a="tabIcons">${ic('shapes')}أيقونة</button><button class="cb" data-a="tabGen">${ic('wand-sparkles')}توليد صورة</button><span class="cbs"></span><button class="cb" data-a="selAll">${ic('mouse-pointer-2')}تحديد الكل</button>`;
+    const bgK = { cover: 'الغلاف', divider: 'الفاصل', closing: 'الختام' }[cur() && cur().spec.kind];
+    h = dirBtn + (bgK ? `<button class="cb on" data-pop="bg">${ic('image')}تغيير صورة ${bgK}</button><span class="cbs"></span>` : '') + `<span class="lbl">اختر عنصراً لتعديله، أو:</span><button class="cb" data-a="addText">${ic('type')}نص</button><button class="cb" data-a="addImg">${ic('image-plus')}صورة</button><button class="cb" data-a="tabIcons">${ic('shapes')}أيقونة</button><button class="cb" data-a="tabGen">${ic('wand-sparkles')}توليد صورة</button><span class="cbs"></span><button class="cb" data-a="selAll">${ic('mouse-pointer-2')}تحديد الكل</button>`;
   } else if (sel.length > 1) {
     h = `<span class="lbl"><span class="num">${sel.length}</span> عناصر</span>
       <button class="cb" data-al="r" title="محاذاة لليمين">${ic('align-horizontal-justify-end')}</button><button class="cb" data-al="c" title="توسيط أفقي">${ic('align-horizontal-justify-center')}</button><button class="cb" data-al="l" title="محاذاة لليسار">${ic('align-horizontal-justify-start')}</button>
@@ -16053,7 +16057,7 @@ UI.renderCtx = function () {
   }
   if (sel.length) h = dirBtn + h;
   bar.innerHTML = h;
-  bar.onclick = e => { const pb = e.target.closest('[data-pop]'); if (pb) return ctxPop(pb); ctxClick(e); };
+  bar.onclick = e => { const pb = e.target.closest('[data-pop]'); if (pb) return pb.dataset.pop === 'bg' ? PM.Brain.bgMenu(pb) : ctxPop(pb); ctxClick(e); };
   // keep the text selection alive while using the bar during editing
   bar.onmousedown = e => { if (Ed.editing && e.target.closest('button')) e.preventDefault(); };
   const tsz = $('#txSize', bar), tw = $('#txW', bar);
@@ -17448,6 +17452,38 @@ B.applyCopilotStory = function (reply) {
   dropped.forEach(s => { s.hidden = true; steps.push({ type: 'keep', x: { s } }); });
   B.applyPlan(steps);
   PM.UI.toast(`✓ طبّقت قصة Copilot${dropped.length ? ` وأخفيت ${dropped.length} شريحة (موجودة لو تبيها)` : ''}`, 4000);
+};
+
+/* ======================================================================
+   cover / divider / closing background photo (upload or library)
+   ====================================================================== */
+const BG_KINDS = ['cover', 'divider', 'closing'];
+B.isBgSlide = s => s && BG_KINDS.includes(s.spec.kind);
+B.setBackground = function (id) {
+  const d = deck(), s = cur(); if (!B.isBgSlide(s) || !id) return false;
+  s.spec.imgs = [id]; s.spec.autoImgs = [];
+  const L = PM.layoutById(s.layout);
+  const usesPhoto = L && !L.official && s.objs.some(o => o.t === 'image' && o.bindImg);
+  const target = usesPhoto ? L : PM.layoutById({ cover: 'cover-photo', divider: 'div-photo', closing: 'close-photo' }[s.spec.kind]);
+  if (!target) return false;
+  PM.applyLayout(d, ST.cur, target);
+  ST.sel.clear(); PM.renumber(d); PM.commit('bg-photo'); PM.UI.renderAll();
+  PM.UI.toast('✓ غيّرت صورة ' + ({ cover: 'الغلاف', divider: 'الفاصل', closing: 'الختام' }[s.spec.kind]) + ' — تقدر تسحب الصورة داخل إطارها من «تحريك داخل الإطار»', 3800);
+  return true;
+};
+B.bgMenu = function (btn) {
+  $$('.menu.cpop').forEach(m => m.remove());
+  const m = document.createElement('div'); m.className = 'menu cpop';
+  m.innerHTML = `<button data-b="up">${ic('upload')}ارفع صورة من جهازي</button><button data-b="lib">${ic('images')}اختر من مكتبة الصور</button>`;
+  const r = btn.getBoundingClientRect();
+  m.style.position = 'fixed'; m.style.top = (r.bottom + 6) + 'px'; m.style.left = Math.max(8, r.left) + 'px'; m.style.insetInlineStart = 'auto'; m.style.minWidth = '220px';
+  document.body.appendChild(m);
+  m.onclick = e => {
+    const b = e.target.closest('[data-b]'); if (!b) return; m.remove();
+    if (b.dataset.b === 'up') { const i = document.createElement('input'); i.type = 'file'; i.accept = 'image/*'; i.onchange = async () => { const f = i.files[0]; if (!f) return; B.setBackground(await PM.assetFromFile(f)); }; i.click(); }
+    else { PM.UI.tab = 'photos'; $$('#tabs button').forEach(x => x.classList.toggle('on', x.dataset.t === 'photos')); PM.UI.renderPane(); if (innerWidth <= 860) $('#side').classList.add('open'); PM.UI.toast('اضغط على أي صورة وتصير خلفية الشريحة'); }
+  };
+  setTimeout(() => document.addEventListener('pointerdown', function h(ev) { if (!m.contains(ev.target)) { m.remove(); document.removeEventListener('pointerdown', h); } }), 0);
 };
 
 /* ======================================================================

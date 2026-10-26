@@ -528,6 +528,7 @@ async function panePhotos(p) {
     el.onclick = e => {
       if (e.target.closest('[data-del]')) { e.stopPropagation(); PM.photoLib.del(e.target.dataset.del).then(() => panePhotos(p)); return; }
       const sel = Ed.selected();
+      if (!sel.length && PM.Brain.isBgSlide(cur())) { PM.Brain.setBackground(el.dataset.asset); if (isPhone()) $('#side').classList.remove('open'); return; }
       Ed.placeImage(el.dataset.asset, { x: 480, y: 270 }, sel.length === 1 && sel[0].t === 'image' ? sel[0] : null);
       if (isPhone()) $('#side').classList.remove('open');
     };
@@ -577,7 +578,8 @@ UI.renderCtx = function () {
   const sw = (list, cur2, act) => `<button class="cb clr" data-pop="sw" data-list="${list.join(',')}" data-act="${act}" title="اللون"><span class="sw" style="background:#${cur2 || list[0]}"></span>${ic('chevron-down')}</button>`;
   const dirBtn = `<button class="cb dirb" data-a="directive" title="اكتب ايش تبي والأداة تنفذ ( / )">${ic('wand-sparkles')}توجيه</button><span class="cbs"></span>`;
   if (!sel.length) {
-    h = dirBtn + `<span class="lbl">اختر عنصراً لتعديله، أو:</span><button class="cb" data-a="addText">${ic('type')}نص</button><button class="cb" data-a="addImg">${ic('image-plus')}صورة</button><button class="cb" data-a="tabIcons">${ic('shapes')}أيقونة</button><button class="cb" data-a="tabGen">${ic('wand-sparkles')}توليد صورة</button><span class="cbs"></span><button class="cb" data-a="selAll">${ic('mouse-pointer-2')}تحديد الكل</button>`;
+    const bgK = { cover: 'الغلاف', divider: 'الفاصل', closing: 'الختام' }[cur() && cur().spec.kind];
+    h = dirBtn + (bgK ? `<button class="cb on" data-pop="bg">${ic('image')}تغيير صورة ${bgK}</button><span class="cbs"></span>` : '') + `<span class="lbl">اختر عنصراً لتعديله، أو:</span><button class="cb" data-a="addText">${ic('type')}نص</button><button class="cb" data-a="addImg">${ic('image-plus')}صورة</button><button class="cb" data-a="tabIcons">${ic('shapes')}أيقونة</button><button class="cb" data-a="tabGen">${ic('wand-sparkles')}توليد صورة</button><span class="cbs"></span><button class="cb" data-a="selAll">${ic('mouse-pointer-2')}تحديد الكل</button>`;
   } else if (sel.length > 1) {
     h = `<span class="lbl"><span class="num">${sel.length}</span> عناصر</span>
       <button class="cb" data-al="r" title="محاذاة لليمين">${ic('align-horizontal-justify-end')}</button><button class="cb" data-al="c" title="توسيط أفقي">${ic('align-horizontal-justify-center')}</button><button class="cb" data-al="l" title="محاذاة لليسار">${ic('align-horizontal-justify-start')}</button>
@@ -622,7 +624,7 @@ UI.renderCtx = function () {
   }
   if (sel.length) h = dirBtn + h;
   bar.innerHTML = h;
-  bar.onclick = e => { const pb = e.target.closest('[data-pop]'); if (pb) return ctxPop(pb); ctxClick(e); };
+  bar.onclick = e => { const pb = e.target.closest('[data-pop]'); if (pb) return pb.dataset.pop === 'bg' ? PM.Brain.bgMenu(pb) : ctxPop(pb); ctxClick(e); };
   // keep the text selection alive while using the bar during editing
   bar.onmousedown = e => { if (Ed.editing && e.target.closest('button')) e.preventDefault(); };
   const tsz = $('#txSize', bar), tw = $('#txW', bar);

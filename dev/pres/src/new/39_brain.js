@@ -631,6 +631,38 @@ B.applyCopilotStory = function (reply) {
 };
 
 /* ======================================================================
+   cover / divider / closing background photo (upload or library)
+   ====================================================================== */
+const BG_KINDS = ['cover', 'divider', 'closing'];
+B.isBgSlide = s => s && BG_KINDS.includes(s.spec.kind);
+B.setBackground = function (id) {
+  const d = deck(), s = cur(); if (!B.isBgSlide(s) || !id) return false;
+  s.spec.imgs = [id]; s.spec.autoImgs = [];
+  const L = PM.layoutById(s.layout);
+  const usesPhoto = L && !L.official && s.objs.some(o => o.t === 'image' && o.bindImg);
+  const target = usesPhoto ? L : PM.layoutById({ cover: 'cover-photo', divider: 'div-photo', closing: 'close-photo' }[s.spec.kind]);
+  if (!target) return false;
+  PM.applyLayout(d, ST.cur, target);
+  ST.sel.clear(); PM.renumber(d); PM.commit('bg-photo'); PM.UI.renderAll();
+  PM.UI.toast('✓ غيّرت صورة ' + ({ cover: 'الغلاف', divider: 'الفاصل', closing: 'الختام' }[s.spec.kind]) + ' — تقدر تسحب الصورة داخل إطارها من «تحريك داخل الإطار»', 3800);
+  return true;
+};
+B.bgMenu = function (btn) {
+  $$('.menu.cpop').forEach(m => m.remove());
+  const m = document.createElement('div'); m.className = 'menu cpop';
+  m.innerHTML = `<button data-b="up">${ic('upload')}ارفع صورة من جهازي</button><button data-b="lib">${ic('images')}اختر من مكتبة الصور</button>`;
+  const r = btn.getBoundingClientRect();
+  m.style.position = 'fixed'; m.style.top = (r.bottom + 6) + 'px'; m.style.left = Math.max(8, r.left) + 'px'; m.style.insetInlineStart = 'auto'; m.style.minWidth = '220px';
+  document.body.appendChild(m);
+  m.onclick = e => {
+    const b = e.target.closest('[data-b]'); if (!b) return; m.remove();
+    if (b.dataset.b === 'up') { const i = document.createElement('input'); i.type = 'file'; i.accept = 'image/*'; i.onchange = async () => { const f = i.files[0]; if (!f) return; B.setBackground(await PM.assetFromFile(f)); }; i.click(); }
+    else { PM.UI.tab = 'photos'; $$('#tabs button').forEach(x => x.classList.toggle('on', x.dataset.t === 'photos')); PM.UI.renderPane(); if (innerWidth <= 860) $('#side').classList.add('open'); PM.UI.toast('اضغط على أي صورة وتصير خلفية الشريحة'); }
+  };
+  setTimeout(() => document.addEventListener('pointerdown', function h(ev) { if (!m.contains(ev.target)) { m.remove(); document.removeEventListener('pointerdown', h); } }), 0);
+};
+
+/* ======================================================================
    find & replace · approved terminal names
    ====================================================================== */
 function replaceIn(val, find, rep) {

@@ -549,6 +549,8 @@ PM.toPng = function (bytes, type) {
 };
 function placeImage(id, p, target) {
   const s = slide();
+  // a photo dropped on a cover / divider / closing (not on another photo) becomes its background
+  if (!target && PM.Brain && PM.Brain.isBgSlide(s) && !s.objs.some(o => o.t === 'image' && o.bindImg && !o.lock)) { PM.Brain.setBackground(id); return; }
   if (target && target.t === 'image') {
     target.src = id; target.fx = 0.5; target.fy = 0.5; target.zoom = 1;
     if (target.bindImg) { const i = +target.bindImg.split('.')[1]; s.spec.imgs = s.spec.imgs || []; s.spec.imgs[i] = id; }
