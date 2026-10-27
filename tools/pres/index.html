@@ -323,6 +323,86 @@ label.f{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px}
 .ctxbar{flex-wrap:nowrap;height:52px;min-height:0;padding:0 14px;overflow-x:auto;overflow-y:hidden}
 .cb.clr{gap:3px;padding:0 6px}.cb.clr .sw{margin:0;width:20px;height:20px}.cb.clr svg.i{width:13px;height:13px}
 .menu.cpop{z-index:400}.swrow{display:flex;gap:6px;padding:6px}.swrow .sw{width:26px;height:26px}
+/* ---------- v2.2 · «حفظ كـ PowerPoint» always in view ---------- */
+.tb .nm{flex:0 1 220px;min-width:70px}
+.tbb.pri{flex:none}
+.tbb .ext{font-size:10.5px;opacity:.7;margin-inline-start:2px}
+.tbb .tp{display:none;font-size:10px;letter-spacing:.02em}
+.menu .mi-pptx{font-weight:700;color:var(--navy)}
+.menu .mi-pptx .ext{font-size:11px;color:var(--muted);font-weight:400}
+@media (max-width:1560px) and (min-width:861px){
+  .tb #bCopilot .t,.tb #bStory .t,.tb #bCheck .t,.tb #bShow .t,.tb #bPdf .t{display:none}
+  .tb #bCopilot,.tb #bStory,.tb #bCheck,.tb #bShow,.tb #bPdf{padding:0;width:36px;justify-content:center}
+}
+@media (max-width:1300px) and (min-width:861px){
+  .brand b,.brand .sep{display:none}
+  .tb .saved{display:none}
+  .tb .seg button{padding:4px 8px}
+  .laybar{flex-wrap:wrap;height:auto;min-height:56px;padding:8px 10px;gap:6px}
+  .lb-name{min-width:150px}
+}
+@media (max-width:1100px) and (min-width:861px){
+  .tbb.pri .ext{display:none}
+  .tb .seg button{padding:4px 6px;font-size:12px}
+  .brand .lg{width:70px}
+}
+@media (max-width:860px){
+  .tbb.pri{padding:0 10px;gap:5px;margin-inline-start:2px}
+  .tbb.pri .tp{display:inline}
+}
+@media (max-width:380px){ .brand .lg{width:56px} .tb .brand{margin-inline-end:2px} .tb{gap:0;padding:0 6px} }
+/* ---------- v2.2 · pick several slides ---------- */
+.strip .sh{gap:6px}
+.sh-all{font-size:12px;color:var(--blue);padding:3px 8px;border-radius:7px;white-space:nowrap}
+.sh-all:hover{background:var(--soft);color:var(--navy)}
+.slbar{margin:2px 10px 8px;padding:9px 10px 8px;border-radius:12px;background:var(--soft);border:1px solid #D6E4F5;display:flex;flex-direction:column;gap:7px}
+.slb-t{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--navy)}
+.slb-t #slN{font-weight:700;flex:1;white-space:nowrap}
+.slb-all{display:none;font-size:11.5px;color:var(--blue);padding:2px 6px;border-radius:6px;white-space:nowrap}
+.slb-x{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--ink2);flex:none}
+.slb-x:hover{background:#fff}.slb-x svg.i{width:15px;height:15px}
+.slb-go{height:36px;border-radius:9px;background:var(--navy);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap}
+.slb-go:hover{background:var(--blue)}.slb-go svg.i{width:16px;height:16px}
+.slb-h{margin:0;font-size:10.5px;color:var(--muted);line-height:1.5}
+.th .ck{position:absolute;top:5px;inset-inline-start:30px;width:20px;height:20px;border-radius:6px;background:#fff;border:1.5px solid var(--line2);display:none;align-items:center;justify-content:center;color:#fff;z-index:2}
+.th .ck svg.i{width:13px;height:13px;stroke-width:3}
+.th:hover .ck,body.sl-multi .th .ck,body.sl-pick .th .ck{display:flex}
+.th.msel .ck{background:var(--blue);border-color:var(--blue)}
+.th.msel .box{outline:2.5px solid var(--sky)}
+.th.msel.cur .box{outline:2.5px solid var(--blue)}
+.th.msel::after{content:"";position:absolute;inset:-4px -4px -4px 22px;border-radius:10px;background:rgba(98,182,243,.13);z-index:-1}
+.thumbs{position:relative;z-index:0}
+.dk-multi{margin:2px 10px 4px;padding:6px 8px;border-radius:8px;background:var(--navy);color:#fff;font-size:11.5px;line-height:1.45}
+.dk-multi b{font-family:SanSeq;font-weight:400;font-size:11px}
+@media (max-width:860px){
+  .th .ck{inset-inline-start:5px}
+  .th:hover .ck{display:none}
+  body.sl-multi .th .ck,body.sl-pick .th .ck{display:flex}
+  .th.msel::after{inset:-4px}
+  .slbar{position:fixed;inset-inline:8px;bottom:104px;margin:0;z-index:6;flex-direction:row;flex-wrap:wrap;align-items:center;background:#fff;border-color:var(--line2)}
+  .slb-t{flex:1 1 auto}
+  .slb-all{display:inline-block}
+  .slb-go{flex:1 1 100%}
+  .slb-h{display:none}
+}
+/* apply-to-selected dialog */
+.ms-sec{margin-bottom:16px}
+.ms-sec h4{margin:0 0 8px!important}
+.ms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.ms-grid .lt .cap{opacity:1;position:static;background:#fff;color:var(--ink2);padding:6px 8px;font-size:11.5px;border-top:1px solid var(--line)}
+.ms-grid .lt.none .h{display:flex;align-items:center;justify-content:center;background:var(--soft);color:var(--navy);font-size:13px;font-weight:700}
+.ms-sw{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ms-sw .sw{width:28px;height:28px}
+.ms-sw .chip{height:30px}
+.ms-pick{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.ms-pick span{font-family:SanSeq;font-size:11px;background:var(--soft);color:var(--navy);border-radius:7px;padding:3px 8px}
+/* ---------- v2.2 · drag handle on every text box ---------- */
+.ed-ov .mvh{pointer-events:auto;position:absolute;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none}
+.ed-ov .mvh:hover{background:var(--navy)}
+.ed-ov .mvh svg{width:70%;height:80%;display:block}
+.ed-ov .hov-box{position:absolute;border:1px dashed var(--sky);border-radius:1px;pointer-events:none}
+body.grabbing,body.grabbing *{cursor:grabbing!important}
+#stageHost{overflow:hidden}
 
 </style>
 </head>
@@ -333,6 +413,8 @@ label.f{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px}
     <input class="nm" id="deckName" placeholder="اسم العرض" title="اسم العرض">
     <div style="position:relative"><button class="tbb" id="bFile"><svg class="i" data-ic="folder-open"></svg><span class="t">ملف</span></button>
       <div class="menu hide" id="mFile">
+        <button data-a="pptx" class="mi-pptx"><svg class="i" data-ic="file-down"></svg><span>حفظ كـ PowerPoint <span class="num ext" dir="ltr">(.pptx)</span></span></button>
+        <hr>
         <button data-a="import"><svg class="i" data-ic="upload"></svg>استيراد Word أو PowerPoint…</button>
         <button data-a="new"><svg class="i" data-ic="file-plus"></svg>عرض جديد…</button>
         <hr>
@@ -355,11 +437,12 @@ label.f{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px}
     <button class="tbb" id="bCheck" title="فحص العرض"><svg class="i" data-ic="shield-check"></svg><span class="t">فحص</span></button>
     <button class="tbb" id="bShow" title="عرض الشرائح"><svg class="i" data-ic="play"></svg><span class="t">عرض</span></button>
     <button class="tbb" id="bPdf" title="حفظ PDF"><svg class="i" data-ic="file-text"></svg><span class="t">PDF</span></button>
-    <button class="tbb pri" id="bExport"><svg class="i" data-ic="download"></svg><span class="t">تصدير PowerPoint</span></button>
+    <button class="tbb pri" id="bExport" title="حفظ العرض كملف PowerPoint ‏(.pptx) يفتح ويتعدّل في PowerPoint"><svg class="i" data-ic="file-down"></svg><span class="t">حفظ كـ PowerPoint <span class="num ext" dir="ltr">(.pptx)</span></span><span class="tp num">PPTX</span></button>
   </header>
   <main class="body">
     <aside class="strip">
-      <div class="sh"><span>الشرائح</span><span class="num" id="slCount"></span></div>
+      <div class="sh"><span>الشرائح <span class="num" id="slCount"></span></span><button class="sh-all" id="slAll" title="حدد كل الشرائح عشان تطبّق عليها نفس الستايل">تحديد الكل</button></div>
+      <div class="slbar hide" id="slBar"><div class="slb-t"><span id="slN"></span><button class="slb-all" id="slAll2">تحديد الكل</button><button class="slb-x" id="slX" title="إلغاء التحديد"><svg class="i" data-ic="x"></svg></button></div><button class="slb-go" id="slApply"><svg class="i" data-ic="paintbrush"></svg><span>طبّق على المحدد (<span class="num" id="slN2"></span>)</span></button><p class="slb-h">Ctrl/⌘ + ضغطة: شريحة شريحة<br>Shift + ضغطة: من … إلى</p></div>
       <div class="thumbs" id="thumbs"></div>
       <div style="position:relative"><button class="addSl" id="bAdd"><svg class="i" data-ic="plus"></svg><span>شريحة جديدة</span></button>
         <div class="menu hide" id="mAdd" style="top:auto;bottom:calc(100% + 6px)"></div></div>
@@ -414,7 +497,7 @@ label.f{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px}
       <button class="st-btn hide" id="stBack"><svg class="i" data-ic="arrow-right"></svg>رجوع للعرض الحالي</button>
     </div>
     <div class="st-recent hide" id="stRecent"><h5>ملفاتي (محفوظة تلقائياً على هذا الجهاز)</h5><div id="stRecentList"></div></div>
-    <div class="credit">Designed by Mohammed Wagih · 2026 · v2.1</div>
+    <div class="credit">Designed by Mohammed Wagih · 2026 · v2.2</div>
   </div>
 </div>
 
@@ -14084,6 +14167,8 @@ Ed.mount = function (host) {
   new ResizeObserver(() => Ed.fit()).observe(host);
   Ed.frame.addEventListener('pointerdown', onDown);
   Ed.frame.addEventListener('dblclick', onDbl);
+  Ed.frame.addEventListener('pointermove', onHover);
+  Ed.frame.addEventListener('pointerleave', () => { if (Ed.hoverId && !drag) { Ed.hoverId = null; Ed.drawOverlay(); } });
   host.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; Ed.frame.classList.add('drop-on'); });
   host.addEventListener('dragleave', e => { if (!host.contains(e.relatedTarget)) Ed.frame.classList.remove('drop-on'); });
   host.addEventListener('drop', onDrop);
@@ -14157,11 +14242,50 @@ Ed.drawOverlay = function (guides) {
     const b = bounds(sel);
     h += `<div class="sel-group" style="left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px;border-width:${1 * inv}px"></div>`;
   }
+  // a grip tab on every text box (selected or under the mouse): drag it to move the text, click the text to type
+  if (!(drag && drag.kind === 'move' && drag.moved)) {
+    const grips = [];
+    const free = sel.filter(o => !o.pin);
+    // one text selected: its own grip · several selected: one grip for the whole group
+    if (sel.length === 1 && free.length && free[0].t === 'text') grips.push({ id: free[0].id, r: gripRect(free[0]) });
+    else if (sel.length > 1 && free.some(o => o.t === 'text')) { const b = bounds(sel); b.dir = ST.deck && ST.deck.lang === 'en' ? 'ltr' : 'rtl'; grips.push({ id: free.find(o => o.t === 'text').id, r: gripRect(b), group: true }); }
+    const hv = Ed.hoverId && !ST.sel.has(Ed.hoverId) ? objById(Ed.hoverId) : null;
+    if (hv && hv.t === 'text' && selectable(hv)) { h += `<div class="hov-box" style="left:${hv.x}px;top:${hv.y}px;width:${hv.w}px;height:${hv.h}px;border-width:${inv}px"></div>`; if (!hv.pin) grips.push({ id: hv.id, r: gripRect(hv) }); }
+    for (const g of grips) h += `<div class="mvh" data-mv="${g.id}" title="${g.group ? 'اسحب من هنا لتحريك العناصر المحددة' : 'اسحب من هنا لتحريك النص'}" style="left:${g.r.x}px;top:${g.r.y}px;width:${g.r.w}px;height:${g.r.h}px;border-radius:${6 * inv}px">${GRIP}</div>`;
+  }
   if (guides) for (const g of guides) h += g.v ? `<div class="guide" style="left:${g.v}px;top:0;width:${inv}px;height:${H}px"></div>` : `<div class="guide" style="top:${g.h}px;left:0;height:${inv}px;width:${W}px"></div>`;
   if (Ed.marquee) { const m = Ed.marquee; h += `<div class="marq" style="left:${Math.min(m.x0, m.x1)}px;top:${Math.min(m.y0, m.y1)}px;width:${Math.abs(m.x1 - m.x0)}px;height:${Math.abs(m.y1 - m.y0)}px;border-width:${inv}px"></div>`; }
   Ed.ov.innerHTML = h;
   PM.emit('overlay');
 };
+const GRIP = '<svg viewBox="0 0 24 12" fill="currentColor"><circle cx="6" cy="3" r="1.7"/><circle cx="12" cy="3" r="1.7"/><circle cx="18" cy="3" r="1.7"/><circle cx="6" cy="9" r="1.7"/><circle cx="12" cy="9" r="1.7"/><circle cx="18" cy="9" r="1.7"/></svg>';
+const coarse = () => { try { return matchMedia('(pointer:coarse)').matches; } catch (e) { return false; } };
+/* where the grip sits: above the box on the side the text starts (Arabic right, English left), below it when the box touches the top */
+function gripRect(o) {
+  const inv = 1 / Ed.scale, big = coarse();
+  const w = (big ? 46 : 38) * inv, h = (big ? 24 : 18) * inv, gap = 6 * inv, inset = 12 * inv;
+  const rtl = o.dir === 'rtl';
+  let x = rtl ? o.x + o.w - inset - w : o.x + inset;
+  if (o.w < w + inset * 2) x = o.x + (o.w - w) / 2;
+  let y = o.y - gap - h;
+  if (y * Ed.scale < -14) y = o.y + o.h + gap;
+  return { x, y, w, h };
+}
+Ed.gripRect = gripRect;
+function onHover(e) {
+  if (drag || e.pointerType !== 'mouse' || !ST.deck || (PM.Dock && PM.Dock.previewing)) return;
+  if (e.target.closest && e.target.closest('.mvh')) return;
+  let id = null;
+  const cur = Ed.hoverId && objById(Ed.hoverId);
+  if (cur) {
+    // keep the hover while the mouse travels from the text to its grip
+    const g = gripRect(cur), p = pt(e), pad = 4 / Ed.scale;
+    const x0 = Math.min(g.x, cur.x), x1 = Math.max(g.x + g.w, cur.x + cur.w), y0 = Math.min(g.y, cur.y), y1 = Math.max(g.y + g.h, cur.y + cur.h);
+    if (p.x >= x0 - pad && p.x <= x1 + pad && p.y >= y0 - pad && p.y <= y1 + pad) id = cur.id;
+  }
+  if (!id) { const o = hit(e); id = o && o.t === 'text' ? o.id : null; }
+  if (id !== Ed.hoverId) { Ed.hoverId = id; Ed.drawOverlay(); }
+}
 function chartHandles(o, inv) {
   const g = PM.chartGeom(o);
   let h = '';
@@ -14189,8 +14313,9 @@ let drag = null;
 function onDown(e) {
   if (e.button !== 0 && e.pointerType === 'mouse') return;
   if (Ed.editing) { if (e.target.closest('.pm-text.editing')) return; Ed.endEdit(); }
-  const t = e.target;
+  const t = e.target.closest ? (e.target.closest('.mvh') || e.target) : e.target;
   const p = pt(e);
+  if (t.classList.contains('mvh')) { startGrip(e, t.dataset.mv, p); return; }
   // value handles (charts / bars)
   if (t.classList.contains('vh')) { startValueDrag(e, t, p); return; }
   if (t.classList.contains('hdl')) { startResize(e, t.dataset.h, p); return; }
@@ -14206,10 +14331,22 @@ function onDown(e) {
   if (Ed.painter) { const f = Ed.painter; Ed.painter = null; document.body.classList.remove('painting'); f(o); return; }
   // image focus mode: drag inside the frame to move the photo
   if (Ed.tool === 'focus' && o.t === 'image' && ST.sel.has(o.id)) { startFocus(e, o, p); return; }
+  const wasOnly = ST.sel.size === 1 && ST.sel.has(o.id);
   if (e.shiftKey || e.ctrlKey || e.metaKey) { if (ST.sel.has(o.id)) ST.sel.delete(o.id); else ST.sel.add(o.id); }
   else if (!ST.sel.has(o.id)) { ST.sel.clear(); ST.sel.add(o.id); }
   const sel = selected();
-  drag = { kind: 'move', p0: p, start: sel.map(s => ({ id: s.id, x: s.x, y: s.y })), moved: false, shift: e.shiftKey };
+  drag = { kind: 'move', p0: p, start: sel.map(s => ({ id: s.id, x: s.x, y: s.y })), moved: false, shift: e.shiftKey, typeIn: wasOnly && o.t === 'text' && !(e.shiftKey || e.ctrlKey || e.metaKey) ? o.id : null };
+  capture(e);
+  Ed.drawOverlay(); PM.emit('sel');
+}
+/* drag by the grip: moves the text (or the whole selection it belongs to) */
+function startGrip(e, id, p) {
+  const o = objById(id); if (!o) return;
+  if (!ST.sel.has(id)) { ST.sel.clear(); ST.sel.add(id); }
+  const sel = selected().filter(x => !x.pin);
+  drag = { kind: 'move', p0: p, start: sel.map(s => ({ id: s.id, x: s.x, y: s.y })), moved: false, grip: true };
+  Ed.hoverId = null;
+  document.body.classList.add('grabbing');
   capture(e);
   Ed.drawOverlay(); PM.emit('sel');
 }
@@ -14250,13 +14387,18 @@ function onMove(e) {
 function onUp(e) {
   Ed.frame.onpointermove = null; Ed.frame.onpointerup = null;
   const d = drag; drag = null;
+  document.body.classList.remove('grabbing');
   if (!d) return;
   if (d.kind === 'marq') { Ed.marquee = null; Ed.drawOverlay(); PM.emit('sel'); return; }
   if (d.kind === 'move' && d.moved) { slide().edited = true; PM.commit('move'); Ed.drawOverlay(); PM.emit('change'); return; }
   if (d.kind === 'move' && !d.moved) {
+    if (d.grip) { Ed.drawOverlay(); return; }
+    // a click on text that is already selected puts the cursor there to type
+    if (d.typeIn) { const o = hit(e); if (o && o.id === d.typeIn) { Ed.startEdit(o, false, { x: e.clientX, y: e.clientY }); return; } }
     // clicking an already-selected item in a group picks just that one
     const o = hit(e);
     if (o && !(e.shiftKey || e.ctrlKey || e.metaKey) && ST.sel.size > 1 && d.start.length > 1) { ST.sel.clear(); ST.sel.add(o.id); Ed.drawOverlay(); PM.emit('sel'); }
+    else Ed.drawOverlay();
     return;
   }
   if (d.kind === 'resize' || d.kind === 'focus') { slide().edited = true; PM.commit(d.kind); Ed.render(); PM.emit('change'); return; }
@@ -14408,12 +14550,13 @@ function setVal(path, v) {
 function onDbl(e) {
   const o = hit(e);
   if (!o) return;
+  if (Ed.editing && Ed.editing.id === o.id) return;
   if (o.t === 'text') return Ed.startEdit(o);
   if (o.t === 'chart' || o.t === 'table') return PM.emit('editdata', o);
   if (o.t === 'image') return PM.emit('replaceimage', o);
   if (o.t === 'icon') return PM.emit('changeicon', o);
 }
-Ed.startEdit = function (o, selectAll) {
+Ed.startEdit = function (o, selectAll, at) {
   if (Ed.editing) Ed.endEdit();
   ST.sel.clear(); ST.sel.add(o.id);
   const el = elFor(o.id); if (!el) return;
@@ -14427,6 +14570,7 @@ Ed.startEdit = function (o, selectAll) {
   const r = document.createRange();
   if (selectAll) r.selectNodeContents(inner); else { r.selectNodeContents(inner); r.collapse(false); }
   const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+  if (at && document.caretRangeFromPoint) { const c = document.caretRangeFromPoint(at.x, at.y); if (c && inner.contains(c.startContainer)) { s.removeAllRanges(); s.addRange(c); } }
   inner.addEventListener('input', growWhileTyping);
   inner.addEventListener('keydown', editKeys);
   inner.addEventListener('paste', plainPaste);
@@ -15566,6 +15710,7 @@ async function importFile(f) {
 UI.importFile = importFile;
 function openDeck(d, o = {}) {
   ST.deck = d; ST.cur = 0; ST.sel.clear(); ST.undo = []; ST.redo = [];
+  UI.slSel = new Set(); UI.slAnchor = null; UI.pick = false;
   if (!o.built) PM.buildDeck(d);
   else d.slides.forEach((s, i) => { if (!s.objs || !s.objs.length) PM.relayout(d, i); });
   PM.renumber(d);
@@ -15609,6 +15754,7 @@ function relayoutAll(label) {
   PM.renumber(d); PM.commit(label); UI.renderAll();
 }
 async function fileAction(a) {
+  if (a === 'pptx') return exportPptx();
   if (a === 'import') { const i = document.createElement('input'); i.type = 'file'; i.accept = '.pptx,.docx,.json'; i.onchange = () => i.files[0] && importFile(i.files[0]); i.click(); }
   if (a === 'new') { showStart(); }
   if (a === 'home') { showStart(); }
@@ -15653,14 +15799,15 @@ function go(delta) {
   const d = deck(); if (!d) return;
   Ed.endEdit();
   ST.cur = PM.clamp(ST.cur + delta, 0, d.slides.length - 1);
-  ST.sel.clear(); UI.renderCur(); scrollThumb();
+  ST.sel.clear(); if (!UI.pick) slSingle(); UI.renderCur(); scrollThumb();
 }
 UI.renderCur = function () {
   $$('#thumbs .th').forEach(t => t.classList.toggle('cur', +t.dataset.i === ST.cur));
+  slMark();
   Ed.render(); UI.renderCtx(); UI.renderLaybar(); UI.renderPane();
   if (PM.Dock) PM.Dock.render();
 };
-UI.select = function (i) { Ed.endEdit(); ST.cur = i; ST.sel.clear(); if ($$('#thumbs .th').length === deck().slides.length) UI.renderCur(); else UI.renderAll(); scrollThumb(); };
+UI.select = function (i, keep) { Ed.endEdit(); ST.cur = i; ST.sel.clear(); if (!keep) slSingle(); if ($$('#thumbs .th').length === deck().slides.length) UI.renderCur(); else UI.renderAll(); scrollThumb(); };
 
 /* ---------- thumbnails ---------- */
 let thumbRaf = null;
@@ -15669,8 +15816,9 @@ function thumbW() { return isPhone() ? 112 : 148; }
 function renderThumbs() {
   const d = deck(), box = $('#thumbs');
   $('#slCount').textContent = d.slides.length;
-  box.innerHTML = d.slides.map((s, i) => `<div class="th ${i === ST.cur ? 'cur' : ''} ${s.hidden ? 'hid' : ''}" data-i="${i}" draggable="true"><span class="n">${i + 1}</span><div class="box" style="width:${thumbW()}px;height:${thumbW() * 9 / 16}px"></div>${(s.overflow || (s.missing && s.missing.length)) ? '<i class="flag" title="تحتاج نظرة"></i>' : ''}<button class="tm" title="خيارات">${ic('ellipsis')}</button></div>`).join('');
+  box.innerHTML = d.slides.map((s, i) => `<div class="th ${i === ST.cur ? 'cur' : ''} ${s.hidden ? 'hid' : ''}" data-i="${i}" draggable="true"><span class="n">${i + 1}</span><button class="ck" title="حدد هذه الشريحة">${ic('check')}</button><div class="box" style="width:${thumbW()}px;height:${thumbW() * 9 / 16}px"></div>${(s.overflow || (s.missing && s.missing.length)) ? '<i class="flag" title="تحتاج نظرة"></i>' : ''}<button class="tm" title="خيارات">${ic('ellipsis')}</button></div>`).join('');
   d.slides.forEach((s, i) => renderThumb(i));
+  slMark();
 }
 function renderThumb(i) {
   const d = deck(); const el = $(`#thumbs .th[data-i="${i}"] .box`); if (!el || !d.slides[i]) return;
@@ -15684,8 +15832,15 @@ function bindStrip() {
     const th = e.target.closest('.th'); if (!th) return;
     const i = +th.dataset.i;
     if (e.target.closest('.tm')) { e.stopPropagation(); slideMenu(i, e.target.closest('.tm')); return; }
+    const id = deck().slides[i].id;
+    if (e.shiftKey) { slRange(i, e.ctrlKey || e.metaKey); return; }
+    if (e.ctrlKey || e.metaKey || e.target.closest('.ck') || UI.pick) { slToggle(i); return; }
+    UI.slAnchor = id;
     UI.select(i);
   });
+  $('#slAll').onclick = slAll; $('#slAll2').onclick = slAll;
+  $('#slX').onclick = () => { UI.pick = false; slSingle(); slMark(); };
+  $('#slApply').onclick = () => applyToSelected();
   let from = null;
   box.addEventListener('dragstart', e => { const th = e.target.closest('.th'); if (!th) return; from = +th.dataset.i; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'slide'); });
   box.addEventListener('dragover', e => { if (from == null) return; e.preventDefault(); $$('.th', box).forEach(t => t.classList.remove('drag-over')); const th = e.target.closest('.th'); if (th) th.classList.add('drag-over'); });
@@ -15720,13 +15875,14 @@ function slideMenu(i, anchor) {
   $$('.menu.slm').forEach(m => m.remove());
   const d = deck(), s = d.slides[i];
   const m = document.createElement('div'); m.className = 'menu slm';
-  m.innerHTML = `<button data-a="dup">${ic('copy')}تكرار الشريحة</button><button data-a="up">${ic('arrow-up')}تقديم</button><button data-a="down">${ic('arrow-down')}تأخير</button><button data-a="hide">${ic(s.hidden ? 'eye' : 'eye-off')}${s.hidden ? 'إظهار في العرض' : 'إخفاء من العرض'}</button><hr><button data-a="del" style="color:#C2410C">${ic('trash-2')}حذف الشريحة</button>`;
+  m.innerHTML = `<button data-a="dup">${ic('copy')}تكرار الشريحة</button><button data-a="up">${ic('arrow-up')}تقديم</button><button data-a="down">${ic('arrow-down')}تأخير</button><button data-a="hide">${ic(s.hidden ? 'eye' : 'eye-off')}${s.hidden ? 'إظهار في العرض' : 'إخفاء من العرض'}</button><button data-a="pick">${ic('list-checks')}تحديد عدة شرائح</button><hr><button data-a="del" style="color:#C2410C">${ic('trash-2')}حذف الشريحة</button>`;
   const r = anchor.getBoundingClientRect();
   m.style.position = 'fixed'; m.style.top = Math.min(innerHeight - 230, r.bottom + 4) + 'px'; m.style.right = Math.max(8, innerWidth - r.right) + 'px'; m.style.left = 'auto'; m.style.insetInlineStart = 'auto';
   document.body.appendChild(m);
   m.onclick = e => {
     const b = e.target.closest('button'); if (!b) return; m.remove();
     const a = b.dataset.a;
+    if (a === 'pick') { UI.pick = true; if (UI.slSel.size < 1) UI.slSel.add(s.id); slMark(); UI.toast('اضغط على الشرائح اللي تبيها، وبعدين «طبّق على المحدد»'); return; }
     if (a === 'dup') { const c = JSON.parse(JSON.stringify(s)); c.id = 's' + Math.random().toString(36).slice(2, 9); c.objs.forEach(o => o.id = PM.uid()); d.slides.splice(i + 1, 0, c); ST.cur = i + 1; }
     if (a === 'up' && i > 0) { [d.slides[i - 1], d.slides[i]] = [d.slides[i], d.slides[i - 1]]; ST.cur = i - 1; }
     if (a === 'down' && i < d.slides.length - 1) { [d.slides[i + 1], d.slides[i]] = [d.slides[i], d.slides[i + 1]]; ST.cur = i + 1; }
@@ -15763,6 +15919,7 @@ function bindLaybar() {
   $('#bTone').onclick = () => {
     const d = deck(), s = cur(); if (!s) return;
     const now = s.tone || (d.dark ? 'dark' : 'light');
+    if (UI.slMulti()) return applyStyle({ tone: now === 'dark' ? 'light' : 'dark' });
     s.tone = now === 'dark' ? 'light' : 'dark';
     const L = PM.layoutById(s.layout);
     if (L && L.tones.includes(s.tone)) PM.applyLayout(d, ST.cur, L); else PM.autoSlide(d, ST.cur);
@@ -15790,9 +15947,150 @@ UI.applyLayoutId = function (id) {
   Ed.endEdit();
   const s = cur();
   if (L.tones.length === 1) s.tone = L.tones[0];
+  // several slides picked in the strip: the same design goes on all of them
+  if (UI.slMulti()) { const tone = s.tone || (d.dark ? 'dark' : 'light'); return applyStyle({ layout: L.id, tone }); }
   PM.applyLayout(d, ST.cur, L);
   ST.sel.clear(); PM.renumber(d); PM.commit('layout'); UI.renderAll();
 };
+
+/* ---------- several slides: pick in the strip, one style for all ---------- */
+UI.slSel = new Set(); UI.slAnchor = null; UI.pick = false;
+UI.slMulti = () => !!deck() && (UI.slSel.size > 1 || (UI.pick && UI.slSel.size > 0));
+const slIdx = () => deck().slides.map((s, i) => UI.slSel.has(s.id) ? i : -1).filter(i => i >= 0);
+UI.slIdx = slIdx;
+const slCount = n => n === 1 ? 'شريحة وحدة' : n === 2 ? 'شريحتين' : n <= 10 ? `${n} شرائح` : `${n} شريحة`;
+UI.slCount = slCount;
+function slSingle() { const s = cur(); UI.slSel = new Set(s ? [s.id] : []); }
+function slMark() {
+  const d = deck(); if (!d) return;
+  const ids = new Set(d.slides.map(s => s.id));
+  [...UI.slSel].forEach(id => { if (!ids.has(id)) UI.slSel.delete(id); });
+  if (!UI.slSel.size && cur()) UI.slSel.add(cur().id);
+  const multi = UI.slMulti(), n = UI.slSel.size;
+  $$('#thumbs .th').forEach(t => { const s = d.slides[+t.dataset.i]; t.classList.toggle('msel', !!s && multi && UI.slSel.has(s.id)); });
+  document.body.classList.toggle('sl-multi', multi);
+  document.body.classList.toggle('sl-pick', !!UI.pick);
+  const bar = $('#slBar'); if (!bar) return;
+  bar.classList.toggle('hide', !multi);
+  $('#slN').innerHTML = `محدد <span class="num">${n}</span> من <span class="num">${d.slides.length}</span>`;
+  $('#slN2').textContent = n;
+  const all = n === d.slides.length;
+  $('#slAll').textContent = all ? 'إلغاء التحديد' : 'تحديد الكل';
+  $('#slAll2').classList.toggle('hide', all);
+  if (PM.Dock && PM.Dock.multi) PM.Dock.multi();
+}
+UI.slMark = slMark;
+function slToggle(i) {
+  const d = deck(), s = d.slides[i];
+  if (!UI.slSel.size && cur()) UI.slSel.add(cur().id);
+  if (UI.slSel.has(s.id) && (UI.slSel.size > 1 || UI.pick)) {
+    UI.slSel.delete(s.id);
+    if (i === ST.cur && UI.slSel.size) { const nx = slIdx()[0]; Ed.endEdit(); ST.cur = nx; ST.sel.clear(); UI.renderCur(); }
+    else slMark();
+  } else {
+    UI.slSel.add(s.id); UI.slAnchor = s.id;
+    Ed.endEdit(); ST.cur = i; ST.sel.clear(); UI.renderCur();
+  }
+  scrollThumb();
+}
+function slRange(i, add) {
+  const d = deck();
+  let a = d.slides.findIndex(s => s.id === UI.slAnchor); if (a < 0) a = ST.cur;
+  if (!add) UI.slSel = new Set();
+  for (let k = Math.min(a, i); k <= Math.max(a, i); k++) UI.slSel.add(d.slides[k].id);
+  Ed.endEdit(); ST.cur = i; ST.sel.clear(); UI.renderCur(); scrollThumb();
+}
+function slAll() {
+  const d = deck(); if (!d) return;
+  if (UI.slSel.size === d.slides.length) { UI.pick = false; slSingle(); }
+  else UI.slSel = new Set(d.slides.map(s => s.id));
+  slMark();
+}
+/* fit test: would design L show all of slide i's content in this tone? */
+function fitOn(L, i, tone) {
+  const d = deck(), s = d.slides[i];
+  const kind = s.spec.kind;
+  if (L.kinds ? !L.kinds.includes(kind) : kind !== 'content') return { ok: false, why: 'kind' };
+  const t = L.tones.includes(tone) ? tone : L.tones[0];
+  const c = PM.slideCtx(d, i); c.dark = t === 'dark'; c.tone = PM.tone(c.dark, d.grey);
+  let f = 0; try { f = L.accepts(PM.shape(s.spec), c) || 0; } catch (e) { f = 0; }
+  if (!f) return { ok: false, why: 'fit' };
+  let r; try { r = PM.renderLayout(L, JSON.parse(JSON.stringify(s.spec)), c); } catch (e) { return { ok: false, why: 'fit' }; }
+  if (r.missing && r.missing.length) return { ok: false, why: 'missing' };
+  return { ok: true, f, tone: t };
+}
+/* one action on all picked slides: design, light/dark, text size, title colour */
+function applyStyle(o) {
+  const d = deck(); Ed.endEdit();
+  const idx = slIdx(); if (!idx.length) return;
+  const L = o.layout ? PM.layoutById(o.layout) : null;
+  const done = [], skipped = [];
+  for (const i of idx) {
+    const s = d.slides[i];
+    const before = s.tone;
+    if (o.tone) s.tone = o.tone;
+    const tone = s.tone || (d.dark ? 'dark' : 'light');
+    if (L) {
+      const f = fitOn(L, i, tone);
+      if (!f.ok) { s.tone = before; skipped.push(i + 1); continue; }
+      s.tone = f.tone; PM.applyLayout(d, i, L);
+    } else if (o.tone && (before || (d.dark ? 'dark' : 'light')) !== tone) {
+      const L0 = PM.layoutById(s.layout);
+      if (L0 && L0.tones.includes(tone)) PM.applyLayout(d, i, L0); else PM.autoSlide(d, i);
+    }
+    const texts = s.objs.filter(x => x.t === 'text' && !x.pageNum && x.role !== 'page');
+    if (o.size && o.size !== 1) { texts.forEach(x => PM.TextTools.setScale(x, PM.TextTools.scaleOf(x) * o.size)); s.edited = true; }
+    if (o.titleColor) { let hit = 0; texts.forEach(x => x.paras.forEach(p => { if (p.bind === 'title') { p.color = o.titleColor; hit++; } })); if (hit) s.edited = true; }
+    done.push(i + 1);
+  }
+  ST.sel.clear(); PM.renumber(d); PM.commit('multi-style'); UI.renderAll();
+  const n = done.length;
+  const msg = n ? `✓ طبّقت${L ? ` تصميم «${L.name}»` : ' الستايل'} على ${slCount(n)}` : 'ما طبّقت على أي شريحة';
+  UI.toast(skipped.length ? `${msg} · ما يناسب الشرائح ${skipped.join('، ')} بدون ما يخفي محتوى، فتركتها` : msg + (n ? ' — تقدر تتراجع بـ Ctrl+Z' : ''), 4600);
+  return { done, skipped };
+}
+UI.applyStyle = applyStyle;
+function applyToSelected() {
+  const d = deck(); if (!d) return;
+  Ed.endEdit();
+  let idx = slIdx();
+  if (!idx.includes(ST.cur)) { ST.cur = idx[0]; UI.renderCur(); idx = slIdx(); }
+  const n = idx.length;
+  const s0 = cur(), tone0 = s0.tone || (d.dark ? 'dark' : 'light');
+  const st = { layout: null, tone: null, size: 1, titleColor: null };
+  // designs that show all the content of every picked slide
+  const kinds = new Set(idx.map(i => d.slides[i].spec.kind));
+  const shared = kinds.size > 1 ? [] : PM.LIB.filter(L => idx.every(i => { const c = PM.slideCtx(d, i); const t = d.slides[i].tone || (d.dark ? 'dark' : 'light'); const tt = L.tones.includes(t) ? t : L.tones[0]; c.dark = tt === 'dark'; c.tone = PM.tone(c.dark, d.grey); const k = d.slides[i].spec.kind; if (L.kinds ? !L.kinds.includes(k) : k !== 'content') return false; try { return L.accepts(PM.shape(d.slides[i].spec), c) > 0; } catch (e) { return false; } }));
+  shared.sort((a, b) => (b.id === s0.layout) - (a.id === s0.layout));
+  const box = document.createElement('div');
+  box.innerHTML = `<div class="ms-pick">${idx.map(i => `<span>${PM.pad2(i + 1)}</span>`).join('')}</div>
+    <div class="ms-sec"><h4>${ic('layout-template')}التصميم</h4>
+      ${shared.length ? `<p class="hint">تصاميم تناسب محتوى كل الشرائح المحددة (المعاينة بمحتوى الشريحة الحالية). اللي ما يناسبها التصميم تبقى مثل ما هي.</p><div class="ms-grid" id="msGrid"><div class="lt none on" data-l=""><div class="h" style="height:96px">بدون تغيير</div><div class="cap">يبقى تصميم كل شريحة</div></div></div>` : `<p class="note">الشرائح المحددة أنواعها مختلفة (مثلاً غلاف وشريحة محتوى)، فما فيه تصميم واحد يناسبها كلها. تقدر تطبّق النمط وحجم الخط ولون العناوين.</p>`}
+    </div>
+    <div class="ms-sec"><h4>${ic('contrast')}النمط</h4><div class="chips" id="msTone"><button class="chip on" data-v="">بدون تغيير</button><button class="chip" data-v="light">فاتح</button><button class="chip" data-v="dark">داكن</button></div></div>
+    <div class="ms-sec"><h4>${ic('type')}حجم الخط</h4><div class="chips" id="msSize"><button class="chip on" data-v="1">بدون تغيير</button><button class="chip" data-v="0.9">أصغر</button><button class="chip" data-v="1.1">أكبر</button><button class="chip" data-v="1.2">أكبر بكثير</button></div></div>
+    <div class="ms-sec"><h4>${ic('palette')}لون العناوين</h4><div class="ms-sw" id="msCol"><button class="chip on" data-v="">بدون تغيير</button>${[K.NAVY, K.BLUE, K.SKY, K.WHITE].map(c => `<span class="sw" data-v="${c}" title="#${c}" style="background:#${c}"></span>`).join('')}</div></div>`;
+  UI.modal(`طبّق ستايل واحد على الشرائح المحددة <span class="num" style="font-size:13px;color:var(--muted);font-weight:400">${n}</span>`, box, { wide: false, foot: `<button class="btn sec" data-close2>إلغاء</button><button class="btn pri" id="msGo">${ic('paintbrush')}<span>طبّق على المحدد (<span class="num">${n}</span>)</span></button>` });
+  const grid = $('#msGrid', box);
+  if (grid) {
+    const w = 170;
+    shared.slice(0, 24).forEach(L => {
+      const el = document.createElement('div'); el.className = 'lt'; el.dataset.l = L.id; el.title = L.name;
+      el.innerHTML = `<div class="h" style="height:${w * 9 / 16}px;position:relative;overflow:hidden"></div><div class="cap">${esc(L.name)}${L.id === s0.layout ? ' · الحالي' : ''}</div>`;
+      grid.appendChild(el);
+      requestAnimationFrame(() => { try { UI.preview(el.querySelector('.h'), L, L.tones.includes(tone0) ? tone0 : L.tones[0], el.clientWidth || w); } catch (e) { } });
+    });
+    grid.onclick = e => { const el = e.target.closest('.lt'); if (!el) return; st.layout = el.dataset.l || null; $$('.lt', grid).forEach(x => x.classList.toggle('on', x === el)); };
+  }
+  const chips = (id, key, num) => { const g = $('#' + id, box); g.onclick = e => { const b = e.target.closest('[data-v]'); if (!b) return; st[key] = num ? +b.dataset.v : (b.dataset.v || null); $$('[data-v]', g).forEach(x => x.classList.toggle('on', x === b)); }; };
+  chips('msTone', 'tone'); chips('msSize', 'size', true); chips('msCol', 'titleColor');
+  $('[data-close2]').onclick = () => UI.closeModal();
+  $('#msGo').onclick = () => {
+    if (!st.layout && !st.tone && st.size === 1 && !st.titleColor) { UI.toast('اختر ايش تبي تغيّر: التصميم أو النمط أو الخط أو اللون'); return; }
+    UI.closeModal(); applyStyle(st);
+  };
+}
+UI.applyToSelected = applyToSelected;
 
 /* ---------- previews of layouts with this slide's content ---------- */
 UI.preview = function (host, L, tone, w) {
@@ -16721,6 +17019,7 @@ D.mount = function () {
   host.innerHTML = `<div class="dk-h"><b>التصاميم</b><span class="num" id="dkN"></span><button class="dk-x" id="dkMin" title="إخفاء الدك">${PM.UI.ic('panel-right-close')}</button></div>
     <div class="dk-f"><div class="seg sm" id="dkTone"><button data-v="light">فاتح</button><button data-v="dark">داكن</button></div><select id="dkFam" class="dk-sel"></select></div>
     <label class="dk-all"><input type="checkbox" id="dkAll"> كل المكتبة</label>
+    <div class="dk-multi hide" id="dkMulti"></div>
     <div class="dk-list" id="dkList"></div>`;
   $('#dkMin').onclick = () => D.toggle(false);
   $('#dkOpen').onclick = () => D.toggle(true);
@@ -16742,6 +17041,13 @@ D.mount = function () {
   list.addEventListener('pointerleave', () => { $$('.dk-t', list).forEach(t => { t.style.transform = ''; t.style.zIndex = ''; }); D.endPreview(); });
   list.addEventListener('scroll', () => D.endPreview(), { passive: true });
   D.toggle(lsGet('pm.dock') !== '0', true);
+};
+/* several slides picked in the strip: say so, a click applies to all of them */
+D.multi = function () {
+  const el = $('#dkMulti'); if (!el) return;
+  const on = PM.UI.slMulti && PM.UI.slMulti(), n = PM.UI.slSel ? PM.UI.slSel.size : 0;
+  el.classList.toggle('hide', !on);
+  if (on) el.innerHTML = `الضغطة تطبّق التصميم على المحدد (<b>${n}</b>)`;
 };
 D.toggle = function (on, quiet) {
   document.body.classList.toggle('dock-off', !on);
