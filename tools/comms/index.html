@@ -599,6 +599,7 @@ body.phone .wm{max-height:86dvh}
         <button data-act="word">استيراد ملف وورد (توزيع تلقائي)…</button>
         <button data-act="paste">لصق نص وتوزيعه تلقائي…</button>
         <button data-act="open">فتح مشروع محفوظ…</button>
+        <button data-act="openFree">فتح تصميم حر (دليل / إنفوجرافيك)…</button>
         <button data-act="save">حفظ المشروع (ملف)</button>
       </div>
     </div>
@@ -1499,9 +1500,9 @@ $('#bExport').onclick = () => { const m = $('#expMenu'); m.style.display = m.sty
 $('#expMenu').addEventListener('click', e => { const k = e.target.closest('[data-exp]')?.dataset.exp; $('#expMenu').style.display = 'none'; if (k === 'png') exportPNG(4); if (k === 'png6') exportPNG(6); if (k === 'pdf') exportPDF(); if (k === 'pngAll') exportAll(4); });
 function usedImgs() { const ids = new Set(); [...S.docs.map(d => d.html), serialize()].forEach(h => (h.match(/__IMG:(\w+)__/g) || []).forEach(m => ids.add(m.slice(6, -2)))); const o = {}; ids.forEach(id => { if (S.imgs[id]) o[id] = S.imgs[id]; }); return o; }
 function saveProject() { commitActive(); const o = { app: 'jedco-internal-comms', v: 3, docs: S.docs.map(d => ({ html: d.html, photo: d.photo, extra: d.extra })), active: S.active, html: serialize(), photo: S.photoSrc, extra: S.extra, deps: S.deps, locs: S.locs, imgs: usedImgs() }; const bl = new Blob([JSON.stringify(o)], { type: 'application/json' }); saveOut(fileBase() + '.json', bl).then(ok => ok && toast('تم حفظ المشروع')); }
-$('#fileProj').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => { try { const o = JSON.parse(rd.result); if (!/^jedco-/.test(o.app || '')) throw 0; if (o.imgs) Object.entries(o.imgs).forEach(([k, v]) => { S.imgs[k] = v; IDB.put(k, v); }); if (o.deps) { S.deps = o.deps; store('deps', JSON.stringify(S.deps)); } if (o.locs) { S.locs = o.locs; store('locs', JSON.stringify(S.locs)); } if (o.docs && o.docs.length) { S.docs = o.docs; S.active = -1; activate(Math.min(o.active || 0, o.docs.length - 1), true); } else { S.docs = [{ html: o.html, photo: o.photo, extra: o.extra }]; S.active = -1; activate(0, true); } toast('تم فتح المشروع'); } catch (x) { toast('الملف غير صالح'); } }; rd.readAsText(f); e.target.value = ''; });
+$('#fileProj').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => { try { const o = JSON.parse(rd.result); if (o.app === 'jedco-free-design') { openFree(o); return; } if (!/^jedco-/.test(o.app || '')) throw 0; if (o.imgs) Object.entries(o.imgs).forEach(([k, v]) => { S.imgs[k] = v; IDB.put(k, v); }); if (o.deps) { S.deps = o.deps; store('deps', JSON.stringify(S.deps)); } if (o.locs) { S.locs = o.locs; store('locs', JSON.stringify(S.locs)); } if (o.docs && o.docs.length) { S.docs = o.docs; S.active = -1; activate(Math.min(o.active || 0, o.docs.length - 1), true); } else { S.docs = [{ html: o.html, photo: o.photo, extra: o.extra }]; S.active = -1; activate(0, true); } toast('تم فتح المشروع'); } catch (x) { toast('الملف غير صالح'); } }; rd.readAsText(f); e.target.value = ''; });
 $('#bNew').onclick = () => { const m = $('#fileMenu'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; };
-$('#fileMenu').addEventListener('click', e => { const a = e.target.closest('[data-act]')?.dataset.act; $('#fileMenu').style.display = 'none'; if (a === 'blank') newWorkspace('blank'); if (a === 'libSave') libSave(); if (a === 'lib') libOpen(); if (a === 'newBoard') addBoard(); if (a === 'welcome') newWorkspace('welcome'); if (a === 'sample') newWorkspace('sample'); if (a === 'open') askSave(() => $('#fileProj').click()); if (a === 'word') $('#fileWord').click(); if (a === 'paste') openPaste('الصق نص الإعلان وأنا أوزعه على التصميم.'); if (a === 'save') saveProject(); });
+$('#fileMenu').addEventListener('click', e => { const a = e.target.closest('[data-act]')?.dataset.act; $('#fileMenu').style.display = 'none'; if (a === 'blank') newWorkspace('blank'); if (a === 'libSave') libSave(); if (a === 'lib') libOpen(); if (a === 'newBoard') addBoard(); if (a === 'welcome') newWorkspace('welcome'); if (a === 'sample') newWorkspace('sample'); if (a === 'open') askSave(() => $('#fileProj').click()); if (a === 'openFree') $('#fileFree').click(); if (a === 'word') $('#fileWord').click(); if (a === 'paste') openPaste('الصق نص الإعلان وأنا أوزعه على التصميم.'); if (a === 'save') saveProject(); });
 $('#bUndo').onclick = undo; $('#bRedo').onclick = redo;
 $('#swMagnet').onclick = e => { S.magnet = !S.magnet; e.currentTarget.classList.toggle('on', S.magnet); };
 
@@ -3114,4 +3115,413 @@ window.APP = { activate, addBoard, exportAll, cleanFormatting, rebalance, export
 
 </script>
 
+<!-- FREE-DESIGN MODE (تصميم حر) v3 -->
+<style id="freeStyle">
+body.free-on #zwrap,body.free-on #blockbar,body.free-on #stretch,body.free-on #hintAdd{display:none!important}
+body.free-on #blockPanel>*:not(#freeProps){display:none!important}
+body.free-on #topbar>*:not(.brand):not(.rel):not(#fmTop){display:none!important}
+body.free-on #topbar .rel:has(#expMenu){display:none!important}
+#fmTop{display:none;align-items:center;gap:6px;margin-inline-start:auto}
+body.free-on #fmTop{display:flex}
+#fmTop button{font:inherit;font-size:13px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:6px 11px;cursor:pointer;white-space:nowrap}
+#fmTop button:hover{background:rgba(255,255,255,.2)}
+#fmTop button.pri{background:#004EAA;border-color:#62B6F3}
+#fmTop button.ai{background:linear-gradient(135deg,#004EAA,#00B2BA);border-color:#62B6F3}
+#fmTop button.ai.on{box-shadow:0 0 0 2px #fff inset}
+#fmTop .fm-sep{width:1px;height:24px;background:rgba(255,255,255,.2);margin:0 4px}
+#fmTop #fmZl{min-width:44px;text-align:center;font-size:12px;opacity:.85;color:#fff}
+#freeHost{display:none;position:absolute;inset:0;overflow:auto;background:#E9EDF2}
+body.free-on #freeHost{display:flex}
+#freeHost .fm-wrap{margin:auto;position:relative;flex:none;box-shadow:0 10px 40px rgba(0,38,87,.15);background:#fff;direction:ltr}
+#freeHost iframe{border:0;display:block;position:absolute;left:0;top:0;transform-origin:0 0;background:#fff}
+#freeHost .fm-pad{padding:28px;display:flex;min-width:100%;min-height:100%;box-sizing:border-box}
+#fmBusy{position:absolute;inset:0;background:rgba(0,38,87,.45);color:#fff;display:none;align-items:center;justify-content:center;font-size:16px;z-index:5}
+#freeProps{display:none;font-size:13px;color:#002657}
+body.free-on #freeProps{display:block}
+#freeProps h4{margin:14px 0 8px;font-size:13px;color:#002657;display:flex;align-items:center;gap:6px}
+#freeProps h4:first-child{margin-top:0}
+#freeProps .fp-sel{background:#EEF3F8;border-radius:10px;padding:10px 12px;margin-bottom:10px;line-height:1.5}
+#freeProps .fp-sel b{color:#004EAA}
+#freeProps .fp-sel small{display:block;color:#5B6B82}
+#freeProps .fp-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+#freeProps .fp-row label{min-width:56px;color:#41536E;font-size:12px}
+#freeProps button.fpb{font:inherit;font-size:12.5px;background:#fff;color:#002657;border:1px solid #CFD8E3;border-radius:8px;padding:6px 9px;cursor:pointer}
+#freeProps button.fpb:hover{border-color:#004EAA}
+#freeProps button.fpb.on{background:#004EAA;color:#fff;border-color:#004EAA}
+#freeProps button.fpb.danger{color:#C0392B}
+#freeProps button.fpb.ai{background:linear-gradient(135deg,#004EAA,#00B2BA);color:#fff;border:0}
+#freeProps input[type=number]{width:70px;font:inherit;font-size:12.5px;padding:5px 6px;border:1px solid #CFD8E3;border-radius:8px}
+#freeProps input[type=range]{flex:1}
+#freeProps textarea{width:100%;box-sizing:border-box;font:inherit;font-size:13px;padding:8px 10px;border:1px solid #CFD8E3;border-radius:10px;resize:vertical;min-height:70px;direction:rtl}
+#freeProps .sw{width:22px;height:22px;border-radius:6px;border:1px solid #CFD8E3;cursor:pointer;padding:0}
+#freeProps .sw.none{background:linear-gradient(45deg,#fff 45%,#E74C3C 45%,#E74C3C 55%,#fff 55%)}
+#freeProps .fp-help{color:#5B6B82;font-size:12px;line-height:1.7;background:#F7F9FB;border-radius:10px;padding:10px 12px}
+#freeProps .fp-ai{border:1.5px solid #62B6F3;border-radius:12px;padding:12px;margin-bottom:12px;background:#F4FAFF}
+#freeProps .fp-ai h4{margin-top:0;color:#004EAA}
+#freeProps .fp-msg{font-size:12px;color:#41536E;margin-top:6px;line-height:1.6}
+#freeProps .fp-msg.err{color:#C0392B}
+@media print{body.fm-printing>*{display:none!important}}
+</style>
+<script>
+(function () {
+  const $1 = s => document.querySelector(s);
+  const toastF = m => (typeof toast === 'function' ? toast(m) : alert(m));
+  const SW = ['#002657', '#004EAA', '#62B6F3', '#FFFFFF', '#000000', '#5B6B82', '#D6D9D4', '#EEF2F6', '#00B2BA', '#FC5C17', '#F5C400'];
+  /* ---------- UI shells ---------- */
+  const top = document.createElement('div'); top.id = 'fmTop';
+  top.innerHTML = `<button id="fmBack" title="الرجوع للمصمم الداخلي">→ رجوع للإعلانات</button><span class="fm-sep"></span><button id="fmUndo" title="تراجع (⌘Z)">↶ تراجع</button><button id="fmRedo" title="إعادة (⌘⇧Z)">↷ إعادة</button><span class="fm-sep"></span><button id="fmAi" class="ai" title="حدد مكان في التصميم واكتب ايش تبي يتعدل">✨ تعديل ذكي</button><span class="fm-sep"></span><button id="fmZo">−</button><span id="fmZl">100%</span><button id="fmZi">+</button><button id="fmFit">ملاءمة</button><span class="fm-sep"></span><button id="fmSave" class="pri">حفظ الملف</button><button id="fmPng">تصدير PNG</button><button id="fmPdf">تصدير PDF</button>`;
+  $1('#topbar').appendChild(top);
+  const host = document.createElement('div'); host.id = 'freeHost';
+  host.innerHTML = `<div class="fm-pad"><div class="fm-wrap" id="fmWrap"><iframe id="fmFrame" title="التصميم"></iframe><div id="fmBusy">جاري التصدير…</div></div></div><input type="file" id="fmImg" accept="image/*" hidden><input type="file" id="fileFree" accept=".json,application/json" hidden>`;
+  $1('#stage').appendChild(host);
+  const props = document.createElement('div'); props.id = 'freeProps'; $1('#blockPanel').appendChild(props);
+  const q = id => document.getElementById(id);
+  const FR = q('fmFrame'), WR = q('fmWrap');
+  let cur = null, zoom = 1, sels = [], editing = null, dirty = false, imgTarget = null, imgNew = false, aiMode = false, aiBusy = false, aiMsg = '', aiErr = false, aiCopilot = null;
+  let hist = [], hi = -1, gSeq = 1;
+  const sel = () => sels[sels.length - 1] || null;
+  const D = () => FR.contentDocument, W = () => FR.contentWindow;
+  const FX_CSS = `#fxSel{position:absolute;pointer-events:none;outline:1.5px solid #004EAA;z-index:2147483000;box-sizing:border-box}
+#fxSel .h{position:absolute;width:9px;height:9px;background:#fff;border:1.5px solid #004EAA;border-radius:2px;pointer-events:auto;box-sizing:border-box}
+#fxSel .nw{left:-5px;top:-5px;cursor:nwse-resize}#fxSel .ne{right:-5px;top:-5px;cursor:nesw-resize}#fxSel .sw{left:-5px;bottom:-5px;cursor:nesw-resize}#fxSel .se{right:-5px;bottom:-5px;cursor:nwse-resize}
+#fxSel .e{right:-5px;top:calc(50% - 4.5px);cursor:ew-resize}#fxSel .w{left:-5px;top:calc(50% - 4.5px);cursor:ew-resize}#fxSel .n{top:-5px;left:calc(50% - 4.5px);cursor:ns-resize}#fxSel .s{bottom:-5px;left:calc(50% - 4.5px);cursor:ns-resize}
+#fxSel.multi .h{display:none}
+.fxM{position:absolute;pointer-events:none;outline:1.5px solid #004EAA;z-index:2147482998;box-sizing:border-box}
+.fxM.grp{outline-style:dashed}
+#fxHov{position:absolute;pointer-events:none;outline:1px dashed #62B6F3;z-index:2147482999;box-sizing:border-box}
+#fxBand{position:absolute;pointer-events:none;border:1px solid #004EAA;background:rgba(98,182,243,.15);z-index:2147483001;display:none}
+#fxSel.editing{outline:2px solid #FC5C17}#fxSel.editing .h{display:none}
+body.fx-ai .fxM,body.fx-ai #fxSel{outline-color:#00B2BA}
+body.fx-ai #fxBand{border-color:#00B2BA;background:rgba(0,178,186,.12)}
+[data-fx-edit]{outline:none;cursor:text}
+html,body{cursor:default}`;
+  /* ---------- helpers ---------- */
+  const isOv = el => el && el.closest && el.closest('#fxSel,#fxHov,#fxBand,.fxM');
+  const hasText = el => [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
+  const bgUrl = el => { const b = W().getComputedStyle(el).backgroundImage; return b && /url\(/.test(b); };
+  const isImg = el => el && (el.tagName === 'IMG' || bgUrl(el));
+  const root = () => D().querySelector('.page') || D().body;
+  function kindOf(el) { if (!el) return ''; if (el.dataset.fxGroup) return 'عنصر في مجموعة'; if (el.tagName === 'IMG' || bgUrl(el)) return 'صورة'; if (el.tagName === 'svg' || el.classList.contains('fx-icon')) return 'أيقونة'; if (hasText(el) && el.children.length <= 3) return 'نص'; return 'صندوق / مجموعة'; }
+  function pickable(t) { if (!t || t.nodeType !== 1) return null; const sv = t.closest('svg'); if (sv) t = sv.parentElement && sv.parentElement.classList.contains('fx-icon') ? sv.parentElement : sv; if (t === D().body || t === D().documentElement || t === root()) return null; return t; }
+  function looksBox(el) { if (!el || el.nodeType !== 1) return false; if (el.dataset.fxOpen) return false; if (el.tagName === 'IMG' || el.tagName === 'svg' || el.classList.contains('fx-icon')) return true; const cs = W().getComputedStyle(el);
+    if (cs.backgroundImage !== 'none' && /url\(/.test(cs.backgroundImage)) return true;
+    const bg = cs.backgroundColor; if (bg && bg !== 'transparent' && !/rgba\(.*,\s*0\)$/.test(bg)) return true;
+    if (parseFloat(cs.borderTopWidth) > 0 || parseFloat(cs.borderRightWidth) > 0 || parseFloat(cs.borderBottomWidth) > 0) return true;
+    if (cs.position === 'absolute' && el.parentElement === root()) return true; return false; }
+  function boxOf(t) { const r = root(); let best = null; for (let el = t; el && el !== r && el !== D().body; el = el.parentElement) { if (looksBox(el)) best = el; } return best || t; }
+  function nextIn(outer, t) { const path = []; for (let el = t; el && el !== outer; el = el.parentElement) path.unshift(el); const bx = path.find(looksBox); return bx || t; }
+  const groupOf = el => { const g = el && el.dataset.fxGroup; return g ? [...D().querySelectorAll(`[data-fx-group="${g}"]`)] : null; };
+  function isLayout(t) { /* plain layout wrapper (no own look/text) → start a selection band instead of moving it */ return t && !looksBox(t) && !hasText(t) && t.children.length > 1 && !t.closest('[data-fx-group]'); }
+  function snapshot() { const b = D().body.cloneNode(true); b.querySelectorAll('#fxSel,#fxHov,#fxBand,.fxM').forEach(x => x.remove()); b.querySelectorAll('[data-fx-edit]').forEach(x => { x.removeAttribute('contenteditable'); x.removeAttribute('data-fx-edit'); }); b.classList.remove('fx-ai'); return b.innerHTML; }
+  function push() { hist = hist.slice(0, hi + 1); hist.push(snapshot()); if (hist.length > 80) hist.shift(); hi = hist.length - 1; dirty = true; }
+  function restore(h) { stopEdit(false); D().body.innerHTML = h; ensureOv(); setSel([]); }
+  function undo() { if (hi > 0) { hi--; restore(hist[hi]); } }
+  function redo() { if (hi < hist.length - 1) { hi++; restore(hist[hi]); } }
+  function ensureOv() { const d = D(); if (!d.getElementById('fxSel')) { const s = d.createElement('div'); s.id = 'fxSel'; s.style.display = 'none'; s.innerHTML = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'].map(k => `<i class="h ${k}" data-h="${k}"></i>`).join(''); d.body.appendChild(s); const h = d.createElement('div'); h.id = 'fxHov'; h.style.display = 'none'; d.body.appendChild(h); const bd = d.createElement('div'); bd.id = 'fxBand'; d.body.appendChild(bd); } d.body.classList.toggle('fx-ai', aiMode); }
+  function rectOf(el) { const r = el.getBoundingClientRect(); return { x: r.left + W().scrollX, y: r.top + W().scrollY, w: r.width, h: r.height }; }
+  function unionRect(els) { const rs = els.map(rectOf); const x = Math.min(...rs.map(r => r.x)), y = Math.min(...rs.map(r => r.y)); return { x, y, w: Math.max(...rs.map(r => r.x + r.w)) - x, h: Math.max(...rs.map(r => r.y + r.h)) - y }; }
+  function placeR(box, r) { if (!r) { box.style.display = 'none'; return; } Object.assign(box.style, { display: 'block', left: r.x + 'px', top: r.y + 'px', width: r.w + 'px', height: r.h + 'px' }); }
+  function refresh() {
+    const d = D(); if (!d || !d.getElementById('fxSel')) return; sels = sels.filter(e => e.isConnected);
+    d.querySelectorAll('.fxM').forEach(x => x.remove());
+    const box = d.getElementById('fxSel');
+    if (!sels.length) placeR(box, null);
+    else if (sels.length === 1) { placeR(box, rectOf(sels[0])); box.classList.remove('multi'); }
+    else { placeR(box, unionRect(sels)); box.classList.add('multi'); sels.forEach(el => { const m = d.createElement('div'); m.className = 'fxM' + (el.dataset.fxGroup ? ' grp' : ''); d.body.appendChild(m); placeR(m, rectOf(el)); }); }
+    box.classList.toggle('editing', !!editing); renderProps();
+  }
+  function setSel(arr) { if (editing && !arr.includes(editing)) stopEdit(true); sels = arr.filter(Boolean); refresh(); }
+  function expand(el) { return groupOf(el) || [el]; }
+  function getT(el) { const t = (el.style.translate || '').split(' ').map(v => parseFloat(v) || 0); return [t[0] || 0, t[1] || 0]; }
+  function setT(el, x, y) { el.style.translate = (Math.round(x) || Math.round(y)) ? `${Math.round(x)}px ${Math.round(y)}px` : ''; }
+  function startEdit(el) { if (!el) return; sels = [el]; editing = el; el.setAttribute('contenteditable', 'true'); el.setAttribute('data-fx-edit', '1'); el.focus(); const r = D().createRange(); r.selectNodeContents(el); const s = W().getSelection(); s.removeAllRanges(); s.addRange(r); refresh(); }
+  function stopEdit(save) { if (!editing) return; const el = editing; editing = null; el.removeAttribute('contenteditable'); el.removeAttribute('data-fx-edit'); if (save) push(); refresh(); }
+  /* ---------- iframe wiring ---------- */
+  function wire() {
+    const d = D(); const st = d.createElement('style'); st.id = 'fxCss'; st.textContent = FX_CSS; d.head.appendChild(st); ensureOv();
+    let drag = null;
+    d.addEventListener('mousedown', e => {
+      if (e.button !== 0) return;
+      const hd = e.target.closest && e.target.closest('#fxSel .h');
+      if (hd && sels.length === 1) { const s = sels[0]; const r = rectOf(s); const [tx, ty] = getT(s); drag = { mode: 'resize', h: hd.dataset.h, x0: e.clientX, y0: e.clientY, w0: r.w, h0: r.h, tx, ty }; e.preventDefault(); return; }
+      if (editing && editing.contains(e.target)) return;
+      const t = pickable(e.target);
+      const inSel = t && sels.some(s => s === t || s.contains(t));
+      if (!t || (isLayout(t) && !inSel)) { if (!e.shiftKey) setSel([]); drag = { mode: 'band', x0: e.clientX + W().scrollX, y0: e.clientY + W().scrollY, add: e.shiftKey, base: sels.slice() }; e.preventDefault(); return; }
+      if (e.shiftKey) { const b = e.altKey ? t : boxOf(t); const grp = expand(b); const has = grp.every(x => sels.includes(x)); setSel(has ? sels.filter(x => !grp.includes(x)) : sels.concat(grp.filter(x => !sels.includes(x)))); e.preventDefault(); return; }
+      let drill = null;
+      if (inSel && !e.altKey) { drill = t; }
+      else setSel(expand(e.altKey ? t : boxOf(t)));
+      drag = { mode: 'move', x0: e.clientX, y0: e.clientY, start: sels.map(s => getT(s)), moved: false, drill }; e.preventDefault();
+    });
+    d.addEventListener('mousemove', e => {
+      const hv = d.getElementById('fxHov');
+      if (!drag) { const t = pickable(e.target); if (t && !isOv(t) && !sels.includes(t) && !isLayout(t)) placeR(hv, rectOf(boxOf(t))); else hv.style.display = 'none'; return; }
+      if (drag.mode === 'band') { const x = e.clientX + W().scrollX, y = e.clientY + W().scrollY; const r = { x: Math.min(x, drag.x0), y: Math.min(y, drag.y0), w: Math.abs(x - drag.x0), h: Math.abs(y - drag.y0) }; drag.r = r; placeR(d.getElementById('fxBand'), r); return; }
+      const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+      if (drag.mode === 'move') { if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 3) return; drag.moved = true; sels.forEach((s, i) => setT(s, drag.start[i][0] + dx, drag.start[i][1] + dy)); }
+      else { const s = sels[0], h = drag.h; let w = drag.w0, hh = drag.h0, tx = drag.tx, ty = drag.ty;
+        if (h.includes('e')) w = drag.w0 + dx; if (h.includes('w')) { w = drag.w0 - dx; tx = drag.tx + dx; }
+        if (h.includes('s')) hh = drag.h0 + dy; if (h.includes('n')) { hh = drag.h0 - dy; ty = drag.ty + dy; }
+        w = Math.max(12, w); hh = Math.max(8, hh);
+        if (h !== 'n' && h !== 's') { s.style.width = w + 'px'; s.style.maxWidth = 'none'; s.style.flex = 'none'; }
+        if (h !== 'e' && h !== 'w') { s.style.height = hh + 'px'; s.style.maxHeight = 'none'; }
+        setT(s, tx, ty); drag.moved = true; }
+      refresh();
+    });
+    d.addEventListener('mouseup', () => {
+      if (!drag) return;
+      if (drag.mode === 'band') { d.getElementById('fxBand').style.display = 'none'; if (drag.r && drag.r.w > 4 && drag.r.h > 4) { const r = drag.r; const inside = el => { const a = rectOf(el); return a.x >= r.x - 1 && a.y >= r.y - 1 && a.x + a.w <= r.x + r.w + 1 && a.y + a.h <= r.y + r.h + 1; };
+          let cand = [...root().querySelectorAll('*')].filter(el => !isOv(el) && !(el.closest('svg') && el.tagName !== 'svg') && (looksBox(el) || (hasText(el) && !el.closest('[data-fx-band-skip]'))) && inside(el));
+          cand = cand.filter(el => !cand.some(o => o !== el && o.contains(el))); /* keep outermost */
+          let out = drag.add ? drag.base.slice() : []; cand.forEach(c => expand(c).forEach(x => { if (!out.includes(x)) out.push(x); })); setSel(out); }
+        drag = null; return; }
+      if (drag.moved) push(); else if (drag.drill && sels.length === 1 && drag.drill !== sels[0]) { setSel([nextIn(sels[0], drag.drill)]); }
+      drag = null; refresh();
+    });
+    d.addEventListener('dblclick', e => { if (aiMode) return; const t = pickable(e.target); if (!t || isOv(t)) return; if (isImg(t)) { setSel([t]); replaceImg(); return; } let el = t; while (el && !hasText(el) && el.parentElement && el.parentElement !== d.body) el = el.parentElement; if (el && hasText(el)) startEdit(el); });
+    d.addEventListener('input', () => { dirty = true; refresh(); });
+    d.addEventListener('keydown', onKey);
+    d.addEventListener('dragover', e => { if ([...e.dataTransfer.types].includes('text/x-icon') || [...e.dataTransfer.types].includes('Files')) e.preventDefault(); });
+    d.addEventListener('drop', e => { e.preventDefault(); const ic = e.dataTransfer.getData('text/x-icon'); if (ic) { addIcon(ic, e.clientX + W().scrollX, e.clientY + W().scrollY); return; } const f = e.dataTransfer.files[0]; if (f && /^image\//.test(f.type)) { const rd = new FileReader(); rd.onload = () => addImage(rd.result, e.clientX + W().scrollX, e.clientY + W().scrollY); rd.readAsDataURL(f); } });
+  }
+  function onKey(e) {
+    const mod = e.metaKey || e.ctrlKey; const k = e.key.toLowerCase();
+    if (mod && k === 's') { e.preventDefault(); saveFree(); return; }
+    if (editing) { if (e.key === 'Escape') { e.preventDefault(); stopEdit(true); } return; }
+    if (mod && k === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
+    if (mod && k === 'g') { e.preventDefault(); e.shiftKey ? ungroup() : group(); return; }
+    if (mod && k === 'a') { e.preventDefault(); setSel([...root().children].filter(x => !isOv(x))); return; }
+    if (!sels.length) return;
+    if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); delSel(); return; }
+    if (mod && k === 'd') { e.preventDefault(); dupSel(); return; }
+    if (e.key === 'Escape') { e.preventDefault(); selParent(); return; }
+    if (e.key === 'Enter' && sels.length === 1) { e.preventDefault(); if (hasText(sels[0])) startEdit(sels[0]); return; }
+    const st = e.shiftKey ? 10 : 1; const mv = { ArrowLeft: [-st, 0], ArrowRight: [st, 0], ArrowUp: [0, -st], ArrowDown: [0, st] }[e.key];
+    if (mv) { e.preventDefault(); sels.forEach(s => { const [x, y] = getT(s); setT(s, x + mv[0], y + mv[1]); }); refresh(); clearTimeout(onKey.t); onKey.t = setTimeout(push, 400); }
+  }
+  document.addEventListener('keydown', e => { if (!document.body.classList.contains('free-on')) return; if (e.target.closest && e.target.closest('input,textarea,[contenteditable]')) return; onKey(e); });
+  /* ---------- actions ---------- */
+  function delSel() { if (!sels.length) return; sels.forEach(s => s.remove()); setSel([]); push(); }
+  function dupSel() { if (!sels.length) return; const map = {}; const out = sels.map(s => { const c = s.cloneNode(true); if (c.dataset.fxGroup) { map[c.dataset.fxGroup] = map[c.dataset.fxGroup] || 'g' + Date.now().toString(36) + (gSeq++); c.dataset.fxGroup = map[c.dataset.fxGroup]; } const [x, y] = getT(s); s.after(c); setT(c, x + 14, y + 14); return c; }); setSel(out); push(); }
+  function selParent() { if (sels.length > 1) { setSel([sels[sels.length - 1]]); return; } const s = sel(); if (!s) return; let p = s.parentElement; while (p && p !== root() && p !== D().body && !looksBox(p)) p = p.parentElement; if (p && p !== root() && p !== D().body) setSel(expand(p)); else if (s.parentElement && s.parentElement !== root() && s.parentElement !== D().body && !looksBox(s)) setSel([s.parentElement]); }
+  function selChild() { const s = sel(); if (s && s.firstElementChild) setSel([s.firstElementChild]); }
+  /* group / ungroup */
+  function group() {
+    if (sels.length < 2) { const s = sel(); if (s && s.dataset.fxOpen) { delete s.dataset.fxOpen; setSel([s]); push(); toastF('رجع الصندوق مجموعة واحدة'); return; } toastF('حدد عنصرين أو أكثر (Shift + كليك أو اسحب مربع تحديد) ثم اضغط «دمج»'); return; }
+    const id = 'g' + Date.now().toString(36) + (gSeq++); sels.forEach(s => s.dataset.fxGroup = id); push(); refresh(); toastF('تم الدمج: العناصر تتحرك مع بعض الحين');
+  }
+  function ungroup() {
+    const gs = [...new Set(sels.map(s => s.dataset.fxGroup).filter(Boolean))];
+    if (gs.length) { gs.forEach(g => D().querySelectorAll(`[data-fx-group="${g}"]`).forEach(x => delete x.dataset.fxGroup)); push(); refresh(); toastF('تم تفكيك المجموعة'); return; }
+    const s = sel(); if (s && s.children.length) { s.dataset.fxOpen = '1'; const kids = [...s.children].filter(c => !isOv(c)); setSel(kids); push(); toastF('تم التفكيك: كل عنصر داخلي صار يتحدد ويتحرك لحاله'); return; }
+    toastF('العنصر المحدد ما فيه عناصر داخلية تتفكك');
+  }
+  function layer(dir) { sels.forEach(s => { const cs = W().getComputedStyle(s); if (cs.position === 'static') s.style.position = 'relative'; const z = parseInt(cs.zIndex) || 0; s.style.zIndex = Math.max(0, z + dir * 10); }); push(); refresh(); }
+  function resetPos() { sels.forEach(s => { setT(s, 0, 0); ['width', 'height', 'maxWidth', 'maxHeight', 'flex'].forEach(k => s.style[k] = ''); }); push(); refresh(); }
+  function addAbs(el, x, y) { const pg = root(); if (W().getComputedStyle(pg).position === 'static') pg.style.position = 'relative'; const pr = rectOf(pg); el.style.position = 'absolute'; el.style.left = Math.round((x ?? pr.x + pr.w / 2 - 60) - pr.x) + 'px'; el.style.top = Math.round((y ?? pr.y + pr.h / 2 - 20) - pr.y) + 'px'; el.style.zIndex = 50; pg.appendChild(el); setSel([el]); push(); }
+  function addText() { const el = D().createElement('div'); el.textContent = 'نص جديد'; Object.assign(el.style, { fontFamily: 'Tajawal', fontWeight: '700', fontSize: '22px', color: '#002657', whiteSpace: 'nowrap', direction: 'rtl' }); addAbs(el); startEdit(el); }
+  function addBox() { const el = D().createElement('div'); Object.assign(el.style, { width: '220px', height: '120px', borderRadius: '14px', border: '1px solid #D6D9D4', background: '#EEF2F6' }); addAbs(el); }
+  function addImage(src, x, y) { const el = D().createElement('img'); el.src = src; el.style.width = '200px'; el.style.height = 'auto'; addAbs(el, x, y); }
+  function iconSvg(el, name) { el.innerHTML = svgIcon(name, 1.8); const s = el.querySelector('svg'); if (s) { s.setAttribute('width', '100%'); s.setAttribute('height', '100%'); s.style.display = 'block'; } }
+  function addIcon(name, x, y) { if (typeof svgIcon !== 'function') return; const el = D().createElement('div'); el.className = 'fx-icon'; iconSvg(el, name); Object.assign(el.style, { width: '48px', height: '48px', color: '#004EAA' }); addAbs(el, x != null ? x - 24 : undefined, y != null ? y - 24 : undefined); }
+  function replaceImg(isNew) { imgNew = !!isNew; imgTarget = isNew ? null : sel(); q('fmImg').click(); }
+  q('fmImg').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; const rd = new FileReader(); rd.onload = () => { if (imgNew) { addImage(rd.result); return; } if (!imgTarget) return; if (imgTarget.tagName === 'IMG') imgTarget.src = rd.result; else imgTarget.style.backgroundImage = `url("${rd.result}")`; push(); toastF('تم استبدال الصورة'); }; rd.readAsDataURL(f); });
+  const ig = $1('#iconGrid'); if (ig) ig.addEventListener('click', e => { if (!document.body.classList.contains('free-on')) return; const it = e.target.closest('.it'); if (!it) return; e.stopPropagation(); e.preventDefault(); const s = sel(); if (sels.length === 1 && s.classList.contains('fx-icon')) { const c = s.style.color; iconSvg(s, it.dataset.icon); s.style.color = c; push(); refresh(); } else addIcon(it.dataset.icon); }, true);
+  /* ---------- AI edit (تعديل ذكي) ---------- */
+  let sampleFn = null; (async () => { try { if (window.claude && claude.use) sampleFn = await claude.use('sample'); } catch (x) { sampleFn = null; } })();
+  function setAi(on) { aiMode = on; q('fmAi').classList.toggle('on', on); if (D() && D().body) D().body.classList.toggle('fx-ai', on); aiMsg = ''; aiErr = false; aiCopilot = null; renderProps(); }
+  function packTargets() {
+    const imgs = []; const tok = s => s.replace(/data:[a-z0-9.+\/-]+;base64,[A-Za-z0-9+\/=]+/gi, m => { imgs.push(m); return `__IMG${imgs.length - 1}__`; });
+    const parts = sels.map((el, i) => { const c = el.cloneNode(true); c.removeAttribute('contenteditable'); c.removeAttribute('data-fx-edit'); return `<!--#${i}-->\n` + tok(c.outerHTML); });
+    return { imgs, text: parts.join('\n') };
+  }
+  function brandRules() { return `هوية مطارات جدة (Jeddah Airports / JEDCO): الألوان الأساسية فقط #002657 كحلي، #004EAA أزرق، #62B6F3 أزرق فاتح، أبيض؛ الثانوية للرسوم فقط: #00B2BA، #FC5C17، #D6D9D4 (والأصفر #F5C400 خاص بالسترة الصفراء). الخطوط: Tajawal للعربي، Sequel لكل الأرقام والعناوين الإنجليزية، FSI للنص الإنجليزي. بدون ظلال، الصناديق بزوايا دائرية، أيقونات خطية بدون إطار، لا تخترع زخارف أو باترن. العربي يمين والإنجليزي يسار، ومسافة واضحة بين السطر العربي وترجمته.`; }
+  function buildPrompt(req, pack) {
+    return `أنت مصمم يعدّل جزءاً من تصميم HTML لمطارات جدة.
+${brandRules()}
+
+طلب المستخدم:
+«${req}»
+
+العناصر المحددة (كل عنصر يبدأ بسطر <!--#رقم-->):
+${pack.text}
+
+القواعد:
+- عدّل فقط ما يطلبه المستخدم، وحافظ على باقي النصوص والكلاسات والصور كما هي.
+- الرموز __IMG0__ و __IMG1__ … هي صور: أبقها كما هي (تقدر تنقلها أو تحذفها لو طُلب).
+- استخدم style داخلي (inline) لأي تغيير في الشكل؛ لا تضف <script> ولا <style> ولا روابط خارجية.
+- لا تغيّر مقاس الصفحة.
+- اكتب الرد كله داخل بلوك كود واحد (\`\`\`html)، بدون أي شرح خارجه، بهذا الشكل بالضبط:
+===#0===
+<العنصر رقم 0 كامل بعد التعديل>
+===#1===
+<العنصر رقم 1 كامل بعد التعديل>
+===NOTE===
+سطر واحد بالعربي يشرح ايش تغيّر
+===END===
+- اكتب HTML عادي (بدون JSON وبدون escape للعلامات).
+- العنصر اللي ما تغيّر لا تكتبه. لحذف عنصر اكتب تحت رقمه كلمة DELETE فقط.`;
+  }
+  function sanitize(html) { const t = D().createElement('template'); t.innerHTML = html; t.content.querySelectorAll('script,style,iframe,object,embed,link,meta').forEach(x => x.remove()); t.content.querySelectorAll('*').forEach(el => [...el.attributes].forEach(a => { if (/^on/i.test(a.name) || /javascript:/i.test(a.value)) el.removeAttribute(a.name); })); return t; }
+  function parseAi(raw, count) {
+    let txt = String(raw || '').replace(/\r/g, '').trim();
+    txt = txt.replace(/[“”„″]/g, '"').replace(/[‘’]/g, "'").replace(/ /g, ' ');
+    txt = txt.replace(/```[a-zA-Z]*\n?/g, '');
+    const edits = []; let note = '';
+    /* 1) marker format ===#n=== */
+    const re = /={2,}\s*#?\s*(\d+|NOTE|END)\s*={2,}/gi; const marks = []; let m;
+    while ((m = re.exec(txt))) marks.push({ k: m[1].toUpperCase(), s: m.index, e: re.lastIndex });
+    if (marks.some(x => /^\d+$/.test(x.k))) {
+      marks.forEach((mk, n) => { const body = txt.slice(mk.e, n + 1 < marks.length ? marks[n + 1].s : txt.length).trim(); if (mk.k === 'NOTE') note = body.split('\n')[0]; else if (/^\d+$/.test(mk.k)) edits.push({ i: +mk.k, html: /^DELETE$/i.test(body) ? '' : body }); });
+      return { edits, note };
+    }
+    /* 2) JSON (old format) with tolerant fallback */
+    const jm = txt.match(/\{[\s\S]*\}/);
+    if (jm) { try { const o = JSON.parse(jm[0]); if (o && Array.isArray(o.edits)) return { edits: o.edits, note: o.note || '' }; } catch (x) { }
+      const hm = [...jm[0].matchAll(/"i"\s*:\s*(\d+)\s*,\s*"html"\s*:\s*"([\s\S]*?)"\s*}\s*(?:,|\])/g)];
+      if (hm.length) return { edits: hm.map(h => ({ i: +h[1], html: h[2].replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\\//g, '/') })), note: '' }; }
+    /* 3) plain HTML for a single target */
+    const hs = txt.indexOf('<'), he = txt.lastIndexOf('>');
+    if (count === 1 && hs >= 0 && he > hs) return { edits: [{ i: 0, html: txt.slice(hs, he + 1) }], note: '' };
+    throw new Error('ما لقيت التعديل في الرد');
+  }
+  function applyAi(raw, pack, targets) {
+    const o = parseAi(raw, targets.length);
+    const back = s => s.replace(/\\"/g, '"').replace(/__IMG(\d+)__/g, (_, n) => pack.imgs[+n] || '');
+    const out = []; let n = 0;
+    o.edits.forEach(ed => { const el = targets[ed.i]; if (!el || !el.isConnected) return; if (!ed.html) { el.remove(); n++; return; } const t = sanitize(back(ed.html)); const nodes = [...t.content.childNodes].filter(x => x.nodeType === 1 || (x.nodeType === 3 && x.textContent.trim())); if (!nodes.length) return; el.replaceWith(...nodes); nodes.forEach(x => x.nodeType === 1 && out.push(x)); n++; });
+    if (!n) throw new Error('ما وصل أي تعديل');
+    push(); setSel(out); return o.note || 'تم التعديل';
+  }
+  async function runAi(req) {
+    if (!sels.length) { aiErr = true; aiMsg = 'حدد المكان أولاً: كليك على العنصر، أو اسحب مربع حوله.'; renderProps(); return; }
+    if (!req.trim()) { aiErr = true; aiMsg = 'اكتب ايش تبي يتعدّل.'; renderProps(); return; }
+    stopEdit(true); const targets = sels.slice(); const pack = packTargets(); const prompt = buildPrompt(req.trim(), pack);
+    if (!sampleFn) { aiCopilot = { prompt, pack, targets }; aiErr = false; aiMsg = ''; renderProps(); return; }
+    aiBusy = true; aiErr = false; aiMsg = 'جاري التعديل… (أول مرة يطلب منك السماح)'; renderProps();
+    try { const { text } = await sampleFn(prompt, { cache: false }); aiMsg = '✓ ' + applyAi(text, pack, targets); }
+    catch (e) { aiErr = true; aiMsg = e && e.code === 'not_granted' ? 'ما تم السماح باستخدام Claude. تقدر تستخدم طريقة Copilot بدالها.' : 'تعذّر التعديل: ' + (e.message || e.code || e); if (e && e.code === 'not_granted') sampleFn = null; }
+    aiBusy = false; renderProps();
+  }
+  /* ---------- properties panel ---------- */
+  function css(k, el) { el = el || sel(); return el ? W().getComputedStyle(el)[k] : ''; }
+  function setS(k, v) { sels.forEach(s => s.style[k] = v); push(); refresh(); }
+  function setText(k, v) { sels.forEach(s => { s.style[k] = v; s.querySelectorAll('*').forEach(c => { if (c.style[k]) c.style[k] = ''; }); }); push(); refresh(); }
+  const sws = (fn, none) => (none ? `<button class="sw none" title="بدون" data-fn="${fn}" data-v="transparent"></button>` : '') + SW.map(c => `<button class="sw" style="background:${c}" title="${c}" data-fn="${fn}" data-v="${c}"></button>`).join('');
+  const esc2 = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  function aiPanel() {
+    const engine = sampleFn ? 'يعدّل مباشرة باستخدام Claude' : 'بدون إنترنت: ينسخ لك طلب جاهز لـ Copilot وتلصق الرد';
+    let h = `<div class="fp-ai"><h4>✨ تعديل ذكي</h4><div class="fp-help" style="margin-bottom:8px">1) حدد المكان: كليك على العنصر، أو اسحب مربع حول المنطقة (Shift لإضافة أكثر)<br>2) اكتب ايش تبي يتعدّل<br>3) اضغط «عدّل»</div>
+      <div class="fp-msg">المحدد الحين: <b>${sels.length ? sels.length + ' عنصر' : 'لا شي'}</b> · ${engine}</div>
+      <textarea id="fpAiReq" placeholder="مثال: خلّ العنوان أكبر ولونه أزرق فاتح، وقرّب المسافة بين البطاقات">${esc2(aiCopilot ? aiCopilot.req || '' : (q('fpAiReq') ? q('fpAiReq').value : ''))}</textarea>
+      <div class="fp-row" style="margin-top:8px"><button class="fpb ai" data-a="aiRun" ${aiBusy ? 'disabled' : ''}>${aiBusy ? '…' : 'عدّل'}</button><button class="fpb" data-a="aiOff">إغلاق</button></div>`;
+    if (aiCopilot) h += `<div class="fp-help" style="margin-top:6px"><b>طريقة Copilot:</b><br>1) اضغط «انسخ الطلب» والصقه في Copilot<br>2) انسخ رد Copilot كامل والصقه تحت<br>3) اضغط «طبّق»</div>
+      <div class="fp-row" style="margin-top:6px"><button class="fpb" data-a="aiCopy">📋 انسخ الطلب</button></div>
+      <textarea id="fpAiResp" placeholder="الصق رد Copilot هنا…" style="direction:ltr;text-align:left"></textarea>
+      <div class="fp-row" style="margin-top:6px"><button class="fpb ai" data-a="aiApply">طبّق</button></div>`;
+    if (aiMsg) h += `<div class="fp-msg ${aiErr ? 'err' : ''}">${esc2(aiMsg)}</div>`;
+    return h + '</div>';
+  }
+  function renderProps() {
+    if (!document.body.classList.contains('free-on')) return;
+    const keepReq = q('fpAiReq') ? q('fpAiReq').value : '';
+    const add = `<h4>إضافة</h4><div class="fp-row"><button class="fpb" data-a="addText">＋ نص</button><button class="fpb" data-a="addBox">＋ صندوق</button><button class="fpb" data-a="addImg">＋ صورة</button></div><div class="fp-help" style="margin-bottom:6px">للأيقونات: اضغط أي أيقونة من المكتبة أو اسحبها على التصميم.</div>`;
+    const grpRow = `<div class="fp-row"><button class="fpb" data-a="group" title="⌘G">⊞ دمج</button><button class="fpb" data-a="ungroup" title="⌘⇧G">⊟ تفكيك</button><button class="fpb ai" data-a="aiOn">✨ تعديل ذكي</button></div>`;
+    let h = aiMode ? aiPanel() : '';
+    if (!sels.length) { h += `<div class="fp-help"><b>كيف تشتغل:</b><br>• <b>كليك</b> يحدد الصندوق، واسحبه لتحريكه · كليك ثاني يدخل لعناصره<br>• <b>Shift + كليك</b> لتحديد أكثر من عنصر، أو <b>اسحب مربع</b> من مكان فاضي<br>• <b>دمج</b> يربط العناصر المحددة مع بعض · <b>تفكيك</b> يفك المجموعة أو يفك الصندوق لعناصره<br>• <b>دبل كليك</b> على نص لتعديله، وعلى صورة لاستبدالها<br>• المربعات الصغيرة لتغيير المقاس · الأسهم للتحريك الدقيق<br>• Esc يحدد العنصر الأكبر · Delete حذف · ⌘D نسخ · ⌘Z تراجع</div>` + (aiMode ? '' : `<div class="fp-row" style="margin-top:10px"><button class="fpb ai" data-a="aiOn">✨ تعديل ذكي</button></div>`) + add; }
+    else {
+      const s = sel(); const fs = Math.round(parseFloat(css('fontSize'))), r = sels.length > 1 ? unionRect(sels) : rectOf(s);
+      const op = Math.round(parseFloat(css('opacity')) * 100), rad = Math.round(parseFloat(css('borderTopLeftRadius')) || 0);
+      const bold = parseInt(css('fontWeight')) >= 600, al = css('textAlign');
+      const what = sels.length > 1 ? `<b>${sels.length} عناصر</b>${groupOf(s) && groupOf(s).length === sels.length ? ' (مجموعة)' : ''}<small>أي تعديل تحت ينطبق عليها كلها</small>` : `<b>${kindOf(s)}</b><small>${esc2((s.textContent || '').trim().slice(0, 40))}</small>`;
+      h += `<div class="fp-sel">المحدد: ${what}</div>${grpRow}
+      <div class="fp-row"><button class="fpb" data-a="parent" title="Esc">⬆ العنصر الأكبر</button><button class="fpb" data-a="child">⬇ العنصر الداخلي</button></div>
+      ${sels.length === 1 ? `<div class="fp-row"><button class="fpb" data-a="edit">✎ تعديل النص</button>${isImg(s) ? '<button class="fpb" data-a="img">🖼 استبدال الصورة</button>' : ''}</div>` : ''}
+      <h4>النص</h4>
+      <div class="fp-row"><label>الحجم</label><button class="fpb" data-a="fs-">A−</button><input type="number" id="fpFs" value="${fs}" min="4" max="300"><button class="fpb" data-a="fs+">A+</button></div>
+      <div class="fp-row"><button class="fpb ${bold ? 'on' : ''}" data-a="bold"><b>B</b> عريض</button><button class="fpb ${al === 'right' || al === 'start' ? 'on' : ''}" data-a="al-right">يمين</button><button class="fpb ${al === 'center' ? 'on' : ''}" data-a="al-center">وسط</button><button class="fpb ${al === 'left' ? 'on' : ''}" data-a="al-left">يسار</button></div>
+      <div class="fp-row"><label>لون النص</label>${sws('color')}</div>
+      <h4>الصندوق</h4>
+      <div class="fp-row"><label>الخلفية</label>${sws('background', true)}</div>
+      <div class="fp-row"><label>الإطار</label>${sws('border', true)}</div>
+      <div class="fp-row"><label>الزوايا</label><input type="range" id="fpRad" min="0" max="60" value="${rad}"><span>${rad}</span></div>
+      <div class="fp-row"><label>الشفافية</label><input type="range" id="fpOp" min="5" max="100" value="${op}"><span>${op}%</span></div>
+      <h4>المقاس والمكان</h4>
+      <div class="fp-row"><label>العرض</label><input type="number" id="fpW" value="${Math.round(r.w)}" ${sels.length > 1 ? 'disabled' : ''}><label style="min-width:auto">الارتفاع</label><input type="number" id="fpH" value="${Math.round(r.h)}" ${sels.length > 1 ? 'disabled' : ''}></div>
+      <div class="fp-row"><button class="fpb" data-a="front">⤒ للأمام</button><button class="fpb" data-a="back">⤓ للخلف</button><button class="fpb" data-a="reset">↺ إرجاع لمكانه</button></div>
+      <div class="fp-row"><button class="fpb" data-a="dup">⧉ نسخ</button><button class="fpb danger" data-a="del">🗑 حذف</button></div>` + add;
+    }
+    props.innerHTML = h;
+    if (q('fpAiReq') && keepReq && !q('fpAiReq').value) q('fpAiReq').value = keepReq;
+    const n = id => props.querySelector('#' + id);
+    if (n('fpFs')) n('fpFs').onchange = e => setText('fontSize', e.target.value + 'px');
+    if (n('fpRad')) { n('fpRad').oninput = e => { sels.forEach(s => s.style.borderRadius = e.target.value + 'px'); e.target.nextElementSibling.textContent = e.target.value; }; n('fpRad').onchange = () => { push(); refresh(); }; }
+    if (n('fpOp')) { n('fpOp').oninput = e => { sels.forEach(s => s.style.opacity = e.target.value / 100); e.target.nextElementSibling.textContent = e.target.value + '%'; }; n('fpOp').onchange = () => push(); }
+    if (n('fpW')) n('fpW').onchange = e => { const s = sel(); s.style.width = e.target.value + 'px'; s.style.maxWidth = 'none'; s.style.flex = 'none'; push(); refresh(); };
+    if (n('fpH')) n('fpH').onchange = e => { const s = sel(); s.style.height = e.target.value + 'px'; s.style.maxHeight = 'none'; push(); refresh(); };
+  }
+  props.addEventListener('click', async e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.fn) { const v = b.dataset.v; if (b.dataset.fn === 'color') setText('color', v); else if (b.dataset.fn === 'background') setS('background', v); else setS('border', v === 'transparent' ? 'none' : `1px solid ${v}`); return; }
+    const a = b.dataset.a; const fs = () => parseFloat(css('fontSize'));
+    const act = { addText, addBox, addImg: () => replaceImg(true), parent: selParent, child: selChild, group, ungroup,
+      edit: () => { let el = sel(); if (el && !hasText(el)) { const t = [...el.querySelectorAll('*')].find(hasText); if (t) el = t; } if (el && hasText(el)) startEdit(el); }, img: () => replaceImg(false),
+      'fs-': () => sels.forEach(s => s.style.fontSize = (parseFloat(css('fontSize', s)) / 1.08).toFixed(1) + 'px') || (push(), refresh()),
+      'fs+': () => sels.forEach(s => s.style.fontSize = (parseFloat(css('fontSize', s)) * 1.08).toFixed(1) + 'px') || (push(), refresh()),
+      bold: () => setText('fontWeight', parseInt(css('fontWeight')) >= 600 ? '400' : '700'), 'al-right': () => setS('textAlign', 'right'), 'al-center': () => setS('textAlign', 'center'), 'al-left': () => setS('textAlign', 'left'),
+      front: () => layer(1), back: () => layer(-1), reset: resetPos, dup: dupSel, del: delSel,
+      aiOn: () => setAi(true), aiOff: () => setAi(false),
+      aiRun: () => { const r = q('fpAiReq').value; if (aiCopilot) aiCopilot = null; runAi(r).then(() => { if (aiCopilot) aiCopilot.req = r; renderProps(); }); },
+      aiCopy: async () => { try { await navigator.clipboard.writeText(aiCopilot.prompt); toastF('تم نسخ الطلب — الصقه في Copilot'); } catch (x) { const ta = document.createElement('textarea'); ta.value = aiCopilot.prompt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toastF('تم نسخ الطلب — الصقه في Copilot'); } },
+      aiApply: () => { try { const req = aiCopilot.req; aiMsg = '✓ ' + applyAi(q('fpAiResp').value, aiCopilot.pack, aiCopilot.targets); aiErr = false; aiCopilot = null; } catch (x) { aiErr = true; aiMsg = 'ما قدرت أطبّق الرد: ' + x.message + ' — انسخ رد Copilot كامل (من أول ===#0=== إلى ===END===) والصقه.'; } renderProps(); } };
+    act[a] && act[a]();
+  });
+  q('fmAi').onclick = () => setAi(!aiMode);
+  /* ---------- open / save / export ---------- */
+  function setZoom(z) { zoom = Math.max(.2, Math.min(3, z)); FR.style.transform = `scale(${zoom})`; WR.style.width = cur.w * zoom + 'px'; WR.style.height = cur.h * zoom + 'px'; q('fmZl').textContent = Math.round(zoom * 100) + '%'; }
+  function fit() { setZoom(Math.min((host.clientWidth - 56) / cur.w, (host.clientHeight - 56) / cur.h)); }
+  window.openFree = function (o) {
+    if (!o || !o.html || !o.w || !o.h) { toastF('ملف التصميم الحر غير صالح'); return; }
+    cur = o; dirty = false; sels = []; editing = null; hist = []; hi = -1; aiMode = false; q('fmAi').classList.remove('on');
+    document.body.classList.add('free-on'); FR.style.width = o.w + 'px'; FR.style.height = o.h + 'px';
+    FR.onload = () => { if (!cur) return; wire(); hist = [snapshot()]; hi = 0; dirty = false; fit(); renderProps(); };
+    FR.srcdoc = o.html; renderProps();
+  };
+  window.__freeTest = { get sels() { return sels; }, setSel: a => setSel(a), group, ungroup, applyAi: (raw) => { const pack = packTargets(); return applyAi(raw, pack, sels.slice()); }, buildPrompt: r => buildPrompt(r, packTargets()) };
+  function closeFree() { document.body.classList.remove('free-on'); FR.onload = null; FR.srcdoc = ''; cur = null; sels = []; editing = null; aiMode = false; }
+  function cleanHTML() {
+    stopEdit(true); const c = D().documentElement.cloneNode(true);
+    c.querySelectorAll('#fxSel,#fxHov,#fxBand,.fxM,#fxCss').forEach(x => x.remove());
+    c.querySelectorAll('[data-fx-edit]').forEach(x => { x.removeAttribute('contenteditable'); x.removeAttribute('data-fx-edit'); });
+    const b = c.querySelector('body'); if (b) b.classList.remove('fx-ai');
+    return '<!doctype html>' + c.outerHTML;
+  }
+  const fname = ext => (cur.name || 'تصميم').replace(/[\\/:*?"<>|]+/g, '') + ext;
+  async function saveOutF(name, blob) { if (typeof saveOut === 'function') return saveOut(name, blob); const u = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = u; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 3000); return true; }
+  async function saveFree() { if (!cur) return; const o = Object.assign({}, cur, { html: cleanHTML(), saved: new Date().toISOString() }); cur = o; const ok = await saveOutF(fname('.json'), new Blob([JSON.stringify(o)], { type: 'application/json' })); if (ok) { dirty = false; toastF('تم حفظ الملف'); } }
+  function hideOv(on) { const d = D(); d.querySelectorAll('#fxSel,#fxHov,.fxM').forEach(x => x.style.visibility = on ? 'hidden' : ''); }
+  async function exportPng() {
+    stopEdit(true); const d = D(); const node = d.querySelector('.page') || d.body; q('fmBusy').style.display = 'flex'; hideOv(true);
+    try {
+      await d.fonts.ready; const fontCss = [...d.querySelectorAll('style')].map(s => (s.textContent.match(/@font-face\s*{[^}]*}/g) || []).join('\n')).join('\n');
+      const saf = typeof IS_SAFARI !== 'undefined' && IS_SAFARI; const pr = saf ? 2 : 4;
+      const opts = { pixelRatio: pr, backgroundColor: '#ffffff', width: cur.w, height: cur.h, fontEmbedCSS: fontCss || (typeof FONT_CSS !== 'undefined' ? FONT_CSS : undefined), cacheBust: false, filter: n => !(n.id === 'fxSel' || n.id === 'fxHov' || n.id === 'fxBand' || (n.classList && n.classList.contains('fxM'))) };
+      if (saf) await htmlToImage.toPng(node, opts);
+      const url = await htmlToImage.toPng(node, opts); const b = await (await fetch(url)).blob(); await saveOutF(fname('.png'), b); toastF('تم التصدير');
+    } catch (err) { console.error(err); toastF('تعذّر التصدير: ' + err.message); }
+    hideOv(false); q('fmBusy').style.display = 'none';
+  }
+  function exportPdf() { stopEdit(true); hideOv(true); const d = D(); const t = d.title; d.title = cur.name || 'تصميم'; setTimeout(() => { W().focus(); W().print(); d.title = t; hideOv(false); }, 60); toastF('اختر "حفظ كـ PDF" من نافذة الطباعة'); }
+  let backArm = 0;
+  q('fmBack').onclick = () => { if (dirty && Date.now() - backArm > 4000) { backArm = Date.now(); toastF('فيه تعديلات ما انحفظت — اضغط «رجوع» مرة ثانية للخروج بدون حفظ، أو اضغط «حفظ الملف»'); return; } backArm = 0; closeFree(); };
+  q('fmUndo').onclick = undo; q('fmRedo').onclick = redo;
+  q('fmZi').onclick = () => setZoom(zoom * 1.15); q('fmZo').onclick = () => setZoom(zoom / 1.15); q('fmFit').onclick = fit;
+  q('fmSave').onclick = saveFree; q('fmPng').onclick = exportPng; q('fmPdf').onclick = exportPdf;
+  if (location.protocol !== 'file:' && window.claude) q('fmPdf').style.display = 'none';
+  window.addEventListener('resize', () => { if (cur) fit(); });
+  q('fileFree').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; const rd = new FileReader(); rd.onload = () => { try { const o = JSON.parse(rd.result); if (o.app !== 'jedco-free-design') throw 0; openFree(o); } catch (x) { toastF('الملف مو تصميم حر صالح'); } }; rd.readAsText(f); });
+})();
+</script>
+<!-- /FREE-DESIGN MODE -->
 </body></html>
