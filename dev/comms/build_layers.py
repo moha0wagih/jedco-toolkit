@@ -9,7 +9,7 @@ import pathlib, re
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 TARGET = ROOT / 'tools' / 'comms' / 'index.html'
-BUILD = 'build 27'
+BUILD = 'build 28'
 
 css = (HERE / 'layers.css').read_text(encoding='utf-8')
 js = (HERE / 'layers.js').read_text(encoding='utf-8')

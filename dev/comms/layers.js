@@ -836,14 +836,33 @@ Only include layers you changed or added. Keep src values unchanged. No other te
   /* my designs (browser storage) */
   const LDB = { open() { return this.p || (this.p = new Promise(res => { try { const r = indexedDB.open('jedIC2_lx', 1); r.onupgradeneeded = () => r.result.createObjectStore('d', { keyPath: 'id' }); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch (e) { res(null); } })); }, async put(v) { const db = await this.open(); if (!db) throw new Error('nodb'); return new Promise((res, rej) => { const t = db.transaction('d', 'readwrite'); t.objectStore('d').put(v); t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); }, async del(id) { const db = await this.open(); if (!db) return; return new Promise(res => { const t = db.transaction('d', 'readwrite'); t.objectStore('d').delete(id); t.oncomplete = () => res(); t.onerror = () => res(); }); }, async get(id) { const db = await this.open(); if (!db) return null; return new Promise(res => { const r = db.transaction('d').objectStore('d').get(id); r.onsuccess = () => res(r.result || null); r.onerror = () => res(null); }); }, async all() { const db = await this.open(); if (!db) return []; return new Promise(res => { const out = []; const c = db.transaction('d').objectStore('d').openCursor(); c.onsuccess = e => { const x = e.target.result; if (x) { const v = x.value; out.push({ id: v.id, name: v.name, updated: v.updated, thumb: v.thumb, w: v.w, h: v.h }); x.continue(); } else res(out.sort((a, b) => b.updated - a.updated)); }; c.onerror = () => res(out); }); } };
   let asT = 0;
-  function autosave(now) { clearTimeout(asT); const go = async () => { if (!L.doc) return; if (!L.libId) L.libId = 'x' + Date.now().toString(36); const id = L.libId, data = fileObj(), meta = { name: L.doc.name || 'تصميم', w: L.doc.w, h: L.doc.h }; const old = await LDB.get(id); try { await LDB.put(Object.assign({ id, updated: Date.now(), thumb: old && old.thumb || '', data }, meta)); try { localStorage.setItem('jedLX_last', id); } catch (x) { } L.dirty = false; } catch (e) { console.warn('lx autosave', e); } }; if (now) return go(); asT = setTimeout(go, 1200); }
-  async function saveThumb() { if (!L.libId || !L.doc) return; try { const k = Math.min(1, 320 / L.doc.w); const { url } = await toImageData(L.doc.layers, L.doc.w, L.doc.h, L.doc.bg || '#fff', k, true); const rec = await LDB.get(L.libId); if (rec) { rec.thumb = url; await LDB.put(rec); } } catch (e) { console.warn('thumb', e); } }
+  // text that is being typed right now goes into the design before any save (without ending the typing)
+  function syncTyping() { const el = L.editing; if (!el) return; const l = get(el.dataset.id); if (l) { const h = cleanHtml(el.innerHTML); if (h !== l.html) { l.html = h; el._h = h; } } }
+  function autosave(now) {
+    clearTimeout(asT);
+    const go = async () => {
+      if (!L.doc) return; syncTyping(); if (!L.libId) L.libId = 'x' + Date.now().toString(36);
+      const id = L.libId; try { localStorage.setItem('jedLX_last', id); if (L.on) localStorage.setItem('jedLX_open', id); } catch (x) { }
+      try { const t = Date.now(); await LDB.put({ id, name: L.doc.name || 'تصميم', w: L.doc.w, h: L.doc.h, updated: t, thumb: L.thumb || '', data: fileObj() }); L.dirty = false; try { const pd = JSON.parse(localStorage.getItem('jedLX_pend') || 'null'); if (pd && pd.id === id && pd.t <= t) localStorage.removeItem('jedLX_pend'); } catch (x) { } } catch (e) { console.warn('lx autosave', e); }
+    };
+    if (now) return go(); asT = setTimeout(go, 600);
+  }
+  async function saveThumb() { if (!L.libId || !L.doc) return; const id = L.libId; try { const k = Math.min(1, 320 / L.doc.w); const { url } = await toImageData(L.doc.layers, L.doc.w, L.doc.h, L.doc.bg || '#fff', k, true); if (L.libId === id) L.thumb = url; const rec = await LDB.get(id); if (rec) { rec.thumb = url; await LDB.put(rec); } } catch (e) { console.warn('thumb', e); } }
+  async function loadRec(id) { const rec = await LDB.get(id); if (!rec || !rec.data) return rec; try { const pd = JSON.parse(localStorage.getItem('jedLX_pend') || 'null'); if (pd && pd.id === id && pd.t > (rec.updated || 0) && Array.isArray(pd.layers)) { Object.assign(rec.data, { name: pd.name, w: pd.w, h: pd.h, bg: pd.bg, fonts: pd.fonts, layers: pd.layers }); } } catch (e) { } return rec; }
+  /* ---- link between an announcement board and its layered version ---- */
+  const hashStr = t => { let h = 0; for (let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0; return t.length + ':' + h; };
+  function getLinks() { try { return JSON.parse(localStorage.getItem('jedLX_links') || '[]'); } catch (e) { return []; } }
+  function setLinks(a) { try { localStorage.setItem('jedLX_links', JSON.stringify(a.slice(-60))); } catch (e) { } }
+  function boardKey() { let html = ''; try { if (typeof commitActive === 'function') commitActive(); html = (S.docs && S.docs[S.active] && S.docs[S.active].html) || page.innerHTML; } catch (e) { html = page ? page.innerHTML : ''; } const t1 = page && page.querySelector('.t1') ? page.querySelector('.t1').textContent.trim() : ''; return { hash: hashStr(html), lib: (typeof S !== 'undefined' && S.libId) || null, act: (typeof S !== 'undefined' && S.active) || 0, t1 }; }
+  function findLink(k) { const ls = getLinks(); return ls.slice().reverse().find(x => x.hash === k.hash) || (k.lib ? ls.slice().reverse().find(x => x.lib === k.lib && x.act === k.act) : null) || (k.t1 ? ls.slice().reverse().find(x => !x.lib && x.t1 === k.t1) : null) || null; }
+  function addLink(k, lx) { const ls = getLinks().filter(x => x.lx !== lx && x.hash !== k.hash); ls.push(Object.assign({}, k, { lx, t: Date.now() })); setLinks(ls); }
+  function updLayersBtn() { const b = q('bLayers'); if (!b) return; let has = false; try { has = !!(page && page.querySelector('.hdr') && findLink(boardKey())); } catch (e) { } b.classList.toggle('lxHas', has); const l = b.querySelector('.lbl'); if (l) l.textContent = has ? 'متابعة الطبقات' : 'طبقات'; b.title = has ? 'عندك نسخة طبقات معدّلة من هذا الإعلان — اضغط لفتحها وتكمل عليها' : 'تفكيك التصميم الحالي إلى طبقات منفصلة (مثل الفوتوشوب): كل نص وصورة وشكل وأيقونة تتحكم فيه لحاله'; }
   async function libModal() {
     const list = await LDB.all(); const ago = typeof window.__ago === 'function' ? window.__ago : (t => new Date(t).toLocaleString('ar-SA-u-nu-latn'));
     modal(`<h3>تصاميمي (الطبقات)</h3><p>كل تصميم بالطبقات ينحفظ هنا تلقائياً على هذا الجهاز والمتصفح. للمشاركة مع زميل استخدم «حفظ ملف الطبقات».</p>${list.length ? `<div class="lib">${list.map(e => `<div class="it${e.id === L.libId ? ' cur' : ''}" data-id="${e.id}"><div class="tn" data-l="open">${e.thumb ? `<img src="${e.thumb}" alt="">` : IC('image')}</div><div class="mt"><b>${ESC(e.name)}</b><small>${Math.round(e.w)}×${Math.round(e.h)} · ${ESC(ago(e.updated))}</small></div><div class="ac"><button data-l="open">${e.id === L.libId ? 'مفتوح' : 'فتح'}</button><button data-l="dup">نسخة</button><button data-l="del" class="dn">حذف</button></div></div>`).join('')}</div>` : '<div class="lxEmpty">ما فيه تصاميم محفوظة للحين.</div>'}<div class="acts"><button class="wmb pri" data-l="new">+ تصميم جديد</button><button class="wmb" data-l="close">إغلاق</button></div>`, async (k, ev) => {
       const it = ev.target.closest('.it'); const id = it && it.dataset.id;
       if (k === 'close') return closeModal(); if (k === 'new') { closeModal(); return newModal(); }
-      if (k === 'open' && id) { if (id === L.libId) return closeModal(); const r = await LDB.get(id); if (r) { if (L.on) { await autosave(true); saveThumb(); } openObj(r.data, { libId: id }); closeModal(); } }
+      if (k === 'open' && id) { if (id === L.libId) return closeModal(); const r = await loadRec(id); if (r) { if (L.on) { await autosave(true); saveThumb(); } openObj(r.data, { libId: id, thumb: r.thumb }); closeModal(); } }
       if (k === 'dup' && id) { const r = await LDB.get(id); if (r) { r.id = 'x' + Date.now().toString(36); r.name += ' (نسخة)'; r.data.name = r.name; r.updated = Date.now(); await LDB.put(r); libModal(); } }
       if (k === 'del' && id) { const b = ev.target.closest('button'); if (!b.classList.contains('sure')) { b.classList.add('sure'); b.textContent = 'متأكد؟'; setTimeout(() => { if (b.isConnected) { b.classList.remove('sure'); b.textContent = 'حذف'; } }, 3000); return; } await LDB.del(id); if (id === L.libId) L.libId = null; libModal(); }
     });
@@ -868,16 +887,16 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     clearTimeout(asT);
     if (o.assets) setAssets(o.assets); else if (!o.keepAssets) setAssets({});
     L.doc = { name: doc.name || 'تصميم', w: doc.w, h: doc.h, bg: doc.bg || '#ffffff', layers: doc.layers || [], fonts: doc.fonts || '' };
-    L.libId = o.libId || null; L.sel = []; L.ctx = null; L.crop = null; L.editing = null; L.hist = []; L.hi = -1; L.open = {}; L.cache.forEach(el => el.remove()); L.cache.clear(); L.aiMode = false; L.ai = {};
+    L.libId = o.libId || null; L.thumb = o.thumb || ''; L.sel = []; L.ctx = null; L.crop = null; L.editing = null; L.hist = []; L.hi = -1; L.open = {}; L.cache.forEach(el => el.remove()); L.cache.clear(); L.aiMode = false; L.ai = {};
     injectFonts(L.doc.fonts);
     reindex(); enter(); paint(true); fitZoom(); push(); L.dirty = false; updUndo(); renderPanel(); renderProps(); setTab('layers');
-    if (!o.libId) autosave(true).then(saveThumb);
+    if (!o.libId) autosave(true).then(saveThumb); else autosave(true);
   }
-  function openObj(o, opt = {}) { if (!o || o.app !== 'jedco-layers' || !Array.isArray(o.layers) || !(o.w > 0) || !(o.h > 0)) { say('ملف الطبقات غير صالح'); return false; } const assets = o.assets || {}; openDoc({ name: o.name, w: o.w, h: o.h, bg: o.bg, layers: sanitizeLayers(o.layers), fonts: o.fonts }, { assets, libId: opt.libId }); return true; }
+  function openObj(o, opt = {}) { if (!o || o.app !== 'jedco-layers' || !Array.isArray(o.layers) || !(o.w > 0) || !(o.h > 0)) { say('ملف الطبقات غير صالح'); return false; } const assets = o.assets || {}; openDoc({ name: o.name, w: o.w, h: o.h, bg: o.bg, layers: sanitizeLayers(o.layers), fonts: o.fonts }, { assets, libId: opt.libId, thumb: opt.thumb }); return true; }
   function sanitizeLayers(arr) { return (arr || []).filter(l => l && /^(text|image|shape|svg|group)$/.test(l.type)).map(l => { l.id = l.id || uid(); if (l.type === 'text') l.html = cleanHtml(String(l.html || '')); if (l.type === 'svg') { const t = document.createElement('template'); t.innerHTML = String(l.svg || ''); t.content.querySelectorAll('script,foreignObject').forEach(x => x.remove()); t.content.querySelectorAll('*').forEach(n => [...n.attributes].forEach(a => { if (/^on/i.test(a.name) || /javascript:/i.test(a.value)) n.removeAttribute(a.name); })); l.svg = t.innerHTML; } if (l.type === 'group') l.children = sanitizeLayers(l.children); return l; }); }
   function injectFonts(css) { let st = q('lxFonts'); if (!st) { st = document.createElement('style'); st.id = 'lxFonts'; document.head.appendChild(st); } st.textContent = css || ''; }
   function enter() { if (L.on) return; L.on = true; if (typeof closeSheets === 'function') closeSheets(); if (typeof qaClose === 'function') try { qaClose(); } catch (e) { } if (typeof libClose === 'function') try { libClose(); } catch (e) { } if (typeof deselect === 'function') try { deselect(); } catch (e) { } document.body.classList.add('lx-on', 'lx-tab-layers'); const sh = document.querySelector('#iconPanel .shead b'); if (sh) { sh._t = sh._t || sh.textContent; sh.textContent = 'الطبقات والأيقونات'; } const sh2 = document.querySelector('#blockPanel .shead b'); if (sh2) { sh2._t = sh2._t || sh2.textContent; sh2.textContent = 'الخصائص'; } if (document.body.classList.contains('free-on') && q('fmBack')) { document.body.classList.remove('free-on'); } setTimeout(() => { sizeStage(); fitZoom(); }, 30); }
-  async function exitLX() { finishEdit(true); if (L.doc) { await autosave(true); saveThumb(); } L.on = false; document.body.classList.remove('lx-on', 'lx-tab-layers', 'lx-tab-icons'); document.querySelectorAll('#iconPanel .shead b, #blockPanel .shead b').forEach(x => { if (x._t) x.textContent = x._t; }); L.cache.forEach(el => el.remove()); L.cache.clear(); q('lxOv').innerHTML = ''; if (typeof closeSheets === 'function') closeSheets(); setTimeout(() => { try { fit(); } catch (e) { } }, 30); say('محفوظ في «تصاميمي» — ترجع له من «ملف ▸ تصاميمي بالطبقات»'); }
+  async function exitLX() { finishEdit(true); if (L.doc) { await autosave(true); saveThumb(); } L.on = false; document.body.classList.remove('lx-on', 'lx-tab-layers', 'lx-tab-icons'); document.querySelectorAll('#iconPanel .shead b, #blockPanel .shead b').forEach(x => { if (x._t) x.textContent = x._t; }); L.cache.forEach(el => el.remove()); L.cache.clear(); q('lxOv').innerHTML = ''; if (typeof closeSheets === 'function') closeSheets(); try { localStorage.removeItem('jedLX_open'); } catch (e) { } setTimeout(() => { try { fit(); } catch (e) { } updLayersBtn(); }, 30); say(L.linkedBoard ? 'تعديلاتك محفوظة — اضغط «متابعة الطبقات» وترجع لها بنفس المكان' : 'تعديلاتك محفوظة في «تصاميمي»'); }
   function setTab(t) { document.body.classList.toggle('lx-tab-layers', t === 'layers'); document.body.classList.toggle('lx-tab-icons', t === 'icons'); q('lxTabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === t)); }
   const isPh = () => document.body.classList.contains('phone');
 
@@ -1112,9 +1131,12 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     return out;
   }
   /* ---- sources ---- */
-  async function fromBoard() {
+  async function fromBoard(fresh) {
     if (!page || !page.querySelector('.hdr')) return say('ما فيه تصميم مفتوح');
-    if (L.on && L.doc) await autosave(true); setAssets({});
+    if (L.on && L.doc) await autosave(true);
+    const key = boardKey();
+    if (fresh !== true) { const ln = findLink(key); const rec = ln && await loadRec(ln.lx); if (rec && rec.data) { openObj(rec.data, { libId: rec.id, thumb: rec.thumb }); L.linkedBoard = key; addLink(key, rec.id); say('فتحت نسخة الطبقات اللي عدّلت عليها — للتفكيك من جديد من الإعلان الأصلي: ملف ▸ تفكيك من جديد'); return; } }
+    setAssets({});
     try { if (typeof commitActive === 'function') commitActive(); } catch (e) { }
     busy(true, 'جاري تفكيك التصميم إلى طبقات…');
     try {
@@ -1124,11 +1146,13 @@ Only include layers you changed or added. Keep src values unchanged. No other te
       const r = await decompose(html, PW, 0, { root: '#page' });
       const title = (page.querySelector('.t1') && page.querySelector('.t1').textContent.trim()) || 'إعلان';
       openDoc({ name: title + ' (طبقات)', w: r.w, h: r.h, bg: r.bg, layers: r.layers, fonts: r.fonts }, { keepAssets: true });
+      L.linkedBoard = key; addLink(key, L.libId);
       say(`تم التفكيك: ${all().filter(l => l.type !== 'group').length} طبقة — كل عنصر تقدر تحركه وتكبّره وتحذفه لحاله. التصميم الأصلي ما تغيّر`);
     } catch (e) { console.error(e); say('تعذّر التفكيك: ' + (e.message || e)); }
     busy(false);
   }
   async function fromTemplate(kind, name) {
+    L.linkedBoard = null;
     if (L.on && L.doc) await autosave(true); setAssets({});
     busy(true, 'جاري تجهيز القالب…');
     try {
@@ -1144,6 +1168,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     busy(false);
   }
   async function fromFree(o) {
+    L.linkedBoard = null;
     if (!o || !o.html || !o.w || !o.h) return say('ملف التصميم الحر غير صالح');
     if (L.on && L.doc) await autosave(true);
     busy(true, 'جاري تفكيك التصميم إلى طبقات…');
@@ -1161,7 +1186,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
       <div class="rel"><button class="tb" id="lxFileB">${IC('folder')}<span class="lbl">ملف ▾</span></button><div class="menu" id="lxFileM">
         <button data-f="new">تصميم جديد بالطبقات…</button><button data-f="lib">تصاميمي…<small>كل التصاميم المحفوظة على هذا الجهاز</small></button><hr>
         <button data-f="save">حفظ ملف الطبقات (للمشاركة)<small><bdi>.layers.json</bdi> · يفتحه زميلك ويكمل التعديل</small></button><button data-f="open">فتح ملف تصميم…</button><hr>
-        <button data-f="rename">تغيير اسم التصميم…</button><button data-f="dupDoc">حفظ نسخة جديدة في «تصاميمي»</button></div></div>
+        <button data-f="rename">تغيير اسم التصميم…</button><button data-f="fresh">تفكيك من جديد من الإعلان الأصلي<small>نسخة طبقات جديدة، وتبقى نسختك الحالية في «تصاميمي»</small></button><button data-f="dupDoc">حفظ نسخة جديدة في «تصاميمي»</button></div></div>
       <button class="tb dis" id="lxUndo" title="تراجع (${K('Z')})">${IC('undo-2')}</button><button class="tb dis" id="lxRedo" title="إعادة (${K('⇧Z')})">${IC('redo-2')}</button>
       <span class="sep dsk"></span>
       <button class="tb dsk" id="lxGroupB" title="تجميع (${K('G')})">${IC('group')}<span class="lbl">تجميع</span></button><button class="tb dsk" id="lxUngroupB" title="فك التجميع (${K('⇧G')})">${IC('ungroup')}<span class="lbl">فك</span></button>
@@ -1185,7 +1210,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     host.addEventListener('pointerdown', onDown); host.addEventListener('pointermove', e => { touchMove(e); onMove(e); }); host.addEventListener('pointerup', e => { touchUp(e); onUp(e); }); host.addEventListener('pointercancel', e => { touchUp(e); onUp(e); }); host.addEventListener('dblclick', onDbl);
     host.addEventListener('pointerleave', () => { if (L.hover && !L.drag) { L.hover = null; drawOv(); } });
     host.addEventListener('contextmenu', onCtx);
-    host.addEventListener('input', e => { if (L.editing && L.editing.contains(e.target)) { measureTexts(L.cache, L.doc.layers); drawOv(); } });
+    host.addEventListener('input', e => { if (L.editing && L.editing.contains(e.target)) { measureTexts(L.cache, L.doc.layers); drawOv(); L.dirty = true; autosave(); } });
     host.addEventListener('scroll', () => closeCtx());
     props.addEventListener('mousedown', e => { if (L.editing && e.target.closest('button')) e.preventDefault(); }); props.addEventListener('click', onPropsClick); props.addEventListener('click', onLintClick);
     tabs.addEventListener('click', e => { const b = e.target.closest('[data-t]'); if (b) setTab(b.dataset.t); });
@@ -1198,7 +1223,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     const tog = (b, m) => { q(b).onclick = e => { e.stopPropagation(); const on = !q(m).classList.contains('on'); document.querySelectorAll('#lxTop .menu').forEach(x => x.classList.remove('on')); q(m).classList.toggle('on', on); }; };
     tog('lxFileB', 'lxFileM'); tog('lxExpB', 'lxExpM');
     document.addEventListener('pointerdown', e => { if (!e.target.closest('#lxTop .rel')) document.querySelectorAll('#lxTop .menu').forEach(x => x.classList.remove('on')); if (!e.target.closest('#lxCtx')) closeCtx(); });
-    q('lxFileM').onclick = e => { const k = e.target.closest('[data-f]')?.dataset.f; q('lxFileM').classList.remove('on'); if (k === 'new') newModal(); if (k === 'lib') libModal(); if (k === 'save') saveFile(); if (k === 'open') q('lxFileIn').click(); if (k === 'rename') renameDoc(); if (k === 'dupDoc') { L.libId = null; L.doc.name += ' (نسخة)'; autosave(true).then(saveThumb); say('تم حفظ نسخة جديدة'); renderProps(); } };
+    q('lxFileM').onclick = e => { const k = e.target.closest('[data-f]')?.dataset.f; q('lxFileM').classList.remove('on'); if (k === 'new') newModal(); if (k === 'lib') libModal(); if (k === 'save') saveFile(); if (k === 'open') q('lxFileIn').click(); if (k === 'rename') renameDoc(); if (k === 'fresh') { exitLX().then(() => fromBoard(true)); } if (k === 'dupDoc') { L.libId = null; L.doc.name += ' (نسخة)'; autosave(true).then(saveThumb); say('تم حفظ نسخة جديدة'); renderProps(); } };
     q('lxExpM').onclick = e => { const k = e.target.closest('[data-e]')?.dataset.e; q('lxExpM').classList.remove('on'); if (k === 'png4') exportPNG(4); if (k === 'png2') exportPNG(2); if (k === 'jpg') exportPNG(3, { jpg: true }); if (k === 'pngT') exportPNG(4, { transparent: true }); if (k === 'pdf') exportPDF(); if (k === 'sel') exportPNG(4, { sel: true }); if (k === 'file') saveFile(); };
     if (location.protocol !== 'file:' && window.claude) { const p = q('lxExpM').querySelector('[data-e=pdf]'); if (p) p.remove(); }
     q('lxFileIn').onchange = () => { const f = q('lxFileIn').files[0]; q('lxFileIn').value = ''; if (!f) return; const r = new FileReader(); r.onload = () => { try { const o = JSON.parse(r.result); if (o.app === 'jedco-layers') openObj(o); else if (o.app === 'jedco-free-design') fromFree(o); else if (typeof openDesignText === 'function') { exitLX(); openDesignText(String(r.result), f.name, true); } } catch (x) { say('الملف تالف أو غير مدعوم'); } }; r.readAsText(f); };
@@ -1213,7 +1238,11 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     window.addEventListener('paste', async e => { if (!L.on) return; if (e.target.closest && e.target.closest('input,textarea')) return; if (L.editing) { e.preventDefault(); const t = e.clipboardData.getData('text/plain'); document.execCommand('insertText', false, t); return; } const files = [...(e.clipboardData && e.clipboardData.files || [])].filter(f => /^image\//.test(f.type)); e.preventDefault(); e.stopImmediatePropagation(); if (files.length) { for (const f of files) await addImageData(await fileToData(f)); return; } if (pasteClip()) return; const t = e.clipboardData.getData('text/plain'); if (t && t.trim()) { addText(/[؀-ۿ]/.test(t) ? 'ar' : 'en'); setTimeout(() => { const el = L.editing; if (el) { el.textContent = t.trim(); finishEdit(true); } }, 60); } }, true);
     window.addEventListener('dragover', e => { if (!L.on || !(e.target.closest && e.target.closest('#lxHost'))) return; const ty = [...e.dataTransfer.types]; if (ty.includes('text/x-icon') || ty.includes('Files')) { e.preventDefault(); e.stopImmediatePropagation(); } }, true);
     window.addEventListener('drop', async e => { if (!L.on || !(e.target.closest && e.target.closest('#lxHost'))) return; const ic = e.dataTransfer.getData('text/x-icon'); const [x, y] = toPg(e.clientX, e.clientY); if (ic) { e.preventDefault(); e.stopImmediatePropagation(); addIcon(ic, x, y); return; } const files = [...e.dataTransfer.files]; const img = files.filter(f => /^image\//.test(f.type)); if (img.length) { e.preventDefault(); e.stopImmediatePropagation(); for (const f of img) await addImageData(await fileToData(f), x, y); } }, true);
-    window.addEventListener('beforeunload', () => { if (L.on && L.doc) autosave(true); });
+    const flush = () => { if (!L.doc || !(L.on || L.dirty)) return; syncTyping(); if (!L.libId) L.libId = 'x' + Date.now().toString(36); try { localStorage.setItem('jedLX_pend', JSON.stringify({ id: L.libId, t: Date.now(), name: L.doc.name, w: L.doc.w, h: L.doc.h, bg: L.doc.bg, fonts: L.doc.fonts, layers: L.doc.layers })); } catch (e) { } autosave(true); };
+    window.addEventListener('beforeunload', flush); window.addEventListener('pagehide', flush); document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
+    window.addEventListener('blur', () => { if (L.on) flush(); });
+    // autosaved work should not trigger the toolkit's «unsaved work» warning
+    ['lxHost', 'lxProps', 'lxLay', 'lxModal', 'lxTop'].forEach(id => q(id) && q(id).setAttribute('data-hub-autosave', ''));
   }
   function renameDoc() { modal(`<h3>اسم التصميم</h3><div class="cust"><input id="lxRn" type="text" value="${ESC(L.doc.name)}" style="width:100%;font-family:Tajawal;direction:rtl"></div><div class="acts"><button class="wmb pri" data-l="ok">حفظ</button><button class="wmb" data-l="close">إلغاء</button></div>`, k => { if (k === 'ok') { L.doc.name = q('lxRn').value.trim() || L.doc.name; push(); } closeModal(); }); setTimeout(() => { const i = q('lxRn'); i.focus(); i.select(); i.onkeydown = e => { e.stopPropagation(); if (e.key === 'Enter') { L.doc.name = i.value.trim() || L.doc.name; push(); closeModal(); } }; }, 30); }
   /* context menu */
@@ -1279,6 +1308,11 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     // design files: layers files open here
     if (typeof openDesignText === 'function') { const orig = openDesignText; openDesignText = function (txt, name, confirm) { try { const o = JSON.parse(txt); if (o && o.app === 'jedco-layers') { openObj(o); return; } if (o && o.app === 'jedco-free-design') { fromFree(o); return; } } catch (e) { } return orig.apply(this, arguments); }; }
     // phone: selecting opens the properties sheet
+    // back from the toolkit home / a reload: reopen the design you were working on
+    (async () => { let id = null; try { id = localStorage.getItem('jedLX_open'); } catch (e) { } if (id) { await wait(400); const rec = await loadRec(id); if (rec && rec.data && !L.on) { const sp = document.getElementById('splash'); if (sp && sp.classList.contains('on')) { await new Promise(res => { const t = setInterval(() => { if (!document.getElementById('splash') || !document.getElementById('splash').classList.contains('on')) { clearInterval(t); res(); } }, 300); }); } openObj(rec.data, { libId: rec.id, thumb: rec.thumb }); const k = getLinks().find(x => x.lx === rec.id); L.linkedBoard = k || null; say('رجعتك لتصميم الطبقات اللي كنت شغال عليه — كل تعديلاتك موجودة'); } } updLayersBtn(); })();
+    if (typeof activate === 'function') { const _act = activate; activate = function () { const r = _act.apply(this, arguments); setTimeout(updLayersBtn, 300); return r; }; }
+    let ubT = 0; const ub = () => { if (L.on) return; clearTimeout(ubT); ubT = setTimeout(updLayersBtn, 900); };
+    document.addEventListener('pointerup', ub, true); document.addEventListener('keyup', ub, true);
     window.__lxApi = { fromBoard, fromFree, openObj, newModal, libModal, exitLX, get state() { return L; }, paint, setSel, groupSel, ungroupSel, flattenAll, exportPNG, get, all, aabb, topSel, undo, redo, alignSel, order, addText, addShape, addIcon, addLogo, decompose, fileObj, applyNum, renderProps, renderPanel };
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hook); else hook();

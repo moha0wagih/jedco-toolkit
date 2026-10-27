@@ -218,3 +218,5 @@ body.phone.lx-on #lxProps{padding:0 2px 20px}
 
 body.lx-on #lxLay{padding-bottom:58px}
 body.phone.lx-on #lxLay{padding-bottom:0}
+
+#bLayers.lxHas{background:#2FC0C7;border-color:#2FC0C7;color:#002657;font-weight:700}
