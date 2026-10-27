@@ -1300,7 +1300,16 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     const tb = document.createElement('button'); tb.className = 'tb'; tb.id = 'bLayers'; tb.title = 'تفكيك التصميم الحالي إلى طبقات منفصلة (مثل الفوتوشوب): كل نص وصورة وشكل وأيقونة تتحكم فيه لحاله'; tb.innerHTML = `${IC('layers', 2)}<span class="lbl">طبقات</span>`; tb.onclick = fromBoard;
     const anchor = q('bQA'); if (anchor) anchor.before(tb); else q('topbar').appendChild(tb);
     // file menu entries
-    const fm = q('fileMenu'); if (fm) { const add = (act, txt, at) => { const b = document.createElement('button'); b.dataset.lx = act; b.textContent = txt; at ? fm.insertBefore(b, at) : fm.appendChild(b); return b; }; const first = fm.querySelector('[data-act=open]'); add('lxBoard', 'تفكيك التصميم الحالي إلى طبقات', first); add('lxNew', 'تصميم حر جديد بالطبقات…', first); add('lxLib', 'تصاميمي بالطبقات…', first); fm.addEventListener('click', e => { const b = e.target.closest('[data-lx]'); if (!b) return; fm.style.display = 'none'; const k = b.dataset.lx; if (k === 'lxBoard') fromBoard(); if (k === 'lxNew') newModal(); if (k === 'lxLib') libModal(); }); const of = fm.querySelector('[data-act=openFree]'); if (of) of.textContent = 'فتح تصميم حر (يتفكك لطبقات)…'; }
+    // file menu: one tidy grouped list (new / open / import / save) — same actions as before
+    const fm = q('fileMenu'); if (fm) {
+      const it = (attr, ic, txt, kb) => `<button ${attr}>${IC(ic, 1.9)}<span>${txt}</span>${kb ? `<kbd>${kb}</kbd>` : ''}</button>`;
+      fm.classList.add('lxMenu');
+      fm.innerHTML = `<div class="mh">جديد</div>${it('data-act="blank"', 'file-plus', 'إعلان جديد')}${it('data-act="welcome"', 'user', 'رسالة ترحيب')}${it('data-lx="lxNew"', 'layers', 'تصميم حر بالطبقات…')}${it('data-act="newBoard"', 'copy-plus', 'لوحة إضافية في نفس الملف')}${it('data-act="sample"', 'layout-template', 'نموذج جاهز للتجربة')}
+        <hr><div class="mh">فتح</div>${it('data-act="lib"', 'folder', 'إعلاناتي')}${it('data-lx="lxLib"', 'layers-3', 'تصاميمي بالطبقات')}${it('data-act="open"', 'folder-open', 'فتح ملف من جهازك…')}
+        <hr><div class="mh">استيراد</div>${it('data-act="word"', 'file-text', 'ملف وورد…')}${it('data-act="paste"', 'clipboard-paste', 'لصق نص…')}
+        <hr><div class="mh">حفظ</div>${it('data-act="libSave"', 'save', 'حفظ في «إعلاناتي»', K('S'))}${it('data-act="save"', 'file-json', 'حفظ ملف للمشاركة')}`;
+      fm.addEventListener('click', e => { const b = e.target.closest('[data-lx]'); if (!b) return; fm.style.display = 'none'; const k = b.dataset.lx; if (k === 'lxNew') newModal(); if (k === 'lxLib') libModal(); });
+    }
     // free designs (guides / infographics) now open fully decomposed into layers
     window.openFreeLegacy = window.openFree; window.openFree = o => fromFree(o);
     // free-design mode button (if someone is still in it)
