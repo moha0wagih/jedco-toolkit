@@ -298,7 +298,7 @@ body:not(.exporting) .blk.hov{box-shadow:0 0 0 1px rgba(0,78,170,.22);border-rad
 @media print{
   html,body{height:auto!important;overflow:visible!important;background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   #app{display:block!important;height:auto!important}
-  #topbar,#iconPanel,#blockPanel,#over,#toast,#busy,#fileMenu,#expMenu{display:none!important}
+  #topbar,#iconPanel,#blockPanel,#over,#toast,#busy,#fileMenu,#expMenu,#selbar,#selmenu{display:none!important}
   #stage{overflow:visible!important}
   #zwrap{width:auto!important;height:auto!important;margin:0!important}
   .abHead,.abPrev,.abAdd{display:none!important}
@@ -389,6 +389,36 @@ body:not(.exporting) .fs.tsel{background:rgba(47,192,199,.22);border-radius:3px}
 .rel{position:relative}
 
 #srcRaw{display:none!important}
+
+/* ---------- free selection (multi-select, groups, move) ---------- */
+#blocks{pointer-events:none}
+#blocks>.blk{pointer-events:auto}
+#msel{position:absolute;inset:0;pointer-events:none}
+.msb{position:absolute;pointer-events:none;border-radius:4px}
+.msb.all{outline:calc(1.5px / var(--z,1)) solid #2FC0C7;outline-offset:calc(3px / var(--z,1))}
+.msb.mem{outline:calc(1px / var(--z,1)) solid rgba(47,192,199,.8);outline-offset:calc(1px / var(--z,1))}
+.msb.mem.g{outline-style:dashed}
+.msb.gin{outline:calc(1px / var(--z,1)) dashed #9DB4CF;outline-offset:calc(7px / var(--z,1))}
+.msb.pan{outline:calc(2px / var(--z,1)) dashed #FC5C17;outline-offset:calc(2px / var(--z,1))}
+#marq{position:absolute;display:none;pointer-events:none;border:calc(1px / var(--z,1)) solid #2FC0C7;background:rgba(47,192,199,.08);border-radius:2px}
+#selbar{position:fixed;z-index:110;display:none;align-items:center;gap:2px;height:38px;padding:3px;background:#fff;border:1px solid var(--ui-line);border-radius:11px;direction:rtl;font-family:Tajawal}
+#selbar.on{display:flex}
+#selbar button{height:30px;min-width:30px;padding:0 7px;border:0;border-radius:8px;background:transparent;color:var(--navy);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5px;font:13px Tajawal;white-space:nowrap}
+#selbar button:hover{background:#eef4fb;color:var(--ui-acc)}
+#selbar button.pri{background:#e8f8f9;color:#00646a}
+#selbar button.pri:hover{background:#d4f2f4}
+#selbar button.del:hover{background:#fdecec;color:#c62828}
+#selbar svg{width:16px;height:16px;flex:none}
+#selbar .msn{font-size:12px;color:var(--ui-sub);padding:0 8px 0 4px;white-space:nowrap}
+#selbar .mss{width:1px;height:18px;background:var(--ui-line);margin:0 3px;flex:none}
+#selmenu{position:fixed;z-index:130;display:none;min-width:190px;background:#fff;border:1px solid var(--ui-line);border-radius:10px;padding:5px;direction:rtl;font-family:Tajawal}
+#selmenu.on{display:block}
+#selmenu button{display:flex;justify-content:space-between;align-items:center;gap:18px;width:100%;border:0;background:none;padding:7px 10px;border-radius:7px;cursor:pointer;font:13.5px Tajawal;color:var(--ui-text);text-align:right}
+#selmenu button:hover{background:#eef4fb;color:var(--ui-acc)}
+#selmenu button[disabled]{opacity:.4;cursor:default;background:none;color:var(--ui-text)}
+#selmenu kbd{font:11.5px FSI;color:var(--ui-sub);direction:ltr}
+#selmenu hr{border:0;border-top:1px solid var(--ui-line);margin:4px 2px}
+body.exporting #msel,body.exporting #marq,body.exporting #selbar,body.exporting #selmenu,body.phone #selbar,body.phone #selmenu{display:none!important}
 /* image block */
 .imgb{--ih:260px;--ir:14px;--iw:100%;position:relative;width:var(--iw);height:var(--ih);margin:0 auto;border-radius:var(--ir);overflow:hidden;background:#EEF3F8}
 .imgb img.bimg{position:absolute;max-width:none;display:block;user-select:none;-webkit-user-drag:none;cursor:grab}
@@ -651,6 +681,7 @@ body.phone .wm{max-height:86dvh}
     <div class="sec">
       <h3>إعدادات</h3>
       <div class="toggle">المغناطيس (التقاط)<button class="sw on" id="swMagnet"></button></div>
+      <div class="hint" id="hintMS">اضغط على أي عنصر لتحديده واسحبه لتحريكه بحرية (العناوين، البطاقات، الصور، النقاط…). <b>Shift</b> أو <b>⌘</b> لتحديد أكثر من عنصر، أو اسحب على مساحة فارغة لتحديد بالمستطيل. <b>⌘G</b> تجميع و <b>⌘⇧G</b> فك التجميع، والأسهم للتحريك الدقيق (مع Shift عشر خطوات). اضغط مرتين على النص لتعديله.</div>
       <div class="hint" id="hintAdd">يضاف العنصر بعد العنصر المحدد، أو في آخر التصميم. مرّر الماوس على أي عنصر: اسحبه من مقبض <b>⠿</b> لتحريكه لفوق أو تحت بحرية، أو احذفه.</div>
     </div>
   </aside>
@@ -1026,7 +1057,7 @@ function autosave(s) {
   if (S.active === 0) store('doc', s);
   if (typeof updDirtyDot === 'function') updDirtyDot();
 }
-new MutationObserver(() => { if (!H.mute && !H.bal) { snap(); scheduleBalance(); } }).observe(page, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style', 'class', 'data-icon', 'data-dep', 'data-cfg'] });
+new MutationObserver(() => { if (!H.mute && !H.bal) { snap(); scheduleBalance(); } }).observe(page, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style', 'class', 'data-icon', 'data-dep', 'data-cfg', 'data-grp'] });
 
 /* ---------------- scale / zoom ---------------- */
 const zwrap = $('#zwrap');
@@ -1103,8 +1134,9 @@ $('#tbox .rs').addEventListener('pointerdown', e => {
 });
 
 /* ---------------- selection + docked properties ---------------- */
-function deselect() { $$('.selx', page).forEach(e => e.classList.remove('selx')); S.sel = null; ctx.style.display = 'none'; ctx.innerHTML = ''; updTbox(); }
-function select(type, el) { deselect(); S.sel = { type, el }; if (el && !['photo', 'title', 'block'].includes(type)) el.classList.add('selx'); renderCtx(); updTbox(); }
+function desel0() { $$('.selx', page).forEach(e => e.classList.remove('selx')); S.sel = null; ctx.style.display = 'none'; ctx.innerHTML = ''; updTbox(); }
+function deselect() { desel0(); if (typeof msClear === 'function') msClear(); }
+function select(type, el) { desel0(); S.sel = { type, el }; if (el && !['photo', 'title', 'block'].includes(type)) el.classList.add('selx'); renderCtx(); updTbox(); }
 const seg = (key, opts, cur) => `<div class="seg" data-seg="${key}">${opts.map(([v, l]) => `<button data-v="${v}" class="${String(cur) === String(v) ? 'on' : ''}">${l}</button>`).join('')}</div>`;
 function swatches(cur) { return `<div class="sws">${PALETTE.map(([c, n]) => `<span class="swc${cur && cur.toLowerCase() === c.toLowerCase() ? ' on' : ''}" data-c="${c}" title="${n}" style="background:${c}"></span>`).join('')}<label class="swc" title="لون مخصص" style="background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);position:relative;overflow:hidden"><input type="color" id="cc" style="opacity:0;position:absolute;inset:0"></label></div>`; }
 function slotCtxTarget(el) { return el.closest('.pcard') || el.closest('.scard') || el.closest('.lst') || el.closest('.pbox') || el; }
@@ -1234,7 +1266,7 @@ ctx.addEventListener('click', e => {
   if (a === 'wReset') { const el = S.sel.el; el.classList.remove('wt', 'wta', 'wte', 'arb', 'w2', 'w3'); ['--sw', '--swa', '--swe'].forEach(p => el.style.removeProperty(p)); afterLayout(); return renderCtx(); }
   if (a === 'close') deselect(); if (a === 'pick') $('#filePhoto').click(); if (a === 'fit') { fitPhoto(); renderCtx(); }
   if (a === 'del') { S.sel.el.remove(); deselect(); }
-  if (a === 'tReset' || a === 'tResetAll') { (a === 'tReset' ? [S.sel.el] : $$('.htitles .ht', page)).forEach(ht => { ht.style.removeProperty('right'); ht.style.removeProperty('top'); ht.style.removeProperty('--ts'); }); renderCtx(); updTbox(); }
+  if (a === 'tReset' || a === 'tResetAll') { (a === 'tReset' ? [S.sel.el] : $$('.htitles .ht', page)).forEach(ht => { ht.style.removeProperty('right'); ht.style.removeProperty('top'); ht.style.removeProperty('--ts'); ht.style.removeProperty('translate'); }); renderCtx(); updTbox(); }
   if (a === 'tDel' && S.sel?.type === 'title') { S.sel.el.remove(); deselect(); return; }
   if (a === 'tRestore') { const ht = $('.htitles', page); const defs = { t1: ['عنوان الإعلان'], t2: ['العنوان الفرعي'], t3: ['Announcement Title'] }; ['t1', 't2', 't3'].forEach((k, i) => { if (!$('.' + k, ht)) { const d = document.createElement('div'); d.className = 'ht ' + k + ' ed'; d.contentEditable = 'true'; d.dataset.ph = defs[k][0]; const after = ['t1', 't2', 't3'].slice(0, i).reverse().map(x => $('.' + x, ht)).find(Boolean); after ? after.after(d) : ht.prepend(d); } }); renderCtx(); return; }
   if ((a === 'pAdd' || a === 'pRem') && S.sel?.type === 'block' && $('.steps', S.sel.el)) { const box = $('.steps', S.sel.el); const st = $$('.stp', box); if (a === 'pAdd' && st.length < 6) { const t = document.createElement('div'); t.innerHTML = stepHTML('', '', 'circle-dot', st.length + 1); box.appendChild(t.firstElementChild); } if (a === 'pRem' && st.length > 2) st[st.length - 1].remove(); $$('.stp', box).forEach((x, i) => { const nb = $('.snum', x); if (nb) nb.textContent = i + 1; }); box.style.setProperty('--n', $$('.stp', box).length); afterLayout(); return; }
@@ -1411,11 +1443,11 @@ bb.addEventListener('click', e => {
   const a = e.target.closest('[data-b]')?.dataset.b, b = S.hovBlk; if (!a || !b || a === 'grip') return;
   if (a === 'up' && b.previousElementSibling) b.previousElementSibling.before(b);
   if (a === 'down' && b.nextElementSibling) b.nextElementSibling.after(b);
-  if (a === 'dup') { const c = b.cloneNode(true); c.classList.remove('hov'); $$('.selx', c).forEach(x => x.classList.remove('selx')); b.after(c); }
+  if (a === 'dup') { const c = b.cloneNode(true); c.classList.remove('hov'); [c, ...$$('[data-grp]', c)].forEach(x => x.removeAttribute('data-grp')); $$('.selx', c).forEach(x => x.classList.remove('selx')); b.after(c); }
   if (a === 'del') { if (S.sel && b.contains(S.sel.el)) deselect(); b.remove(); hideBar(); afterLayout(); return; }
-  if (a === 'cadd') { const cards = $$('.pcard', b); if (cards.length < 7) { const c = cards[cards.length - 1].cloneNode(true); $$('.ed', c).forEach(x => x.textContent = ''); cards[cards.length - 1].after(c); } }
+  if (a === 'cadd') { const cards = $$('.pcard', b); if (cards.length < 7) { const c = cards[cards.length - 1].cloneNode(true); c.removeAttribute('data-grp'); c.style.removeProperty('translate'); $$('.ed', c).forEach(x => x.textContent = ''); cards[cards.length - 1].after(c); } }
   if (a === 'crem') { const cards = $$('.pcard', b); if (cards.length > 1) cards[cards.length - 1].remove(); }
-  if (a === 'ladd') { const it = $$('.li', b); const c = it[it.length - 1].cloneNode(true); $$('.ed', c).forEach(x => x.textContent = ''); it[it.length - 1].after(c); }
+  if (a === 'ladd') { const it = $$('.li', b); const c = it[it.length - 1].cloneNode(true); c.removeAttribute('data-grp'); c.style.removeProperty('translate'); $$('.ed', c).forEach(x => x.textContent = ''); it[it.length - 1].after(c); }
   if (a === 'lrem') { const it = $$('.li', b); if (it.length > 1) it[it.length - 1].remove(); }
   if (a === 'iadd') { const it = $$('.iitem', b); if (it.length < 5) { const tmp = document.createElement('div'); tmp.innerHTML = iitem({ kind: 'text', ar: '', en: '' }); const n = tmp.firstElementChild; it[it.length - 1].after(n); renderItem(n); select('item', n); } }
   if (a === 'irem') { const it = $$('.iitem', b); if (it.length > 1) { if (S.sel?.el === it[it.length - 1]) deselect(); it[it.length - 1].remove(); } }
@@ -2904,7 +2936,7 @@ function setHeaderType(type) {
     hd.classList.remove('welcome');
     ['t1', 't2', 't3'].forEach(k => { const el = $('.htitles .' + k, hd); if (el) el.dataset.ph = A_PH[k]; });
   }
-  $$('.htitles .ht', hd).forEach(x => { x.style.removeProperty('right'); x.style.removeProperty('top'); });
+  $$('.htitles .ht', hd).forEach(x => { x.style.removeProperty('right'); x.style.removeProperty('top'); x.style.removeProperty('translate'); });
   afterLayout(); updTbox();
 }
 function docWelcome() {
@@ -3213,7 +3245,363 @@ renderIconGrid(null);
   if (!S.docs.length) { S.docs = [curDoc()]; S.active = 0; }
   fit(); renderStack(); setTimeout(() => { if (!ok) rebalance(); else snap(true); }, 300);
 })();
-window.APP = { activate, addBoard, exportAll, cleanFormatting, rebalance, exportPNG, addBlock, applyIcon, select, setDep, searchIcons, serialize, S, undo, renderDynamic };
+/* ================= free selection: multi-select, marquee, groups, free move, align (Figma / PowerPoint style) =================
+   Everything is stored on the design itself, so undo/redo, autosave, «إعلاناتي» and .jedco.json keep it:
+   - a moved template element gets an inline CSS `translate` (layout of the others is untouched); free icons / the welcome photo keep left/top
+   - a group is a shared data-grp="g…" on its members */
+var MS = { sel: [], gIn: null, pan: null, eat: false, quiet: false, drag: null, marq: false, lines: null, raf: 0 };
+const U_TOP = '.htitles .ht, #blocks > .blk, #sender, #free > .fi, .hclip img.wp';
+const U_CHILD = '.pillars > .pcard, .info > .iitem, .lst > .li, .steps > .stp, .chipw > .chip';
+const U_ANY = U_TOP + ', ' + U_CHILD;
+const BLK_PROPS = '.blk[data-type=greet], .blk[data-type=text], .blk[data-type=card], .blk[data-type=heading], .blk[data-type=list], .blk[data-type=tagline], .blk[data-type=path], .blk[data-type=image]';
+const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+const KB = k => (IS_MAC ? '⌘' : 'Ctrl+') + k;
+const msOn = () => !isPhone();
+const isAbs = el => el.classList.contains('fi') || el.classList.contains('wp');
+function msClear() { if (!MS) return; MS.sel = []; MS.gIn = null; MS.pan = null; msRender(); }
+function unitAt(t) { if (!t || !t.closest) return null; const u = t.closest(U_ANY); return u && page.contains(u) ? u : null; }
+function topOf(u) { return u.matches(U_TOP) ? u : (u.closest('#blocks > .blk') || u); }
+const grpOf = el => (el && el.dataset && el.dataset.grp) || null;
+const grpMembers = g => g ? $$(`[data-grp="${g}"]`, page) : [];
+// what one click picks: the element itself, or its whole group (unless we stepped inside that group)
+function pickFor(u) {
+  if (!u) return [];
+  for (const x of [topOf(u), u]) { const g = grpOf(x); if (g && g !== MS.gIn) { const m = grpMembers(g); if (m.length > 1) return m; } }
+  return [u];
+}
+function msNorm(arr) { const a = [...new Set(arr)].filter(el => el && page.contains(el)); return a.filter(el => !a.some(o => o !== el && o.contains(el))); }
+function msSet(arr) { MS.sel = msNorm(arr); MS.pan = null; msRender(); }
+// the visible box: an image / chip / info block is a full-width row, but what you see (and align) is the picture / the strip
+function visRect(el) {
+  if (el.matches('#blocks > .blk')) { const t = el.dataset.type, inner = t === 'image' ? $$('.imgb', el) : t === 'chip' ? $$('.chip', el) : t === 'info' ? $$('.iitem', el) : [];
+    if (inner.length) return unionRect(inner, relRect); }
+  if (el.classList.contains('wp')) { const a = relRect(el), c = relRect(el.parentElement), x = Math.max(a.x, c.x), y = Math.max(a.y, c.y); return { x, y, w: Math.max(0, Math.min(a.x + a.w, c.x + c.w) - x), h: Math.max(0, Math.min(a.y + a.h, c.y + c.h) - y) }; } // the photo is clipped by the header
+  return relRect(el);
+}
+function unionRect(els, f = visRect) {
+  let x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity;
+  els.forEach(el => { const r = f(el); x1 = Math.min(x1, r.x); y1 = Math.min(y1, r.y); x2 = Math.max(x2, r.x + r.w); y2 = Math.max(y2, r.y + r.h); });
+  return { x: x1, y: y1, w: x2 - x1, h: y2 - y1 };
+}
+// objects = loose elements + whole groups (a group aligns / distributes as one piece)
+function msObjects() {
+  const out = [], seen = {};
+  MS.sel.forEach(el => {
+    const g = grpOf(el);
+    if (g && g !== MS.gIn && MS.sel.filter(x => grpOf(x) === g).length > 1) { if (!seen[g]) { seen[g] = { els: [] }; out.push(seen[g]); } seen[g].els.push(el); }
+    else out.push({ els: [el] });
+  });
+  out.forEach(o => o.r = unionRect(o.els)); return out;
+}
+/* ---- position helpers ---- */
+function getT(el) { const v = (el.style.translate || '').trim(); if (!v || v === 'none') return [0, 0]; const p = v.split(/\s+/).map(parseFloat); return [p[0] || 0, p[1] || 0]; }
+function setT(el, x, y) { x = Math.round(x * 10) / 10; y = Math.round(y * 10) / 10; if (!x && !y) el.style.removeProperty('translate'); else el.style.translate = `${x}px ${y}px`; }
+const posOf = el => isAbs(el) ? [parseFloat(el.style.left) || 0, parseFloat(el.style.top) || 0] : getT(el);
+function posSet(el, p) { if (isAbs(el)) { el.style.left = Math.round(p[0] * 10) / 10 + 'px'; el.style.top = Math.round(p[1] * 10) / 10 + 'px'; } else setT(el, p[0], p[1]); }
+function moveBy(el, dx, dy) { const p = posOf(el); posSet(el, [p[0] + dx, p[1] + dy]); }
+const isMoved = el => !isAbs(el) && (getT(el).some(Boolean) || (el.classList.contains('ht') && !!(el.style.right || el.style.top)));
+function cleanGroups() { const c = {}; $$('[data-grp]', page).forEach(el => { c[el.dataset.grp] = (c[el.dataset.grp] || 0) + 1; }); $$('[data-grp]', page).forEach(el => { if (c[el.dataset.grp] < 2) el.removeAttribute('data-grp'); }); }
+const newGid = () => 'g' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+
+/* ---- snapping for the selection's bounding box (same orange guides as before) ---- */
+function msSnapLines() {
+  const xs = [66, 406, 439.38, 779.38, PW / 2, 40.2, 800.6, 48, 797.4], ys = [];
+  const moving = el => MS.sel.some(s => s === el || s.contains(el));
+  $$(U_ANY, page).forEach(el => { if (moving(el) || !el.getClientRects().length) return; const r = visRect(el); if (!r.w) return; xs.push(r.x, r.x + r.w / 2, r.x + r.w); ys.push(r.y, r.y + r.h / 2, r.y + r.h); });
+  return { xs, ys };
+}
+function snapBox(x, y, w, h) {
+  const g = $('#guides'); g.innerHTML = ''; if (!S.magnet) return [x, y];
+  const { xs, ys } = MS.lines || msSnapLines(), th = 6 / Math.min(1, S.scale); let bx = null, by = null;
+  for (const off of [0, w / 2, w]) for (const L of xs) { const d = L - (x + off); if (Math.abs(d) < th && (!bx || Math.abs(d) < Math.abs(bx.d))) bx = { d, L }; }
+  for (const off of [0, h / 2, h]) for (const L of ys) { const d = L - (y + off); if (Math.abs(d) < th && (!by || Math.abs(d) < Math.abs(by.d))) by = { d, L }; }
+  if (bx) { x += bx.d; g.insertAdjacentHTML('beforeend', `<div class="guide v" style="left:${bx.L}px"></div>`); }
+  if (by) { y += by.d; g.insertAdjacentHTML('beforeend', `<div class="guide h" style="top:${by.L}px"></div>`); }
+  return [x, y];
+}
+
+/* ---- drawing: outline per element, one combined box, floating toolbar ---- */
+const msLayer = document.createElement('div'); msLayer.id = 'msel'; over.appendChild(msLayer);
+const marq = document.createElement('div'); marq.id = 'marq'; over.appendChild(marq);
+const selbar = document.createElement('div'); selbar.id = 'selbar'; document.body.appendChild(selbar);
+const selmenu = document.createElement('div'); selmenu.id = 'selmenu'; document.body.appendChild(selmenu);
+const msBox = (r, c) => `<div class="msb ${c}" style="left:${r.x.toFixed(1)}px;top:${r.y.toFixed(1)}px;width:${r.w.toFixed(1)}px;height:${r.h.toFixed(1)}px"></div>`;
+function msRender() {
+  if (!MS) return;
+  if (!msOn()) { MS.sel = []; MS.gIn = null; MS.pan = null; }
+  MS.sel = MS.sel.filter(el => page.contains(el)); if (MS.pan && !page.contains(MS.pan)) MS.pan = null;
+  over.style.setProperty('--z', S.scale);
+  let h = '';
+  if (MS.gIn) { const m = grpMembers(MS.gIn); if (m.length > 1) h += msBox(unionRect(m), 'gin'); else MS.gIn = null; }
+  const n = MS.sel.length;
+  if (n) {
+    const objs = msObjects();
+    if (n > 1) MS.sel.forEach(el => h += msBox(visRect(el), 'mem' + (grpOf(el) && grpOf(el) !== MS.gIn ? ' g' : '')));
+    const one = MS.sel[0], own = n === 1 && (one.classList.contains('selx') || (S.sel?.type === 'title' && S.sel.el === one));
+    if (!own) h += msBox(unionRect(MS.sel), 'all' + (objs.length === 1 && n > 1 ? ' grp' : ''));
+  }
+  if (MS.pan) h += msBox(relRect(MS.pan), 'pan');
+  msLayer.innerHTML = h; msBar();
+}
+function editingEd() { const a = document.activeElement; return a && a.closest && page.contains(a) ? a.closest('.ed') : null; }
+function msBar() {
+  const n = MS.sel.length;
+  if (!n || MS.drag || MS.marq || editingEd() || !msOn() || document.body.classList.contains('exporting')) { selbar.classList.remove('on'); return; }
+  const objs = msObjects(), k = objs.length, oneGroup = k === 1 && n > 1, hasG = MS.sel.some(el => grpOf(el));
+  const Bt = (a, ic, t, lbl, cls) => `<button data-ms="${a}" title="${t}"${cls ? ` class="${cls}"` : ''}>${svgIcon(ic, 2)}${lbl ? `<span>${lbl}</span>` : ''}</button>`, sep = '<i class="mss"></i>';
+  let h = n > 1 ? `<span class="msn">${oneGroup ? 'مجموعة · ' : ''}${n} عناصر</span>` : '';
+  if (k >= 2) h += Bt('group', 'group', `تجميع (${KB('G')})`, 'تجميع', 'pri');
+  if (hasG) h += Bt('ungroup', 'ungroup', `فك التجميع (${KB('⇧G')})`, 'فك التجميع');
+  if (n === 1 && !MS.sel[0].matches(U_TOP)) h += Bt('parent', 'square-dashed-mouse-pointer', 'تحديد العنصر كامل (كل البطاقات أو النقاط معاً)');
+  if (k >= 2) h += sep + Bt('ar', 'align-end-vertical', 'محاذاة لليمين') + Bt('ac', 'align-center-vertical', 'توسيط أفقي') + Bt('al', 'align-start-vertical', 'محاذاة لليسار')
+    + sep + Bt('at', 'align-start-horizontal', 'محاذاة للأعلى') + Bt('am', 'align-center-horizontal', 'توسيط عمودي') + Bt('ab', 'align-end-horizontal', 'محاذاة للأسفل');
+  if (k >= 3) h += sep + Bt('dh', 'align-horizontal-space-between', 'توزيع أفقي بمسافات متساوية') + Bt('dv', 'align-vertical-space-between', 'توزيع عمودي بمسافات متساوية');
+  const canDup = MS.sel.some(el => el.id !== 'sender' && !el.classList.contains('wp'));
+  h += sep + (MS.sel.some(isMoved) ? Bt('reset', 'undo-2', 'إرجاع لمكانه الأصلي في القالب', 'إرجاع لمكانه') : '') + (canDup ? Bt('dup', 'copy', `تكرار (${KB('D')})`) + Bt('del', 'trash-2', 'حذف (Delete)', '', 'del') : '');
+  h = h.replace(/^(<i class="mss"><\/i>)+/, '').replace(/(<i class="mss"><\/i>)+$/, '');
+  if (!h) { selbar.classList.remove('on'); return; }
+  selbar.innerHTML = h; selbar.classList.add('on');
+  const U = unionRect(MS.sel), pg = page.getBoundingClientRect(), z = S.scale, R = { l: pg.left + U.x * z, t: pg.top + U.y * z, r: pg.left + (U.x + U.w) * z, b: pg.top + (U.y + U.h) * z };
+  const st = stage.getBoundingClientRect(), w = selbar.offsetWidth, hh = selbar.offsetHeight, gap = S.sel?.type === 'title' ? 24 : 12;
+  if (R.b < st.top || R.t > st.bottom) { selbar.classList.remove('on'); return; }
+  let y = R.t - hh - gap; if (y < st.top + 6) y = R.b + gap; if (y + hh > st.bottom - 6) y = st.top + 6;
+  const x = Math.max(st.left + 6, Math.min(st.right - w - 6, (R.l + R.r) / 2 - w / 2));
+  selbar.style.left = x + 'px'; selbar.style.top = y + 'px';
+}
+
+/* ---- properties panel for the clicked thing (same rules as before) ---- */
+function propFor(t) {
+  MS.quiet = true;
+  try {
+    const slot = t.closest('.slot'); if (slot) return select('slot', slot);
+    const ii = t.closest('.ii'); if (ii) return select('inline', ii);
+    const chip = t.closest('.chip'); if (chip) return select('chip', chip);
+    const it = t.closest('.iitem'); if (it) return select('item', it);
+    if (t.closest('#sender')) return select('sender', $('#sender', page));
+    const ht = t.closest('.htitles .ht'); if (ht) { if (S.sel?.el !== ht) select('title', ht); return; }
+    const fi = t.closest('.fi'); if (fi) return select('free', fi);
+    const wp = t.closest('img.wp'); if (wp) { if (S.sel?.el !== wp) select('person', wp); return; }
+    if (t.closest('.hclip')) { if (S.sel?.type !== 'photo') select('photo', $('.hclip', page)); return; }
+    const tb = t.closest(BLK_PROPS); if (tb) { if (S.sel?.el !== tb) select('block', tb); return; }
+    desel0();
+  } finally { MS.quiet = false; }
+}
+function propSync(t) { if (MS.sel.length === 1) propFor(t && MS.sel[0].contains(t) ? t : MS.sel[0]); else desel0(); }
+// anything else that selects (drop an icon, add a block, the old click path) also becomes the move selection
+{ const _sel = select; select = function (type, el) { _sel(type, el); if (MS && !MS.quiet && msOn()) { const u = type === 'photo' ? null : unitAt(el); MS.gIn = null; MS.pan = null; MS.sel = u ? [u] : []; msRender(); } }; }
+{ const _ut = updTbox; updTbox = function () { _ut(); msRender(); }; }
+
+/* ---- text editing: click on an already selected text, or double-click ---- */
+function msEdit(ed, x, y) {
+  ed.focus({ preventScroll: true }); const rg = document.caretRangeFromPoint(x, y), sel = getSelection();
+  if (rg && ed.contains(rg.startContainer)) { sel.removeAllRanges(); sel.addRange(rg); }
+  msRender();
+}
+function msDeeper(t, ev) {
+  const u = unitAt(t), s = MS.sel.find(x => x.contains(t)); if (!s) return;
+  const g = grpOf(s);
+  if (MS.stepT && Date.now() - MS.stepT < 450) return;                                         // 2nd click of the double-click that stepped into a group
+  if (MS.sel.length > 1 && g && g !== MS.gIn && MS.sel.every(x => grpOf(x) === g)) { MS.gIn = g; msSet([s]); propSync(t); MS.stepT = Date.now(); return; } // step into the group
+  if (MS.sel.length > 1) { msSet(pickFor(s)); propSync(t); return; }                          // click one of a multi-selection → only it
+  if (u && u !== s && s.contains(u)) { msSet([u]); propSync(t); return; }                     // the whole block was selected → the card under the mouse
+  const box = s.matches('.blk[data-type=image]') && $('.imgb', s);
+  if (box && !box.classList.contains('empty') && box.dataset.fit !== 'full') { MS.pan = box; msRender(); toast('اسحب الصورة لتحريكها داخل الإطار · Esc للخروج'); return; }
+  if (box && box.classList.contains('empty')) { MS.pick = s; return; }
+  const ed = t.closest('.ed'); if (ed && s.contains(ed)) { msEdit(ed, ev.clientX, ev.clientY); return; }
+  propFor(t);
+}
+function docPD() { $('#fileMenu').style.display = 'none'; $('#expMenu').style.display = 'none'; if (tbar.classList.contains('on')) hideTbar(); }
+
+/* ---- pointer: select / shift-select / drag / marquee ---- */
+scaler.addEventListener('pointerdown', e => {
+  MS.eat = false; MS.pick = null;
+  if (!msOn() || e.pointerType === 'touch' || pres.classList.contains('on')) return;
+  const t = e.target; if (!page.contains(t) || t.closest('.wph')) return;
+  const edA = editingEd(); if (edA && edA.contains(t)) return;                 // typing / selecting words
+  if (e.button === 2) { e.preventDefault(); e.stopPropagation(); MS.eat = true; return; } // context menu, without moving the caret
+  if (e.button !== 0) return;
+  if (MS.pan && MS.pan.contains(t)) return;                                      // panning a picture inside its frame
+  let u = unitAt(t); const add = e.shiftKey || e.metaKey || e.ctrlKey;
+  if (u && u.matches('#blocks > .blk[data-type=image], #blocks > .blk[data-type=chip], #blocks > .blk[data-type=info]')) { const r = visRect(u), [px, py] = toPage(e.clientX, e.clientY); if (px < r.x - 4 || px > r.x + r.w + 4 || py < r.y - 4 || py > r.y + r.h + 4) u = null; }
+  if (!u && !add && t.closest('.hclip') && S.sel?.type === 'photo') return;      // header photo selected: drag pans it (as before)
+  e.preventDefault(); e.stopPropagation(); MS.eat = true; docPD();
+  const ae = document.activeElement; if (ae && ae !== document.body && ae.blur) ae.blur();
+  if (edA) getSelection().removeAllRanges();
+  if (MS.pan && !MS.pan.contains(t)) MS.pan = null;
+  if (!u) return startMarquee(e, add, t);
+  const b = t.closest('#blocks > .blk'); if (b) S.curBlk = b;
+  let mode;
+  if (add) { const p = pickFor(u); const allIn = p.every(x => MS.sel.includes(x)); msSet(allIn ? MS.sel.filter(x => !p.includes(x)) : MS.sel.concat(p)); mode = 'add'; if (MS.sel.length !== 1) desel0(); else propSync(); }
+  else if (MS.sel.some(s => s.contains(t))) mode = 'inside';
+  else { if (MS.gIn && !grpMembers(MS.gIn).some(m => m.contains(t))) MS.gIn = null; msSet(pickFor(u)); mode = 'fresh'; propSync(t); }
+  const x0 = e.clientX, y0 = e.clientY; let moved = false;
+  const mv = ev => {
+    if (!moved) { if (Math.hypot(ev.clientX - x0, ev.clientY - y0) < 3 || !MS.sel.length || !MS.sel.some(s => s.contains(t))) return; moved = true; msDragStart(); }
+    msDragMove((ev.clientX - x0) / S.scale, (ev.clientY - y0) / S.scale);
+  };
+  const up = ev => {
+    removeEventListener('pointermove', mv); removeEventListener('pointerup', up);
+    if (moved) return msDragEnd();
+    if (mode === 'fresh') { const em = t.closest('.imgb.empty'); if (em) MS.pick = em.closest('.blk'); }
+    else if (mode === 'inside') msDeeper(t, ev);
+    msRender();
+  };
+  addEventListener('pointermove', mv); addEventListener('pointerup', up);
+}, true);
+scaler.addEventListener('mousedown', e => { if (MS.eat) e.preventDefault(); }, true);
+scaler.addEventListener('click', e => { if (MS.eat) { MS.eat = false; e.stopPropagation(); e.preventDefault(); } if (MS.pick) { const b = MS.pick; MS.pick = null; if (page.contains(b)) pickImage(b); } }, true); // the file picker needs the click itself
+function msDragStart() {
+  snap(true);
+  MS.drag = { els: MS.sel.slice(), p0: MS.sel.map(posOf), r0: unionRect(MS.sel) }; MS.lines = msSnapLines();
+  if (tbar.classList.contains('on')) hideTbar(); selbar.classList.remove('on');
+}
+function msDragMove(dx, dy) {
+  const D = MS.drag; if (!D) return; const [nx, ny] = snapBox(D.r0.x + dx, D.r0.y + dy, D.r0.w, D.r0.h); dx = nx - D.r0.x; dy = ny - D.r0.y;
+  D.els.forEach((el, i) => posSet(el, [D.p0[i][0] + dx, D.p0[i][1] + dy])); msRender();
+}
+function msDragEnd() { MS.drag = null; MS.lines = null; $('#guides').innerHTML = ''; snap(true); msRender(); }
+function marqHits(r) {
+  const ov = a => a.w > 0 && a.x < r.x + r.w && a.x + a.w > r.x && a.y < r.y + r.h && a.y + a.h > r.y;
+  const inside = a => a.x >= r.x && a.y >= r.y && a.x + a.w <= r.x + r.w && a.y + a.h <= r.y + r.h;
+  const tops = $$(U_TOP, page).filter(el => el.getClientRects().length).map(el => ({ el, r: visRect(el) })).filter(o => ov(o.r));
+  let hits = tops.map(o => o.el);
+  // a marquee inside one block (cards, list items, info items, steps) picks those pieces
+  if (tops.length === 1 && tops[0].el.matches('#blocks > .blk') && !inside(tops[0].r)) { const kids = $$(U_CHILD, tops[0].el).filter(c => ov(relRect(c))); if (kids.length) hits = kids; }
+  return hits.flatMap(el => pickFor(el));
+}
+function startMarquee(e, add, t) {
+  const base = add ? MS.sel.slice() : [], [sx, sy] = toPage(e.clientX, e.clientY); let moved = false;
+  const mv = ev => {
+    if (!moved) { if (Math.hypot(ev.clientX - e.clientX, ev.clientY - e.clientY) < 3) return; moved = true; MS.marq = true; MS.gIn = null; desel0(); }
+    const [x, y] = toPage(ev.clientX, ev.clientY), r = { x: Math.min(sx, x), y: Math.min(sy, y), w: Math.abs(x - sx), h: Math.abs(y - sy) };
+    Object.assign(marq.style, { display: 'block', left: r.x + 'px', top: r.y + 'px', width: r.w + 'px', height: r.h + 'px' });
+    MS.sel = msNorm(base.concat(marqHits(r))); msRender();
+  };
+  const up = () => {
+    removeEventListener('pointermove', mv); removeEventListener('pointerup', up); marq.style.display = 'none'; MS.marq = false;
+    if (!moved) { if (!add) { MS.sel = []; MS.gIn = null; if (t && page.contains(t) && t.closest('.hclip')) propFor(t); else desel0(); } }
+    else propSync();
+    msRender();
+  };
+  addEventListener('pointermove', mv); addEventListener('pointerup', up);
+}
+// marquee can also start on the grey workspace around the design
+stage.addEventListener('pointerdown', e => {
+  if (!msOn() || e.pointerType === 'touch' || e.button !== 0 || page.contains(e.target) || e.target.closest('.abHead, .abPrev, .abAdd, #tbox, #blockbar, #stretch, #page')) return;
+  const r = stage.getBoundingClientRect(), sbw = stage.offsetWidth - stage.clientWidth, rtl = getComputedStyle(stage).direction === 'rtl';
+  if (e.clientY > r.top + stage.clientHeight || (rtl ? e.clientX < r.left + sbw : e.clientX > r.left + stage.clientWidth)) return; // scrollbar
+  e.preventDefault(); startMarquee(e, e.shiftKey || e.metaKey || e.ctrlKey, null);
+});
+
+/* ---- actions ---- */
+function msCommit() { snap(true); msRender(); }
+function msCommitLayout() { afterLayout(); msRender(); } // delete / duplicate: the history step is taken after the columns re-balance
+function msBegin() { snap(true); }
+function msGroup() {
+  msBegin();
+  if (msObjects().length < 2) return toast('حدد عنصرين أو أكثر للتجميع');
+  const g = newGid(); MS.sel.forEach(el => el.dataset.grp = g); cleanGroups(); MS.gIn = null; desel0(); msCommit();
+  toast('تم التجميع — اضغط مرتين على المجموعة لتحديد عنصر داخلها');
+}
+function msUngroup() {
+  msBegin();
+  const gs = new Set(MS.sel.map(grpOf).filter(Boolean)); if (!gs.size) return toast('التحديد ما فيه مجموعة');
+  gs.forEach(g => grpMembers(g).forEach(el => el.removeAttribute('data-grp'))); MS.gIn = null; msCommit(); toast('تم فك التجميع');
+}
+function msDel() {
+  msBegin();
+  const els = MS.sel.filter(el => el.id !== 'sender' && !el.classList.contains('wp')); if (!els.length) return toast('هذا العنصر ثابت في القالب وما ينحذف');
+  if (S.sel && els.some(el => el === S.sel.el || el.contains(S.sel.el))) desel0();
+  if (S.hovBlk && els.some(el => el === S.hovBlk || el.contains(S.hovBlk))) hideBar();
+  els.forEach(el => el.remove()); cleanGroups(); MS.sel = MS.sel.filter(el => page.contains(el)); MS.gIn = null; msCommitLayout();
+}
+function msDup() {
+  msBegin();
+  const els = MS.sel.filter(el => el.id !== 'sender' && !el.classList.contains('wp')); if (!els.length) return;
+  const gm = {}, out = [];
+  els.forEach(el => {
+    const c = el.cloneNode(true); [c, ...$$('*', c)].forEach(x => { x.classList.remove('selx', 'hov', 'tsel', 'drop-hl'); if (x !== c) x.removeAttribute('data-grp'); });
+    const g = grpOf(el); if (g) c.dataset.grp = gm[g] || (gm[g] = newGid());
+    if (isAbs(c) || c.classList.contains('ht')) moveBy(c, 16, 16);   // positioned pieces get a small offset, the others take the next place in the layout
+    el.after(c); out.push(c);
+  });
+  cleanGroups(); MS.gIn = null; desel0(); MS.sel = msNorm(out); renderDynamic(); msCommitLayout(); toast('تم التكرار');
+}
+function msReset() {
+  msBegin();
+  MS.sel.forEach(el => { if (isAbs(el)) return; el.style.removeProperty('translate'); if (el.classList.contains('ht')) { el.style.removeProperty('right'); el.style.removeProperty('top'); } });
+  msCommit(); toast('رجعت العناصر لمكانها في القالب');
+}
+function msAlign(c) {
+  const objs = msObjects(); if (objs.length < 2) return; msBegin(); const U = unionRect(MS.sel);
+  objs.forEach(o => {
+    const r = o.r; let dx = 0, dy = 0;
+    if (c === 'r') dx = U.x + U.w - (r.x + r.w); if (c === 'l') dx = U.x - r.x; if (c === 'c') dx = U.x + U.w / 2 - (r.x + r.w / 2);
+    if (c === 't') dy = U.y - r.y; if (c === 'b') dy = U.y + U.h - (r.y + r.h); if (c === 'm') dy = U.y + U.h / 2 - (r.y + r.h / 2);
+    if (Math.abs(dx) > .05 || Math.abs(dy) > .05) o.els.forEach(el => moveBy(el, dx, dy));
+  });
+  msCommit();
+}
+function msDist(d) {
+  const objs = msObjects(); if (objs.length < 3) return toast('حدد ثلاثة عناصر أو أكثر للتوزيع'); msBegin();
+  const hz = d === 'h', P = r => hz ? r.x : r.y, L = r => hz ? r.w : r.h;
+  objs.sort((a, b) => (P(a.r) + L(a.r) / 2) - (P(b.r) + L(b.r) / 2));
+  const f = objs[0].r, l = objs[objs.length - 1].r, gap = (P(l) + L(l) - P(f) - objs.reduce((s, o) => s + L(o.r), 0)) / (objs.length - 1);
+  let pos = P(f);
+  objs.forEach((o, i) => { const dd = pos - P(o.r); if (i && i < objs.length - 1 && Math.abs(dd) > .05) o.els.forEach(el => hz ? moveBy(el, dd, 0) : moveBy(el, 0, dd)); pos += L(o.r) + gap; });
+  msCommit();
+}
+function msAll() { desel0(); MS.gIn = null; msSet($$(U_TOP, page).filter(el => el.getClientRects().length).flatMap(pickFor)); }
+function msNudge(dx, dy) { if (!MS.nt) snap(true); clearTimeout(MS.nt); MS.sel.forEach(el => moveBy(el, dx, dy)); msRender(); MS.nt = setTimeout(() => { MS.nt = 0; snap(true); }, 500); }
+function msAct(a) {
+  if (a === 'group') msGroup(); if (a === 'ungroup') msUngroup(); if (a === 'dup') msDup(); if (a === 'del') msDel(); if (a === 'reset') msReset(); if (a === 'all') msAll();
+  if (a === 'parent') { const u = MS.sel[0], tp = u && topOf(u); if (tp && tp !== u) { msSet(pickFor(tp)); propSync(); } }
+  if (/^a[rcltmb]$/.test(a)) msAlign(a[1]); if (a === 'dh' || a === 'dv') msDist(a[1]);
+}
+selbar.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); });
+selbar.addEventListener('click', e => { const b = e.target.closest('[data-ms]'); if (b) msAct(b.dataset.ms); });
+/* ---- right-click menu ---- */
+scaler.addEventListener('contextmenu', e => {
+  if (!msOn() || !page.contains(e.target)) return; const edA = editingEd(); if (edA && edA.contains(e.target)) return;
+  e.preventDefault(); const u = unitAt(e.target);
+  if (u && !MS.sel.some(s => s.contains(e.target))) { MS.gIn = null; msSet(pickFor(u)); propSync(e.target); }
+  const n = MS.sel.length ? msObjects().length : 0, hasG = MS.sel.some(el => grpOf(el)), canDel = MS.sel.some(el => el.id !== 'sender' && !el.classList.contains('wp'));
+  const it = (a, l, kb, off) => `<button data-ms="${a}"${off ? ' disabled' : ''}><span>${l}</span>${kb ? `<kbd>${kb}</kbd>` : ''}</button>`;
+  selmenu.innerHTML = it('group', 'تجميع', KB('G'), n < 2) + it('ungroup', 'فك التجميع', KB('⇧G'), !hasG) + '<hr>' + it('dup', 'تكرار', KB('D'), !canDel) + it('reset', 'إرجاع لمكانه', '', !MS.sel.some(isMoved)) + it('del', 'حذف', 'Delete', !canDel) + '<hr>' + it('all', 'تحديد الكل', KB('A'));
+  selmenu.classList.add('on'); const w = selmenu.offsetWidth, h = selmenu.offsetHeight;
+  selmenu.style.left = Math.max(8, e.clientX - w > 8 ? e.clientX - w : Math.min(innerWidth - w - 8, e.clientX)) + 'px'; selmenu.style.top = Math.max(8, Math.min(innerHeight - h - 8, e.clientY)) + 'px';
+});
+selmenu.addEventListener('pointerdown', e => e.stopPropagation());
+selmenu.addEventListener('click', e => { const b = e.target.closest('[data-ms]'); if (!b || b.disabled) return; selmenu.classList.remove('on'); msAct(b.dataset.ms); });
+document.addEventListener('pointerdown', e => { if (!selmenu.contains(e.target)) selmenu.classList.remove('on'); }, true);
+/* ---- keyboard ---- */
+window.addEventListener('keydown', e => {
+  if (!msOn() || pres.classList.contains('on') || $('#wordModal').classList.contains('on') || ask.classList.contains('on')) return;
+  const tg = e.target; if (tg.matches && tg.matches('input,textarea,select')) return;
+  const stop = () => { e.preventDefault(); e.stopImmediatePropagation(); };
+  const inEd = tg.closest && tg.closest('.ed');
+  if (inEd) { if (e.key === 'Escape' && page.contains(inEd)) { stop(); inEd.blur(); getSelection().removeAllRanges(); hideTbar(); const u = unitAt(inEd); if (u) msSet(pickFor(u)); } return; }
+  const mod = e.ctrlKey || e.metaKey, k = e.code;
+  if (e.key === 'Escape') selmenu.classList.remove('on');
+  if (mod && !e.shiftKey && !e.altKey && k === 'KeyA') { stop(); msAll(); return; }
+  if (!MS.sel.length) { if (e.key === 'Escape' && (MS.gIn || MS.pan)) { stop(); MS.gIn = null; MS.pan = null; msRender(); } return; }
+  if (mod && k === 'KeyG') { stop(); e.shiftKey ? msUngroup() : msGroup(); return; }
+  if (mod && k === 'KeyD') { stop(); msDup(); return; }
+  if (!mod && (e.key === 'Delete' || e.key === 'Backspace')) { if (S.sel?.type === 'inline') return; stop(); msDel(); return; }
+  if (!mod && e.key.startsWith('Arrow')) { stop(); const d = e.shiftKey ? 10 : 1; msNudge(e.key === 'ArrowLeft' ? -d : e.key === 'ArrowRight' ? d : 0, e.key === 'ArrowUp' ? -d : e.key === 'ArrowDown' ? d : 0); return; }
+  if (e.key === 'Escape') { stop(); if (MS.pan) { MS.pan = null; msRender(); return; } if (MS.gIn) { const m = grpMembers(MS.gIn); MS.gIn = null; desel0(); msSet(m); return; } deselect(); }
+}, true);
+/* ---- keep the boxes and the toolbar in place ---- */
+new MutationObserver(() => { if (MS.sel.length || MS.gIn || MS.pan) { cancelAnimationFrame(MS.raf); MS.raf = requestAnimationFrame(msRender); } }).observe(page, { subtree: true, childList: true, characterData: true, attributes: true });
+stage.addEventListener('scroll', () => { if (MS.sel.length) msBar(); });
+addEventListener('resize', () => { if (MS.sel.length) msRender(); });
+page.addEventListener('focusin', () => msBar()); page.addEventListener('focusout', () => setTimeout(msBar, 0));
+
+{ const pathOf = el => { const a = []; for (let x = el; x && x !== page; x = x.parentElement) a.unshift([...x.parentElement.children].indexOf(x)); return { a, c: el.className.replace(/\b(selx|hov|tsel|drop-hl)\b/g, '').trim() }; };
+  const resolve = o => { let x = page; for (const i of o.a) { x = x && x.children[i]; } return x && x.className.replace(/\b(selx|hov|tsel|drop-hl)\b/g, '').trim() === o.c && x.matches(U_ANY) ? x : null; };
+  const _restore = restore; restore = function (k) { const keep = MS.sel.map(pathOf), gIn = MS.gIn; _restore(k); if (!msOn()) return; const back = keep.map(resolve).filter(Boolean); if (back.length === keep.length) { MS.sel = back; MS.gIn = gIn && grpMembers(gIn).length > 1 ? gIn : null; if (back.length === 1) propSync(); msRender(); } }; }
+
+window.APP = { activate, addBoard, exportAll, cleanFormatting, rebalance, exportPNG, addBlock, applyIcon, select, setDep, searchIcons, serialize, S, undo, redo, renderDynamic, MS, msSet, msGroup, msUngroup, msAlign, msDist, msDup, msDel, msReset, msAll, unionRect };
 
 </script>
 
