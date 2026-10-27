@@ -4,6 +4,8 @@
     <input class="nm" id="deckName" placeholder="اسم العرض" title="اسم العرض">
     <div style="position:relative"><button class="tbb" id="bFile"><svg class="i" data-ic="folder-open"></svg><span class="t">ملف</span></button>
       <div class="menu hide" id="mFile">
+        <button data-a="pptx" class="mi-pptx"><svg class="i" data-ic="file-down"></svg><span>حفظ كـ PowerPoint <span class="num ext" dir="ltr">(.pptx)</span></span></button>
+        <hr>
         <button data-a="import"><svg class="i" data-ic="upload"></svg>استيراد Word أو PowerPoint…</button>
         <button data-a="new"><svg class="i" data-ic="file-plus"></svg>عرض جديد…</button>
         <hr>
@@ -26,11 +28,12 @@
     <button class="tbb" id="bCheck" title="فحص العرض"><svg class="i" data-ic="shield-check"></svg><span class="t">فحص</span></button>
     <button class="tbb" id="bShow" title="عرض الشرائح"><svg class="i" data-ic="play"></svg><span class="t">عرض</span></button>
     <button class="tbb" id="bPdf" title="حفظ PDF"><svg class="i" data-ic="file-text"></svg><span class="t">PDF</span></button>
-    <button class="tbb pri" id="bExport"><svg class="i" data-ic="download"></svg><span class="t">تصدير PowerPoint</span></button>
+    <button class="tbb pri" id="bExport" title="حفظ العرض كملف PowerPoint ‏(.pptx) يفتح ويتعدّل في PowerPoint"><svg class="i" data-ic="file-down"></svg><span class="t">حفظ كـ PowerPoint <span class="num ext" dir="ltr">(.pptx)</span></span><span class="tp num">PPTX</span></button>
   </header>
   <main class="body">
     <aside class="strip">
-      <div class="sh"><span>الشرائح</span><span class="num" id="slCount"></span></div>
+      <div class="sh"><span>الشرائح <span class="num" id="slCount"></span></span><button class="sh-all" id="slAll" title="حدد كل الشرائح عشان تطبّق عليها نفس الستايل">تحديد الكل</button></div>
+      <div class="slbar hide" id="slBar"><div class="slb-t"><span id="slN"></span><button class="slb-all" id="slAll2">تحديد الكل</button><button class="slb-x" id="slX" title="إلغاء التحديد"><svg class="i" data-ic="x"></svg></button></div><button class="slb-go" id="slApply"><svg class="i" data-ic="paintbrush"></svg><span>طبّق على المحدد (<span class="num" id="slN2"></span>)</span></button><p class="slb-h">Ctrl/⌘ + ضغطة: شريحة شريحة<br>Shift + ضغطة: من … إلى</p></div>
       <div class="thumbs" id="thumbs"></div>
       <div style="position:relative"><button class="addSl" id="bAdd"><svg class="i" data-ic="plus"></svg><span>شريحة جديدة</span></button>
         <div class="menu hide" id="mAdd" style="top:auto;bottom:calc(100% + 6px)"></div></div>
@@ -55,6 +58,7 @@
       <div class="tabs" id="tabs">
         <button data-t="design" class="on"><svg class="i" data-ic="layout-template"></svg>التصميم</button>
         <button data-t="insert"><svg class="i" data-ic="square-plus"></svg>إضافة</button>
+        <button data-t="layers"><svg class="i" data-ic="layers"></svg>الطبقات</button>
         <button data-t="photos"><svg class="i" data-ic="images"></svg>الصور</button>
         <button data-t="gen"><svg class="i" data-ic="wand-sparkles"></svg>توليد صورة</button>
         <button data-t="notes"><svg class="i" data-ic="notebook-pen"></svg>ملاحظات</button>
@@ -85,6 +89,6 @@
       <button class="st-btn hide" id="stBack"><svg class="i" data-ic="arrow-right"></svg>رجوع للعرض الحالي</button>
     </div>
     <div class="st-recent hide" id="stRecent"><h5>ملفاتي (محفوظة تلقائياً على هذا الجهاز)</h5><div id="stRecentList"></div></div>
-    <div class="credit">Designed by Mohammed Wagih · 2026 · v2.1</div>
+    <div class="credit">Designed by Mohammed Wagih · 2026 · v2.3</div>
   </div>
 </div>

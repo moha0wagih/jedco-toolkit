@@ -13,9 +13,9 @@ Each layout turns a structured slide spec into positioned objects on a 960×540 
   Output JSON lists each layout with `ov` (overflow/overlap count) and `miss` (content dropped). Both must be 0/empty for every layout on every sample, in `ar` and `en`, `dark:false` and `dark:true`.
 
 ## Authoring model
-- Author in LEFT-TO-RIGHT coordinates (English orientation: logo + blue edge bar on the left). The engine mirrors everything for Arabic automatically. Never branch on language for positions (except struct layouts which set noMirror).
+- Author in LEFT-TO-RIGHT coordinates (English orientation: logo on the left). The engine mirrors everything for Arabic automatically. Never branch on language for positions (except struct layouts which set noMirror).
 - Content box: `G.X0=64 … G.X1=904`, `G.TOP=56`, `G.BOT=494`. Page number sits at y 508.
-- Start every content layout with `PM.chrome(c, o)` (background, tiny logo top corner, blue edge bar, page number) or, for full-bleed photo layouts, `PM.photoBlock(...)` + `PM.chromeOnPhoto(c, o)`.
+- Start every content layout with `PM.chrome(c, o)` (background, tiny logo top corner, page number — no edge bar since v2.3) or, for full-bleed photo layouts, `PM.photoBlock(...)` + `PM.chromeOnPhoto(c, o)`.
 - Header: `PM.head(c, sp, o, {...})` or `PM.itemsArea(c, sp, o)` (header + lead paragraph + block label). Use itemsArea whenever the spec may have a lead paragraph.
 - Siblings (cards, columns, rows) MUST share one text scale: build paragraph lists, compute `k = PM.groupK(boxes, maxK)`, then draw each with `PM.tk(x, y, w, ps, k)`. Measure with `PM.hK(ps, w, k)` to size containers to content and to balance vertically with `PM.place(top, bottom, h, bias)`.
 - Text helpers: `PM.tx.title/sub/eyebrow/h/body/num/label/cap`, items: `PM.ips(c, it, i)` (title/text/bullets of item i with correct binds), `PM.its(sp)` (items with bare short lines promoted to titles).

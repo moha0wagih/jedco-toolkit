@@ -18,6 +18,7 @@ D.mount = function () {
   host.innerHTML = `<div class="dk-h"><b>التصاميم</b><span class="num" id="dkN"></span><button class="dk-x" id="dkMin" title="إخفاء الدك">${PM.UI.ic('panel-right-close')}</button></div>
     <div class="dk-f"><div class="seg sm" id="dkTone"><button data-v="light">فاتح</button><button data-v="dark">داكن</button></div><select id="dkFam" class="dk-sel"></select></div>
     <label class="dk-all"><input type="checkbox" id="dkAll"> كل المكتبة</label>
+    <div class="dk-multi hide" id="dkMulti"></div>
     <div class="dk-list" id="dkList"></div>`;
   $('#dkMin').onclick = () => D.toggle(false);
   $('#dkOpen').onclick = () => D.toggle(true);
@@ -39,6 +40,13 @@ D.mount = function () {
   list.addEventListener('pointerleave', () => { $$('.dk-t', list).forEach(t => { t.style.transform = ''; t.style.zIndex = ''; }); D.endPreview(); });
   list.addEventListener('scroll', () => D.endPreview(), { passive: true });
   D.toggle(lsGet('pm.dock') !== '0', true);
+};
+/* several slides picked in the strip: say so, a click applies to all of them */
+D.multi = function () {
+  const el = $('#dkMulti'); if (!el) return;
+  const on = PM.UI.slMulti && PM.UI.slMulti(), n = PM.UI.slSel ? PM.UI.slSel.size : 0;
+  el.classList.toggle('hide', !on);
+  if (on) el.innerHTML = `الضغطة تطبّق التصميم على المحدد (<b>${n}</b>)`;
 };
 D.toggle = function (on, quiet) {
   document.body.classList.toggle('dock-off', !on);

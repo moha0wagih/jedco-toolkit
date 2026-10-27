@@ -5,6 +5,7 @@
 'use strict';
 const { W, H } = PM;
 const esc = PM.esc;
+const ZOOM_OK = (() => { try { return CSS.supports('zoom', '2'); } catch (e) { return false; } })();
 const col = (hex, a = 100) => a >= 100 ? '#' + hex : PM.hexA(hex, a / 100);
 PM.imgURL = function (assets, id) {
   const a = assets && assets[id];
@@ -113,7 +114,9 @@ PM.renderSlide = function (host, objs, assets, o = {}) {
   const s = document.createElement('div');
   s.className = 'pm-slide';
   s.style.width = W + 'px'; s.style.height = H + 'px';
-  if (o.scale) { s.style.transform = `scale(${o.scale})`; s.style.transformOrigin = '0 0'; }
+  // enlarged slides (slideshow) are drawn at their real size so text and photos stay sharp
+  if (o.scale && o.scale > 1 && ZOOM_OK) s.style.zoom = o.scale;
+  else if (o.scale) { s.style.transform = `scale(${o.scale})`; s.style.transformOrigin = '0 0'; }
   for (const ob of objs) { if (ob.hidden) continue; s.appendChild(PM.objEl(ob, assets)); }
   host.appendChild(s);
   return s;

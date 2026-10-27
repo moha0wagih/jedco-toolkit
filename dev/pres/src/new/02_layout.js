@@ -51,12 +51,12 @@ const tx = PM.tx;
 PM.hOf = (ps, w) => PM.blockH(ps.filter(p => p && String(p.t).trim()), w);
 
 /* ---------- slide chrome ---------- */
-/* official content chrome: tiny logo in the top corner, the blue edge bar, page number on the language side */
+/* official content chrome: tiny logo in the top corner and the page number on the language side (no edge bar since v2.3) */
 PM.chrome = function (c, objs, o = {}) {
   const t = c.tone;
   objs.push(R(0, 0, W, H, t.bg, { role: 'bg', lock: true, name: 'Background' }));
   if (o.bg2) objs.push(R(...o.bg2, t.bg2, { role: 'bg', lock: true }));
-  if (!o.noBar) objs.push(R(0, 84, G.BAR, 399, c.dark ? K.SKY : K.BLUE, { role: 'chrome', lock: true, name: 'Edge bar' }));
+  // v2.3: no blue edge bar on the slide edge (Moe asked to drop it everywhere)
   if (!o.noLogo) objs.push(Logo(19 + (o.logoDx || 0), 13, 58, o.logoColor || t.logo));
   if (!o.noPage) {
     const pn = T(G.X0, 508, 60, 12, [P(PM.pad2(c.page), 8, { font: 'num', color: o.pageColor || t.muted })], { role: 'page', name: 'Page number', lock: true });

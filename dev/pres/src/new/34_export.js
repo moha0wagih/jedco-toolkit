@@ -236,6 +236,32 @@ async function readTemplate(tz) {
   const contentLayout = logoLayout || blank || (slides[1].rels.match(/Target="([^"]*slideLayout\d+\.xml)"/) || [])[1];
   return { pres, relsXml, slides, contentLayout };
 }
+/* v2.3: the official layouts carry a thin blue bar on the slide edge — take it out of every layout */
+async function stripEdgeBars(tz) {
+  const paths = [];
+  tz.forEach(p => { if (/^ppt\/slideLayouts\/slideLayout\d+\.xml$/.test(p)) paths.push(p); });
+  const P = 'http://schemas.openxmlformats.org/presentationml/2006/main', A = 'http://schemas.openxmlformats.org/drawingml/2006/main';
+  for (const p of paths) {
+    const xml = await tz.file(p).async('string');
+    if (!/<p:grpSp>|<p:sp>/.test(xml)) continue;
+    let doc;
+    try { doc = new DOMParser().parseFromString(xml, 'application/xml'); } catch (e) { continue; }
+    if (doc.getElementsByTagName('parsererror').length) continue;
+    const tree = doc.getElementsByTagNameNS(P, 'spTree')[0]; if (!tree) continue;
+    let changed = false;
+    for (const el of [...tree.children]) {
+      if (el.localName !== 'grpSp' && el.localName !== 'sp') continue;
+      if (el.getElementsByTagNameNS(P, 'ph').length) continue; // never a placeholder
+      const pr = [...el.children].find(k => k.localName === 'grpSpPr' || k.localName === 'spPr'); if (!pr) continue;
+      const xf = [...pr.children].find(k => k.localName === 'xfrm'); if (!xf) continue;
+      const off = xf.getElementsByTagNameNS(A, 'off')[0], ext = xf.getElementsByTagNameNS(A, 'ext')[0]; if (!off || !ext) continue;
+      const x = +off.getAttribute('x'), cx = +ext.getAttribute('cx'), cy = +ext.getAttribute('cy');
+      const atEdge = x < 120000 || x + cx > 11900000;
+      if (atEdge && cx > 0 && cx <= 320000 && cy >= 4500000) { el.remove(); changed = true; }
+    }
+    if (changed) tz.file(p, new XMLSerializer().serializeToString(doc));
+  }
+}
 function stripText(xml) {
   let out = xml;
   out = out.replace(/<p:grpSp>(?:(?!<p:grpSp>)[\s\S])*?<\/p:grpSp>/g, m => /<a:t>/.test(m) ? '' : m);
@@ -373,6 +399,7 @@ PM.exportPptx = async function (deck, onProgress) {
   tz.file('ppt/presentation.xml', pres);
   tz.file('ppt/_rels/presentation.xml.rels', presRels);
   tz.file('[Content_Types].xml', ct);
+  await stripEdgeBars(tz);
   tz.file('docProps/app.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"><Application>Microsoft Office PowerPoint</Application><PresentationFormat>Widescreen</PresentationFormat><Slides>${out.length}</Slides></Properties>`);
   return tz.generateAsync({ type: 'uint8array', compression: 'DEFLATE', compressionOptions: { level: 6 } });
 };

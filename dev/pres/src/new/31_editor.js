@@ -17,29 +17,117 @@ Ed.objById = objById;
 const SNAP = 6;
 
 /* ---------- mount ---------- */
+/* v2.3 · the artboard zooms on its own (like مصمم التواصل الداخلي): Ctrl/⌘ + wheel, trackpad pinch,
+   Ctrl/⌘ + / − / 0, the zoom pill, space + drag (or middle button) to pan. The page around it stays put.
+   The slide is drawn at its real on-screen size (CSS zoom) so text and photos stay sharp at any zoom. */
+const ZOOM_OK = (() => { try { return CSS.supports('zoom', '2'); } catch (e) { return false; } })();
+Ed.zoom = null; // null = fit the space · a number = fixed scale chosen by the user
 Ed.mount = function (host) {
   Ed.host = host;
-  host.innerHTML = `<div class="ed-wrap"><div class="ed-frame"><div class="ed-stage"></div><div class="ed-ov"></div></div></div>`;
-  Ed.wrap = $('.ed-wrap', host); Ed.frame = $('.ed-frame', host); Ed.stage = $('.ed-stage', host); Ed.ov = $('.ed-ov', host);
+  host.innerHTML = `<div class="ed-wrap"><div class="ed-pad"><div class="ed-frame"><div class="ed-stage"></div><div class="ed-ov"></div></div></div></div>
+    <div class="zm" id="zmBar"><button class="zm-b" data-z="out" title="تصغير (Ctrl/⌘ −)">${zIc('M5 12h14')}</button><button class="zm-v num" data-z="100" title="الحجم الحقيقي 100%"></button><button class="zm-b" data-z="in" title="تكبير (Ctrl/⌘ +)">${zIc('M5 12h14M12 5v14')}</button><i class="zm-s"></i><button class="zm-f" data-z="fit" title="ملاءمة الشريحة للمساحة (Ctrl/⌘ 0)">ملاءمة</button></div>`;
+  Ed.wrap = $('.ed-wrap', host); Ed.pad = $('.ed-pad', host); Ed.frame = $('.ed-frame', host); Ed.stage = $('.ed-stage', host); Ed.ov = $('.ed-ov', host);
   new ResizeObserver(() => Ed.fit()).observe(host);
   Ed.frame.addEventListener('pointerdown', onDown);
   Ed.frame.addEventListener('dblclick', onDbl);
+  Ed.frame.addEventListener('pointermove', onHover);
+  Ed.frame.addEventListener('pointerleave', () => { if (Ed.hoverId && !drag) { Ed.hoverId = null; Ed.drawOverlay(); } });
   host.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; Ed.frame.classList.add('drop-on'); });
   host.addEventListener('dragleave', e => { if (!host.contains(e.relatedTarget)) Ed.frame.classList.remove('drop-on'); });
   host.addEventListener('drop', onDrop);
   document.addEventListener('keydown', onKey);
   document.addEventListener('paste', onPaste);
+  // zoom pill
+  $('#zmBar', host).addEventListener('click', e => {
+    const b = e.target.closest('[data-z]'); if (!b) return;
+    const z = b.dataset.z, r = Ed.wrap.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    if (z === 'fit') Ed.setZoom(null);
+    else if (z === '100') Ed.zoomAt(1, cx, cy);
+    else Ed.zoomAt(stepZoom(z === 'in' ? 1 : -1), cx, cy);
+  });
+  // Ctrl/⌘ + wheel and trackpad pinch (Chrome/Edge send it as ctrl+wheel) zoom the artboard, never the browser page
+  window.addEventListener('wheel', e => {
+    if (!(e.ctrlKey || e.metaKey)) return;
+    e.preventDefault();
+    if (!ST.deck || !host.contains(e.target) || innerWidth <= 860) return;
+    const k = Math.exp(-e.deltaY * (e.ctrlKey && Math.abs(e.deltaY) < 30 ? 0.012 : 0.0025));
+    Ed.zoomAt(Ed.scale * k, e.clientX, e.clientY);
+  }, { passive: false });
+  // Safari pinch
+  let g0 = 1;
+  window.addEventListener('gesturestart', e => { e.preventDefault(); g0 = Ed.scale; }, { passive: false });
+  window.addEventListener('gesturechange', e => { e.preventDefault(); if (host.contains(e.target) && innerWidth > 860) Ed.zoomAt(g0 * e.scale, e.clientX, e.clientY); }, { passive: false });
+  window.addEventListener('gestureend', e => e.preventDefault(), { passive: false });
+  // pan: space + drag, or the middle mouse button
+  Ed.wrap.addEventListener('pointerdown', e => {
+    if (!(Ed.space || e.button === 1) || Ed.editing) return;
+    e.preventDefault(); e.stopPropagation();
+    const x0 = e.clientX, y0 = e.clientY, sl = Ed.wrap.scrollLeft, st = Ed.wrap.scrollTop;
+    document.body.classList.add('panning');
+    const mv = ev => { Ed.wrap.scrollLeft = sl - (ev.clientX - x0); Ed.wrap.scrollTop = st - (ev.clientY - y0); };
+    const up = () => { document.body.classList.remove('panning'); removeEventListener('pointermove', mv); removeEventListener('pointerup', up); };
+    addEventListener('pointermove', mv); addEventListener('pointerup', up);
+  }, true);
+  const busy = () => !ST.deck || document.querySelector('.pm-show') || (PM.UI && PM.UI.modalOpen && PM.UI.modalOpen());
+  // Ctrl/⌘ + = − 0 zoom the artboard (also while typing in a slide), never the browser page
+  document.addEventListener('keydown', e => {
+    if (!(e.ctrlKey || e.metaKey) || e.altKey || !['=', '+', '-', '_', '0'].includes(e.key)) return;
+    if (busy() || innerWidth <= 860 || /^(INPUT|TEXTAREA|SELECT)$/.test((e.target && e.target.tagName) || '')) return;
+    e.preventDefault();
+    const r = Ed.wrap.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    if (e.key === '0') Ed.setZoom(null); else Ed.zoomAt(stepZoom(e.key === '-' || e.key === '_' ? -1 : 1), cx, cy);
+  }, true);
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space' && !busy() && !e.repeat && !typing(e) && !(e.target && e.target.closest && e.target.closest('button,a,label'))) { Ed.space = true; document.body.classList.add('can-pan'); e.preventDefault(); }
+  });
+  document.addEventListener('keyup', e => { if (e.code === 'Space') { Ed.space = false; document.body.classList.remove('can-pan'); } });
+  addEventListener('blur', () => { Ed.space = false; document.body.classList.remove('can-pan'); });
 };
-Ed.fit = function () {
-  if (!Ed.host) return;
+function zIc(d) { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="${d}"/></svg>`; }
+const ZSTEPS = [0.25, 0.33, 0.5, 0.67, 0.75, 0.9, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 4];
+function stepZoom(dir) {
+  const s = Ed.scale;
+  if (dir > 0) return ZSTEPS.find(z => z > s * 1.02) || ZSTEPS[ZSTEPS.length - 1];
+  return [...ZSTEPS].reverse().find(z => z < s / 1.02) || ZSTEPS[0];
+}
+function fitScale() {
   const r = Ed.host.getBoundingClientRect();
   const pad = innerWidth < 760 ? 10 : 28;
-  const s = Math.max(0.12, Math.min((r.width - pad * 2) / W, (r.height - pad * 2) / H));
+  return Math.max(0.12, Math.min((r.width - pad * 2) / W, (r.height - pad * 2) / H));
+}
+Ed.fitScale = () => Ed.host ? fitScale() : 1;
+Ed.fit = function () {
+  if (!Ed.host) return;
+  const phone = innerWidth <= 860;
+  if (phone) Ed.zoom = null;
+  const s = Ed.zoom == null ? fitScale() : Ed.zoom;
   Ed.scale = s;
+  const fitting = Ed.zoom == null;
+  Ed.host.classList.toggle('zoomed', !fitting);
+  Ed.pad.style.padding = fitting ? '0' : (innerWidth < 760 ? 10 : 28) + 'px';
   Ed.frame.style.width = W * s + 'px'; Ed.frame.style.height = H * s + 'px';
-  Ed.stage.style.transform = `scale(${s})`; Ed.ov.style.transform = `scale(${s})`;
+  for (const el of [Ed.stage, Ed.ov]) {
+    if (ZOOM_OK) { el.style.zoom = s; el.style.transform = ''; }
+    else el.style.transform = `scale(${s})`;
+  }
+  const v = Ed.host.querySelector('.zm-v'); if (v) v.textContent = Math.round(s * 100) + '%';
+  const f = Ed.host.querySelector('.zm-f'); if (f) f.classList.toggle('on', fitting);
   Ed.drawOverlay();
   PM.emit('fit');
+};
+Ed.setZoom = function (z) {
+  if (z != null) { z = PM.clamp(z, 0.15, 5); if (Math.abs(z - fitScale()) < 0.004) z = null; }
+  Ed.zoom = z; Ed.fit();
+};
+/* zoom keeping the slide point under (cx, cy) where it is */
+Ed.zoomAt = function (z, cx, cy) {
+  if (!Ed.frame) return;
+  const r0 = Ed.frame.getBoundingClientRect();
+  const px = (cx - r0.left) / Ed.scale, py = (cy - r0.top) / Ed.scale;
+  Ed.setZoom(z);
+  const r1 = Ed.frame.getBoundingClientRect();
+  Ed.wrap.scrollLeft += r1.left + px * Ed.scale - cx;
+  Ed.wrap.scrollTop += r1.top + py * Ed.scale - cy;
 };
 /* ---------- render ---------- */
 Ed.render = function () {
@@ -97,11 +185,50 @@ Ed.drawOverlay = function (guides) {
     const b = bounds(sel);
     h += `<div class="sel-group" style="left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px;border-width:${1 * inv}px"></div>`;
   }
+  // a grip tab on every text box (selected or under the mouse): drag it to move the text, click the text to type
+  if (!(drag && drag.kind === 'move' && drag.moved)) {
+    const grips = [];
+    const free = sel.filter(o => !o.pin);
+    // one text selected: its own grip · several selected: one grip for the whole group
+    if (sel.length === 1 && free.length && free[0].t === 'text') grips.push({ id: free[0].id, r: gripRect(free[0]) });
+    else if (sel.length > 1 && free.some(o => o.t === 'text')) { const b = bounds(sel); b.dir = ST.deck && ST.deck.lang === 'en' ? 'ltr' : 'rtl'; grips.push({ id: free.find(o => o.t === 'text').id, r: gripRect(b), group: true }); }
+    const hv = Ed.hoverId && !ST.sel.has(Ed.hoverId) ? objById(Ed.hoverId) : null;
+    if (hv && hv.t === 'text' && selectable(hv)) { h += `<div class="hov-box" style="left:${hv.x}px;top:${hv.y}px;width:${hv.w}px;height:${hv.h}px;border-width:${inv}px"></div>`; if (!hv.pin) grips.push({ id: hv.id, r: gripRect(hv) }); }
+    for (const g of grips) h += `<div class="mvh" data-mv="${g.id}" title="${g.group ? 'اسحب من هنا لتحريك العناصر المحددة' : 'اسحب من هنا لتحريك النص'}" style="left:${g.r.x}px;top:${g.r.y}px;width:${g.r.w}px;height:${g.r.h}px;border-radius:${6 * inv}px">${GRIP}</div>`;
+  }
   if (guides) for (const g of guides) h += g.v ? `<div class="guide" style="left:${g.v}px;top:0;width:${inv}px;height:${H}px"></div>` : `<div class="guide" style="top:${g.h}px;left:0;height:${inv}px;width:${W}px"></div>`;
   if (Ed.marquee) { const m = Ed.marquee; h += `<div class="marq" style="left:${Math.min(m.x0, m.x1)}px;top:${Math.min(m.y0, m.y1)}px;width:${Math.abs(m.x1 - m.x0)}px;height:${Math.abs(m.y1 - m.y0)}px;border-width:${inv}px"></div>`; }
   Ed.ov.innerHTML = h;
   PM.emit('overlay');
 };
+const GRIP = '<svg viewBox="0 0 24 12" fill="currentColor"><circle cx="6" cy="3" r="1.7"/><circle cx="12" cy="3" r="1.7"/><circle cx="18" cy="3" r="1.7"/><circle cx="6" cy="9" r="1.7"/><circle cx="12" cy="9" r="1.7"/><circle cx="18" cy="9" r="1.7"/></svg>';
+const coarse = () => { try { return matchMedia('(pointer:coarse)').matches; } catch (e) { return false; } };
+/* where the grip sits: above the box on the side the text starts (Arabic right, English left), below it when the box touches the top */
+function gripRect(o) {
+  const inv = 1 / Ed.scale, big = coarse();
+  const w = (big ? 46 : 38) * inv, h = (big ? 24 : 18) * inv, gap = 6 * inv, inset = 12 * inv;
+  const rtl = o.dir === 'rtl';
+  let x = rtl ? o.x + o.w - inset - w : o.x + inset;
+  if (o.w < w + inset * 2) x = o.x + (o.w - w) / 2;
+  let y = o.y - gap - h;
+  if (y * Ed.scale < -14) y = o.y + o.h + gap;
+  return { x, y, w, h };
+}
+Ed.gripRect = gripRect;
+function onHover(e) {
+  if (drag || e.pointerType !== 'mouse' || !ST.deck || (PM.Dock && PM.Dock.previewing)) return;
+  if (e.target.closest && e.target.closest('.mvh')) return;
+  let id = null;
+  const cur = Ed.hoverId && objById(Ed.hoverId);
+  if (cur) {
+    // keep the hover while the mouse travels from the text to its grip
+    const g = gripRect(cur), p = pt(e), pad = 4 / Ed.scale;
+    const x0 = Math.min(g.x, cur.x), x1 = Math.max(g.x + g.w, cur.x + cur.w), y0 = Math.min(g.y, cur.y), y1 = Math.max(g.y + g.h, cur.y + cur.h);
+    if (p.x >= x0 - pad && p.x <= x1 + pad && p.y >= y0 - pad && p.y <= y1 + pad) id = cur.id;
+  }
+  if (!id) { const o = hit(e); id = o && o.t === 'text' ? o.id : null; }
+  if (id !== Ed.hoverId) { Ed.hoverId = id; Ed.drawOverlay(); }
+}
 function chartHandles(o, inv) {
   const g = PM.chartGeom(o);
   let h = '';
@@ -129,8 +256,9 @@ let drag = null;
 function onDown(e) {
   if (e.button !== 0 && e.pointerType === 'mouse') return;
   if (Ed.editing) { if (e.target.closest('.pm-text.editing')) return; Ed.endEdit(); }
-  const t = e.target;
+  const t = e.target.closest ? (e.target.closest('.mvh') || e.target) : e.target;
   const p = pt(e);
+  if (t.classList.contains('mvh')) { startGrip(e, t.dataset.mv, p); return; }
   // value handles (charts / bars)
   if (t.classList.contains('vh')) { startValueDrag(e, t, p); return; }
   if (t.classList.contains('hdl')) { startResize(e, t.dataset.h, p); return; }
@@ -146,10 +274,22 @@ function onDown(e) {
   if (Ed.painter) { const f = Ed.painter; Ed.painter = null; document.body.classList.remove('painting'); f(o); return; }
   // image focus mode: drag inside the frame to move the photo
   if (Ed.tool === 'focus' && o.t === 'image' && ST.sel.has(o.id)) { startFocus(e, o, p); return; }
+  const wasOnly = ST.sel.size === 1 && ST.sel.has(o.id);
   if (e.shiftKey || e.ctrlKey || e.metaKey) { if (ST.sel.has(o.id)) ST.sel.delete(o.id); else ST.sel.add(o.id); }
   else if (!ST.sel.has(o.id)) { ST.sel.clear(); ST.sel.add(o.id); }
   const sel = selected();
-  drag = { kind: 'move', p0: p, start: sel.map(s => ({ id: s.id, x: s.x, y: s.y })), moved: false, shift: e.shiftKey };
+  drag = { kind: 'move', p0: p, start: sel.map(s => ({ id: s.id, x: s.x, y: s.y })), moved: false, shift: e.shiftKey, typeIn: wasOnly && o.t === 'text' && !(e.shiftKey || e.ctrlKey || e.metaKey) ? o.id : null };
+  capture(e);
+  Ed.drawOverlay(); PM.emit('sel');
+}
+/* drag by the grip: moves the text (or the whole selection it belongs to) */
+function startGrip(e, id, p) {
+  const o = objById(id); if (!o) return;
+  if (!ST.sel.has(id)) { ST.sel.clear(); ST.sel.add(id); }
+  const sel = selected().filter(x => !x.pin);
+  drag = { kind: 'move', p0: p, start: sel.map(s => ({ id: s.id, x: s.x, y: s.y })), moved: false, grip: true };
+  Ed.hoverId = null;
+  document.body.classList.add('grabbing');
   capture(e);
   Ed.drawOverlay(); PM.emit('sel');
 }
@@ -190,13 +330,18 @@ function onMove(e) {
 function onUp(e) {
   Ed.frame.onpointermove = null; Ed.frame.onpointerup = null;
   const d = drag; drag = null;
+  document.body.classList.remove('grabbing');
   if (!d) return;
   if (d.kind === 'marq') { Ed.marquee = null; Ed.drawOverlay(); PM.emit('sel'); return; }
   if (d.kind === 'move' && d.moved) { slide().edited = true; PM.commit('move'); Ed.drawOverlay(); PM.emit('change'); return; }
   if (d.kind === 'move' && !d.moved) {
+    if (d.grip) { Ed.drawOverlay(); return; }
+    // a click on text that is already selected puts the cursor there to type
+    if (d.typeIn) { const o = hit(e); if (o && o.id === d.typeIn) { Ed.startEdit(o, false, { x: e.clientX, y: e.clientY }); return; } }
     // clicking an already-selected item in a group picks just that one
     const o = hit(e);
     if (o && !(e.shiftKey || e.ctrlKey || e.metaKey) && ST.sel.size > 1 && d.start.length > 1) { ST.sel.clear(); ST.sel.add(o.id); Ed.drawOverlay(); PM.emit('sel'); }
+    else Ed.drawOverlay();
     return;
   }
   if (d.kind === 'resize' || d.kind === 'focus') { slide().edited = true; PM.commit(d.kind); Ed.render(); PM.emit('change'); return; }
@@ -348,12 +493,13 @@ function setVal(path, v) {
 function onDbl(e) {
   const o = hit(e);
   if (!o) return;
+  if (Ed.editing && Ed.editing.id === o.id) return;
   if (o.t === 'text') return Ed.startEdit(o);
   if (o.t === 'chart' || o.t === 'table') return PM.emit('editdata', o);
   if (o.t === 'image') return PM.emit('replaceimage', o);
   if (o.t === 'icon') return PM.emit('changeicon', o);
 }
-Ed.startEdit = function (o, selectAll) {
+Ed.startEdit = function (o, selectAll, at) {
   if (Ed.editing) Ed.endEdit();
   ST.sel.clear(); ST.sel.add(o.id);
   const el = elFor(o.id); if (!el) return;
@@ -367,6 +513,7 @@ Ed.startEdit = function (o, selectAll) {
   const r = document.createRange();
   if (selectAll) r.selectNodeContents(inner); else { r.selectNodeContents(inner); r.collapse(false); }
   const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+  if (at && document.caretRangeFromPoint) { const c = document.caretRangeFromPoint(at.x, at.y); if (c && inner.contains(c.startContainer)) { s.removeAllRanges(); s.addRange(c); } }
   inner.addEventListener('input', growWhileTyping);
   inner.addEventListener('keydown', editKeys);
   inner.addEventListener('paste', plainPaste);

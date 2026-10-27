@@ -23,7 +23,7 @@ const bgNavy = o => o.push(R(0, 0, W, H, K.NAVY, { role: 'bg', lock: true, name:
 const bgTone = (c, o) => o.push(R(0, 0, W, H, c.tone.bg, { role: 'bg', lock: true, name: 'Background' }));
 const bigLogo = (o, col) => o.push(PM.Logo(44, 36, 112, col || K.WHITE));
 const smallLogo = (o, col) => o.push(PM.Logo(19, 13, 58, col || K.WHITE));
-const edgeBar = (c, o) => o.push(R(0, 84, 15, 399, c.dark ? K.SKY : K.BLUE, { role: 'chrome', lock: true, name: 'Edge bar' }));
+const edgeBar = () => {}; // v2.3: edge bar removed
 const topVeil = (o, h = 130, a = 60) => o.push(PM.Veil(0, 0, W, h, K.NAVY, 'down', a, 0));
 const photo = (c, sp, o, x, y, w, h, i = 0, extra = {}) => PM.photoBlock(c, sp, o, x, y, w, h, Object.assign({ i }, extra));
 /* the measured height of paragraphs at a width (clamped) */
