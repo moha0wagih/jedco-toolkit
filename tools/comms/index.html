@@ -1527,7 +1527,7 @@ function dfCheck(o) {
   if (!Number.isInteger(o.version) || o.version < 1) return 'رقم إصدار الملف غير صحيح.';
   if (o.version > DF.version) return `هذا الملف محفوظ بإصدار أحدث من الأداة (إصدار الملف ${o.version}). حدّث الأداة ثم افتحه مرة ثانية.`;
   if (!Array.isArray(o.boards) || !o.boards.length) return 'الملف ما فيه أي تصميم (لوحات).';
-  if (o.boards.some(b => !b || typeof b.html !== 'string' || !b.html.includes('class="hdr"'))) return 'بيانات التصميم داخل الملف ناقصة أو تالفة.';
+  if (o.boards.some(b => !b || typeof b.html !== 'string' || !/class="hdr[\s"]/.test(b.html))) return 'بيانات التصميم داخل الملف ناقصة أو تالفة.';
   if (o.assets != null && (typeof o.assets !== 'object' || Object.values(o.assets).some(a => !a || !isImgData(a.data)))) return 'الصور داخل الملف تالفة أو بصيغة غير مدعومة.';
   return '';
 }
@@ -1551,7 +1551,7 @@ function dfApply(o) {
   const ai = Math.min(Math.max(0, o.active | 0), docs.length - 1); if (ai) { activate(ai, true); scrollToBoard(ai); }
   toast(miss ? 'تم فتح التصميم، لكن بعض الصور غير موجودة داخل الملف' : `تم فتح ملف التصميم${docs.length > 1 ? ` (${docs.length} لوحات)` : ''}، تقدر تكمل التعديل`);
 }
-function openLegacy(o) { if (o.imgs) Object.entries(o.imgs).forEach(([k, v]) => { S.imgs[k] = v; IDB.put(k, v); }); if (o.deps) { S.deps = o.deps; store('deps', JSON.stringify(S.deps)); } if (o.locs) { S.locs = o.locs; store('locs', JSON.stringify(S.locs)); } if (o.docs && o.docs.length) { S.docs = o.docs; S.active = -1; activate(Math.min(o.active || 0, o.docs.length - 1), true); } else { S.docs = [{ html: o.html, photo: o.photo, extra: o.extra }]; S.active = -1; activate(0, true); } toast('تم فتح المشروع'); }
+function openLegacy(o) { S.libId = null; if (o.imgs) Object.entries(o.imgs).forEach(([k, v]) => { S.imgs[k] = v; IDB.put(k, v); }); if (o.deps) { S.deps = o.deps; store('deps', JSON.stringify(S.deps)); } if (o.locs) { S.locs = o.locs; store('locs', JSON.stringify(S.locs)); } if (o.docs && o.docs.length) { S.docs = o.docs; S.active = -1; activate(Math.min(o.active || 0, o.docs.length - 1), true); } else { S.docs = [{ html: o.html, photo: o.photo, extra: o.extra }]; S.active = -1; activate(0, true); } toast('تم فتح المشروع'); }
 function openDesignText(txt, name, confirm) {
   const bad = s => dfMsg('تعذّر فتح الملف', s, name);
   let o; try { o = JSON.parse(txt); } catch (e) { return bad('الملف ليس ملف تصميم صالح، أو أنه تالف أو ناقص.'); }
