@@ -376,7 +376,7 @@ body.phone #homeBtn svg{width:16px;height:16px}
     if(!f){
       f=document.createElement('iframe');f.title=BY[id].ar;f.dataset.tool=id;
       f.setAttribute('allow','clipboard-read; clipboard-write; fullscreen');
-      f.src='tools/'+id+'/index.html?v=20261028#jedhub&os='+os;
+      f.src='tools/'+id+'/index.html?v=20261028b#jedhub&os='+os;
       $('#stage').appendChild(f);OPEN[id]=f;f._os=os;
     }
     [].forEach.call(document.querySelectorAll('#stage iframe'),function(x){x.classList.toggle('on',x===f)});

@@ -99,4 +99,16 @@
     catch (e) { console.error(e); toast('تعذّر تجهيز الرسالة'); }
   }
   window.v2Share = share;
+
+  /* any open menu stays fully on screen (the export menus sit at the far edge of the bar) */
+  function keepIn(m) {
+    if (!m || !m.offsetParent) return;
+    m.style.transform = '';
+    const r = m.getBoundingClientRect(), pad = 8; let dx = 0;
+    if (r.left < pad) dx = pad - r.left; else if (r.right > innerWidth - pad) dx = innerWidth - pad - r.right;
+    if (dx) m.style.transform = `translateX(${Math.round(dx)}px)`;
+  }
+  const watch = () => document.querySelectorAll('#expMenu,#fileMenu,#lxExpM,#lxFileM').forEach(m => { if (m._kp) return; m._kp = true; new MutationObserver(() => keepIn(m)).observe(m, { attributes: true, attributeFilter: ['style', 'class'] }); });
+  watch(); new MutationObserver(watch).observe(document.body, { childList: true, subtree: true });
+  addEventListener('resize', () => document.querySelectorAll('#expMenu,#fileMenu,#lxExpM,#lxFileM').forEach(keepIn));
 })();
