@@ -118,7 +118,17 @@ async function importFile(f) {
   UI.progress('جاري قراءة الملف…', f.name);
   await new Promise(r => setTimeout(r, 30));
   try {
-    const opt = { lang, grey: segVal('stBg') === 'grey', dark: segVal('stTone') === 'dark', keep: segVal('stRead') === 'keep' };
+    const opt = { lang, grey: segVal('stBg') === 'grey', dark: segVal('stTone') === 'dark', keep: segVal('stRead') === 'keep' || segVal('stRead') === 'asis' };
+    if ((segVal('stRead') === 'asis' || UI.asisOnce) && /\.pptx$/i.test(f.name || '')) {
+      UI.asisOnce = false;
+      const r = await PM.importAsIs(f, { onProgress: (i, n) => UI.progress('أفتح العرض كما هو…', `الشريحة ${i + 1} من ${n}`) });
+      UI.progress(false);
+      openDeck(r.deck, { built: true });
+      UI.toast(`فتحت ${r.deck.slides.length} شريحة كما هي بالضبط. عدّل عليها مباشرة، أو اضغط «توزيع ذكي» لأي شريحة تبي تعيد تصميمها`, 5200);
+      if (r.report.warnings.length) setTimeout(() => UI.toast(r.report.warnings.map(w => w.msg).join(' · '), 5200), 5400);
+      return;
+    }
+    UI.asisOnce = false;
     const r = await PM.importFile(f, opt);
     if (r.report.kind === 'project') { UI.progress(false); openDeck(r.deck, { built: true }); UI.toast('فتحت المشروع'); return; }
     UI.progress('أحلل المحتوى وأوزّع التصاميم…', `${r.deck.slides.length} شريحة`);
@@ -157,8 +167,9 @@ function bindTop() {
   $('#deckName').oninput = e => { if (deck()) { deck().name = e.target.value; PM.autosave(); } };
   segBind('segBg', v => { deck().grey = v === 'grey'; relayoutAll('bg'); });
   segBind('segTone', v => { deck().dark = v === 'dark'; deck().slides.forEach(s => s.tone = null); relayoutAll('tone'); });
-  $('#bExport').onclick = exportPptx;
-  $('#bPdf').onclick = async () => { if (!deck()) return; Ed.endEdit(); UI.progress('أجهّز الصور…'); await PM.ensurePhotos(deck()); UI.progress(false); PM.printPdf(deck()); };
+  const me = $('#mExport');
+  $('#bExport').onclick = e => { e.stopPropagation(); $$('.menu').forEach(m => { if (m !== me) m.classList.add('hide'); }); me.classList.toggle('hide'); };
+  me.onclick = e => { const b = e.target.closest('button[data-x]'); if (!b) return; me.classList.add('hide'); exportAs(b.dataset.x); };
   $('#bShow').onclick = async () => { if (!deck()) return; Ed.endEdit(); UI.progress('أجهّز الصور…'); await PM.ensurePhotos(deck()); UI.progress(false); PM.present(deck(), ST.cur); };
   $('#bCheck').onclick = checkDeck;
   $('#bCopilot').onclick = copilot;
@@ -172,6 +183,7 @@ function bindTop() {
 function relayoutAll(label) {
   const d = deck();
   d.slides.forEach((s, i) => {
+    if (s.asis) return;   // slides opened «كما هو» keep their design
     const L = PM.layoutById(s.layout);
     const tone = (s.tone || (d.dark ? 'dark' : 'light'));
     if (L && L.tones.includes(tone)) PM.applyLayout(d, i, L); else PM.autoSlide(d, i);
@@ -181,6 +193,8 @@ function relayoutAll(label) {
 async function fileAction(a) {
   if (a === 'pptx') return exportPptx();
   if (a === 'import') { const i = document.createElement('input'); i.type = 'file'; i.accept = '.pptx,.docx,.json'; i.onchange = () => i.files[0] && importFile(i.files[0]); i.click(); }
+  if (a === 'asis') { const i = document.createElement('input'); i.type = 'file'; i.accept = '.pptx'; i.onchange = () => { if (!i.files[0]) return; UI.asisOnce = true; importFile(i.files[0]); }; i.click(); }
+  if (a === 'pdf' || a === 'pdfMail' || a === 'pptxMail') return exportAs(a);
   if (a === 'new') { showStart(); }
   if (a === 'home') { showStart(); }
   if (a === 'saveProj') saveProject();
@@ -196,6 +210,35 @@ function saveProject() {
   PM.autosave();
   UI.toast('حفظت ملف المشروع — افتحه من «ملف ← فتح ملف مشروع»');
 }
+/* ---------- v2.0 export: PDF · PowerPoint · each one straight into a new Outlook message ---------- */
+async function pdfBlob() {
+  Ed.endEdit();
+  UI.progress('أجهّز ملف PDF…');
+  try { const b = await PM.pdfBlob(deck(), (i, n) => UI.progress('أجهّز ملف PDF…', `الشريحة ${i + 1} من ${n}`)); UI.progress(false); return b; }
+  catch (e) { console.error(e); UI.progress(false); UI.toast('ما قدرت أجهّز PDF: ' + (e.message || e), 5000); return null; }
+}
+async function pptxBlob() {
+  Ed.endEdit();
+  UI.progress('أجهّز ملف PowerPoint…');
+  try { const bytes = await PM.exportPptx(deck(), (i, n) => UI.progress('أجهّز ملف PowerPoint…', `الشريحة ${i + 1} من ${n}`)); UI.progress(false); return new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' }); }
+  catch (e) { console.error(e); UI.progress(false); UI.toast('ما قدرت أصدّر: ' + (e.message || e), 5000); return null; }
+}
+async function exportAs(kind) {
+  if (!deck()) return;
+  if (kind === 'pptx') return exportPptx();
+  if (kind === 'pdf') { const b = await pdfBlob(); if (!b) return; PM.download(b, fileName('pdf'), 'application/pdf'); UI.toast('حفظت ملف PDF ✓'); return; }
+  if (kind === 'pdfMail' || kind === 'pptxMail') {
+    if (!window.JEDMAIL) { UI.toast('ميزة Outlook ما انحملت، افتح الأداة من «أدوات مطارات جدة»', 4200); return; }
+    const pdf = kind === 'pdfMail';
+    const b = pdf ? await pdfBlob() : await pptxBlob(); if (!b) return;
+    const name = fileName(pdf ? 'pdf' : 'pptx');
+    const title = (deck().name || (deck().slides[0] && PM.plain(deck().slides[0].spec.title)) || 'Presentation').trim();
+    const body = `Hi,\n\nPlease find attached the presentation "${name}".\n\nBest regards,`;
+    try { await JEDMAIL.draft({ subject: `Presentation: ${title}`, body, fileName: name.replace(/\.[a-z]+$/i, ''), files: [{ name, blob: b }] }); }
+    catch (e) { console.error(e); UI.toast('تعذّر تجهيز رسالة Outlook', 4200); }
+  }
+}
+UI.exportAs = exportAs;
 async function exportPptx() {
   if (!deck()) return;
   Ed.endEdit();
@@ -459,7 +502,7 @@ function applyStyle(o) {
       const f = fitOn(L, i, tone);
       if (!f.ok) { s.tone = before; skipped.push(i + 1); continue; }
       s.tone = f.tone; PM.applyLayout(d, i, L);
-    } else if (o.tone && (before || (d.dark ? 'dark' : 'light')) !== tone) {
+    } else if (o.tone && !s.asis && (before || (d.dark ? 'dark' : 'light')) !== tone) {
       const L0 = PM.layoutById(s.layout);
       if (L0 && L0.tones.includes(tone)) PM.applyLayout(d, i, L0); else PM.autoSlide(d, i);
     }

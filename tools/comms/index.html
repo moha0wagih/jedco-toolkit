@@ -3210,7 +3210,7 @@ $('#bDev').onclick = () => setDevice(isPhone() ? 'desktop' : 'phone', true);
 
 /* ---------------- boot ---------------- */
 $('#brandLogo').innerHTML = ASSETS.logo;
-const APP_VER = 'v1.0 Beta', APP_BUILD = 'build 28';
+const APP_VER = 'v2.0', APP_BUILD = 'build 29';
 $('#sig').innerHTML = `<span>Designed by Mohammed Wagih · ${new Date().getFullYear()} · <b class="beta">${APP_VER}</b></span><button id="bReport" title="أرسل ملاحظة أو مشكلة لمحمد وجيه">الإبلاغ عن مشكلة</button>`;
 $('#bReport').onclick = () => {
   const ua = navigator.userAgent; const br = /Edg\//.test(ua) ? 'Edge' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : /Firefox\//.test(ua) ? 'Firefox' : 'Other';
@@ -3241,9 +3241,9 @@ renderIconGrid(null);
   const bs = load('boards');
   if (bs) { try { const o = JSON.parse(bs); S.docs = o.docs.map(d => ({ html: d.html, extra: d.extra, photo: d.photo === '@H' ? ASSETS.header : d.photo })); S.active = Math.min(o.active || 0, S.docs.length - 1); const d = S.docs[S.active]; setPage(d.html, d.photo, { extra: d.extra }); ok = true; } catch (e) { S.docs = []; } }
   if (!ok && saved) { try { const o = JSON.parse(saved); setPage(o.h, load('photo') || ASSETS.header, { extra: o.x }); ok = true; } catch (e) { } }
-  if (!ok) setPage(docSample());
+  if (!ok) setPage(docBlank());
   if (!S.docs.length) { S.docs = [curDoc()]; S.active = 0; }
-  fit(); renderStack(); setTimeout(() => { if (!ok) rebalance(); else snap(true); }, 300);
+  fit(); renderStack(); setTimeout(() => { snap(true); }, 300);
 })();
 /* ================= free selection: multi-select, marquee, groups, free move, align (Figma / PowerPoint style) =================
    Everything is stored on the design itself, so undo/redo, autosave, «إعلاناتي» and .jedco.json keep it:
@@ -4250,6 +4250,59 @@ body.phone.lx-on #lxLay{padding-bottom:0}
 body.phone #fileMenu.lxMenu button{padding:10px 12px;font-size:14.5px}
 body.phone #fileMenu.lxMenu{max-height:calc(100dvh - 170px);z-index:95}
 body.phone #fileMenu.lxMenu kbd{display:none}
+
+/* ---------- v2.0 · start page: nothing open, one + to begin ---------- */
+#v2Start{position:fixed;inset:0;z-index:97;display:none;flex-direction:column;background:var(--ui-bg);direction:rtl}
+#v2Start.on{display:flex}
+#v2Start .v2h{flex:none;height:56px;display:flex;align-items:center;gap:10px;padding:0 18px;background:var(--navy);color:#fff;font-weight:700;font-size:16px}
+#v2Start .v2h .lg{display:block;width:60px;height:20px}
+#v2Start .v2h .lg svg{width:100%;height:100%;display:block}
+#v2Start .v2b{flex:1;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px 60px;gap:26px}
+#v2Start .v2plus{width:220px;height:220px;border-radius:28px;border:2px dashed #b9c6d8;background:#fff;color:var(--ui-acc);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;font:700 17px Tajawal,sans-serif;transition:border-color .2s,transform .2s,background .2s}
+#v2Start .v2plus:hover{border-color:var(--ui-acc);background:#f7faff}
+#v2Start .v2plus:active{transform:scale(.98)}
+#v2Start .v2plus svg{width:64px;height:64px;stroke-width:1.6}
+#v2Start .v2plus span{color:var(--ui-text)}
+#v2Start .v2new{display:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:min(760px,100%)}
+#v2Start.pick .v2plus{display:none}
+#v2Start.pick .v2new{display:grid}
+#v2Start .v2c{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:right;padding:18px 18px 16px;border-radius:18px;border:1px solid var(--ui-line);background:#fff;cursor:pointer;font-family:Tajawal,sans-serif;color:var(--ui-text);transition:border-color .2s,background .2s;animation:v2in .28s ease-out both}
+#v2Start .v2c:hover{border-color:var(--ui-acc);background:#f7faff}
+#v2Start .v2c svg{width:28px;height:28px;color:var(--ui-acc);stroke-width:1.7}
+#v2Start .v2c span{display:flex;flex-direction:column;gap:4px}
+#v2Start .v2c b{font-size:16px;font-weight:700}
+#v2Start .v2c small{font-size:13px;line-height:1.6;color:var(--ui-sub)}
+#v2Start .v2c:nth-child(2){animation-delay:.03s}#v2Start .v2c:nth-child(3){animation-delay:.06s}#v2Start .v2c:nth-child(4){animation-delay:.09s}#v2Start .v2c:nth-child(5){animation-delay:.12s}
+@keyframes v2in{from{opacity:0;transform:translateY(6px)}}
+#v2Start .v2back{display:none;border:0;background:none;color:var(--ui-sub);font:600 14px Tajawal,sans-serif;cursor:pointer;padding:6px 10px;border-radius:8px}
+#v2Start .v2back:hover{color:var(--ui-acc);background:#e4eaf3}
+#v2Start.pick .v2back{display:inline-flex}
+#v2Start .v2row{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+#v2Start .v2o{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 16px;border-radius:12px;border:1px solid var(--ui-line);background:#fff;color:var(--ui-text);font:600 14px Tajawal,sans-serif;cursor:pointer}
+#v2Start .v2o:hover{border-color:var(--ui-acc);color:var(--ui-acc)}
+#v2Start .v2o svg{width:18px;height:18px;color:var(--ui-acc);stroke-width:1.8}
+#v2Start .v2o.cont{background:var(--navy);border-color:var(--navy);color:#fff}
+#v2Start .v2o.cont svg{color:#62B6F3}
+#v2Start .v2o.cont:hover{background:var(--blue);border-color:var(--blue);color:#fff}
+#v2Start .v2o bdi{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:400;opacity:.85}
+#v2Start .v2t{font-size:12.5px;font-weight:700;color:var(--ui-sub);text-align:center}
+#v2Start .v2sig{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;white-space:nowrap;font-family:FSI,sans-serif;font-size:11px;color:#a3adbb;direction:ltr}
+#v2Start .v2sig b{font-weight:400;color:#7d8899;border:1px solid #d5dbe4;border-radius:5px;padding:0 4px}
+body.phone #v2Start .v2h{height:52px;font-size:15px}
+body.phone #v2Start .v2b{justify-content:flex-start;padding-top:40px}
+body.phone #v2Start .v2plus{width:180px;height:180px}
+body.phone #v2Start .v2new{grid-template-columns:minmax(0,1fr)}
+body.phone #v2Start .v2c{flex-direction:row;align-items:center;gap:14px;padding:14px 16px}
+body.phone #v2Start .v2c span{display:flex;flex-direction:column;gap:2px}
+body.phone #v2Start .v2sig{position:static;transform:none;margin:10px auto 0}
+/* the File menu's start-page entry */
+#fileMenu.lxMenu button[data-v2]{color:var(--ui-sub)}
+/* export menu: the share entry */
+#expMenu hr{border:0;border-top:1px solid var(--ui-line);margin:5px 4px}
+#expMenu button.v2share{display:flex;align-items:flex-start;gap:10px}
+#expMenu button.v2share svg{flex:none;width:18px;height:18px;margin-top:2px;color:#004EAA}
+#expMenu button.v2share b{display:block;font-weight:700}
+#expMenu button.v2share small{display:block;font-size:11.5px;color:var(--ui-sub);margin-top:2px;white-space:normal}
 
 </style>
 <script id="lxScript">
@@ -5559,10 +5612,10 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     const fm = q('fileMenu'); if (fm) {
       const it = (attr, ic, txt, kb) => `<button ${attr}>${IC(ic, 1.9)}<span>${txt}</span>${kb ? `<kbd>${kb}</kbd>` : ''}</button>`;
       fm.classList.add('lxMenu');
-      fm.innerHTML = `<div class="mh">جديد</div>${it('data-act="blank"', 'file-plus', 'إعلان جديد')}${it('data-act="welcome"', 'user', 'رسالة ترحيب')}${it('data-lx="lxNew"', 'layers', 'تصميم حر بالطبقات…')}${it('data-act="newBoard"', 'copy-plus', 'لوحة إضافية في نفس الملف')}${it('data-act="sample"', 'layout-template', 'نموذج جاهز للتجربة')}
+      fm.innerHTML = `<div class="mh">جديد</div>${it('data-act="blank"', 'file-plus', 'إعلان جديد')}${it('data-act="welcome"', 'user', 'رسالة ترحيب')}${it('data-lx="lxNew"', 'layers', 'تصميم حر بالطبقات…')}
         <hr><div class="mh">فتح</div>${it('data-act="lib"', 'folder', 'إعلاناتي')}${it('data-lx="lxLib"', 'layers-3', 'تصاميمي بالطبقات')}${it('data-act="open"', 'folder-open', 'فتح ملف من جهازك…')}
-        <hr><div class="mh">استيراد</div>${it('data-act="word"', 'file-text', 'ملف وورد…')}${it('data-act="paste"', 'clipboard-paste', 'لصق نص…')}
-        <hr><div class="mh">حفظ</div>${it('data-act="libSave"', 'save', 'حفظ في «إعلاناتي»', K('S'))}${it('data-act="save"', 'file-json', 'حفظ ملف للمشاركة')}`;
+        <hr><div class="mh">حفظ</div>${it('data-act="libSave"', 'save', 'حفظ في «إعلاناتي»', K('S'))}${it('data-act="save"', 'download', 'حفظ نسخة على جهازك')}
+        <hr>${it('data-v2="start"', 'house', 'صفحة البداية')}`;
       fm.addEventListener('click', e => { const b = e.target.closest('[data-lx]'); if (!b) return; fm.style.display = 'none'; const k = b.dataset.lx; if (k === 'lxNew') newModal(); if (k === 'lxLib') libModal(); });
     }
     // free designs (guides / infographics) now open fully decomposed into layers
@@ -5573,13 +5626,121 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     if (typeof openDesignText === 'function') { const orig = openDesignText; openDesignText = function (txt, name, confirm) { try { const o = JSON.parse(txt); if (o && o.app === 'jedco-layers') { openObj(o); return; } if (o && o.app === 'jedco-free-design') { fromFree(o); return; } } catch (e) { } return orig.apply(this, arguments); }; }
     // phone: selecting opens the properties sheet
     // back from the toolkit home / a reload: reopen the design you were working on
-    (async () => { let id = null; try { id = localStorage.getItem('jedLX_open'); } catch (e) { } if (id) { await wait(400); const rec = await loadRec(id); if (rec && rec.data && !L.on) { const sp = document.getElementById('splash'); if (sp && sp.classList.contains('on')) { await new Promise(res => { const t = setInterval(() => { if (!document.getElementById('splash') || !document.getElementById('splash').classList.contains('on')) { clearInterval(t); res(); } }, 300); }); } openObj(rec.data, { libId: rec.id, thumb: rec.thumb }); const k = getLinks().find(x => x.lx === rec.id); L.linkedBoard = k || null; say('رجعتك لتصميم الطبقات اللي كنت شغال عليه — كل تعديلاتك موجودة'); } } updLayersBtn(); })();
+    // back from a reload: the start page offers to reopen the layers design you were working on
+    async function resumeLX() { let id = null; try { id = localStorage.getItem('jedLX_open'); } catch (e) { } if (!id) return false; const rec = await loadRec(id); if (!rec || !rec.data || L.on) return false; openObj(rec.data, { libId: rec.id, thumb: rec.thumb }); const k = getLinks().find(x => x.lx === rec.id); L.linkedBoard = k || null; say('رجعتك لتصميم الطبقات اللي كنت شغال عليه، كل تعديلاتك موجودة'); return true; }
+    async function resumeInfo() { let id = null; try { id = localStorage.getItem('jedLX_open'); } catch (e) { } if (!id) return null; try { const rec = await loadRec(id); return rec && rec.data ? { id: rec.id, name: rec.name || rec.title || (rec.data && rec.data.name) || 'تصميم بالطبقات', thumb: rec.thumb || null } : null; } catch (e) { return null; } }
+    updLayersBtn();
     if (typeof activate === 'function') { const _act = activate; activate = function () { const r = _act.apply(this, arguments); setTimeout(updLayersBtn, 300); return r; }; }
     let ubT = 0; const ub = () => { if (L.on) return; clearTimeout(ubT); ubT = setTimeout(updLayersBtn, 900); };
     document.addEventListener('pointerup', ub, true); document.addEventListener('keyup', ub, true);
-    window.__lxApi = { fromBoard, fromFree, openObj, newModal, libModal, exitLX, get state() { return L; }, paint, setSel, groupSel, ungroupSel, flattenAll, exportPNG, get, all, aabb, topSel, undo, redo, alignSel, order, addText, addShape, addIcon, addLogo, decompose, fileObj, applyNum, renderProps, renderPanel };
+    window.__lxApi = { resumeLX, resumeInfo, fromBoard, fromFree, openObj, newModal, libModal, exitLX, get state() { return L; }, paint, setSel, groupSel, ungroupSel, flattenAll, exportPNG, get, all, aabb, topSel, undo, redo, alignSel, order, addText, addShape, addIcon, addLogo, decompose, fileObj, applyNum, renderProps, renderPanel };
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hook); else hook();
+})();
+
+</script>
+<script id="v2Script">
+/* ==========================================================================
+   مصمم التواصل الداخلي · v2.0
+   1) start page: nothing opens by itself — an empty page with one «+»
+   2) «مشاركة عبر Outlook» under the export menu: a new Outlook message with
+      the editable design file (.jedco.json) attached and a short English text
+   ========================================================================== */
+(function () {
+  'use strict';
+  const q = id => document.getElementById(id);
+  const IC = (n, sw) => svgIcon(n, sw || 1.8);
+  const hasWork = () => { try { return !!(localStorage.getItem(KEY + 'boards') || localStorage.getItem(KEY + 'doc')); } catch (e) { return false; } };
+
+  /* ---------------- start page ---------------- */
+  const st = document.createElement('div'); st.id = 'v2Start'; st.setAttribute('role', 'dialog'); st.setAttribute('aria-label', 'صفحة البداية');
+  st.innerHTML = `<div class="v2h"><span class="lg">${ASSETS.logo}</span>مصمم التواصل الداخلي</div>
+  <div class="v2b">
+    <button class="v2plus" type="button" data-v="plus" aria-label="تصميم جديد">${IC('plus', 1.6)}<span>تصميم جديد</span></button>
+    <div class="v2new" role="group" aria-label="ايش تبي تصمم؟">
+      <button class="v2c" data-v="blank">${IC('file-plus')}<span><b>إعلان جديد</b><small>القالب الرسمي للإعلانات الداخلية.</small></span></button>
+      <button class="v2c" data-v="welcome">${IC('user')}<span><b>رسالة ترحيب</b><small>ترحيب بموظف جديد، بصورته واسمه ومسماه.</small></span></button>
+      <button class="v2c" data-v="free">${IC('layers')}<span><b>تصميم حر بالطبقات</b><small>دليل أو إنفوجرافيك بمقاس تختاره.</small></span></button>
+      <button class="v2c" data-v="word">${IC('file-text')}<span><b>من ملف وورد</b><small>ارفع الملف ويتوزع على القالب تلقائياً.</small></span></button>
+      <button class="v2c" data-v="paste">${IC('clipboard-paste')}<span><b>من نص منسوخ</b><small>الصق نص الإيميل أو الملف ويتوزع.</small></span></button>
+      <button class="v2c" data-v="open">${IC('folder-open')}<span><b>فتح ملف تصميم</b><small>ملف <bdi>.jedco.json</bdi> من جهازك أو من زميلك.</small></span></button>
+    </div>
+    <button class="v2back" data-v="back" type="button">${IC('arrow-right')}رجوع</button>
+    <div class="v2t">أو افتح من شغلك المحفوظ</div>
+    <div class="v2row" id="v2Row"></div>
+  </div>
+  <div class="v2sig">Designed by Mohammed Wagih · ${new Date().getFullYear()} · <b>${APP_VER}</b></div>`;
+  document.body.appendChild(st);
+
+  async function paintRow() {
+    const row = q('v2Row'); let h = '';
+    if (hasWork()) { let t = ''; try { t = docTitle(S.docs[S.active] || S.docs[0]); } catch (e) { } h += `<button class="v2o cont" data-v="cont">${IC('history')}كمّل آخر إعلان<bdi>${esc(t)}</bdi></button>`; }
+    const lx = window.__lxApi && window.__lxApi.resumeInfo ? await window.__lxApi.resumeInfo() : null;
+    if (lx) h += `<button class="v2o cont" data-v="contLx">${IC('layers')}كمّل تصميم الطبقات<bdi>${esc(lx.name)}</bdi></button>`;
+    h += `<button class="v2o" data-v="lib">${IC('folder')}إعلاناتي</button><button class="v2o" data-v="lxLib">${IC('layers-3')}تصاميمي بالطبقات</button>`;
+    row.innerHTML = h;
+  }
+  function show() { st.classList.remove('pick'); st.classList.add('on'); paintRow(); try { q('fileMenu').style.display = 'none'; q('expMenu').style.display = 'none'; } catch (e) { } try { const wm = q('wordModal'); if (wm && getComputedStyle(wm).display !== 'none') q('wmClose').click(); } catch (e) { } try { libClose(); } catch (e) { } try { if (typeof qaClose === 'function') qaClose(); } catch (e) { } }
+  function hide() { st.classList.remove('on', 'pick'); requestAnimationFrame(() => { try { fit(); } catch (e) { } }); }
+  // work that was left open (not saved in «إعلاناتي») is kept there before something new starts
+  const norm = h => String(h || '').replace(/\s+/g, '').replace(/contenteditable="[^"]*"/g, '');
+  function pristine() { try { const t = [docBlank(), docSample(), docWelcome()].map(norm); return S.docs.every(d => t.includes(norm(d.html))); } catch (e) { return false; } }
+  async function secure() {
+    try { commitActive(); if (hasWork() && libDirty() && !pristine()) { const ok = await libSave(true); if (ok) toast('حفظت شغلك السابق في «إعلاناتي»'); } } catch (e) { }
+  }
+  // a clean, empty announcement under the start page (the page stays up while a picker is open)
+  async function blankBase() { await secure(); st._quiet = true; try { S.photoSrc = ASSETS.header; loadWorkspace([{ html: docBlank(), photo: ASSETS.header, extra: 0 }], null); } finally { st._quiet = false; } }
+  st.addEventListener('click', async e => {
+    const b = e.target.closest('[data-v]'); if (!b) return; const v = b.dataset.v;
+    if (v === 'plus') { st.classList.add('pick'); setTimeout(() => { const c = st.querySelector('.v2c'); if (c) c.focus(); }, 30); return; }
+    if (v === 'back') { st.classList.remove('pick'); return; }
+    if (v === 'cont') { hide(); return; }
+    if (v === 'contLx') { const ok = await window.__lxApi.resumeLX(); if (ok) hide(); else { toast('ما لقيت تصميم الطبقات'); paintRow(); } return; }
+    if (v === 'blank' || v === 'welcome') { await secure(); hide(); newWorkspace(v); return; }
+    if (v === 'free') { await blankBase(); window.__lxApi.newModal(); return; }        // the layers screen covers the page once a size is picked
+    if (v === 'lxLib') { window.__lxApi.libModal(); return; }
+    if (v === 'lib') { await blankBase(); hide(); libOpen(); return; }
+    if (v === 'word') { q('fileWord').click(); return; }
+    if (v === 'paste') { await blankBase(); openPaste('الصق نص الإعلان وأنا أوزعه على التصميم.'); return; }
+    if (v === 'open') { q('fileProj').click(); return; }
+  });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && st.classList.contains('on') && st.classList.contains('pick')) st.classList.remove('pick'); });
+  // a file picked from the start page: start from a clean page, then the tool fills it
+  q('fileWord').addEventListener('change', e => { if (st.classList.contains('on') && e.target.files && e.target.files.length) { blankBase().then(hide); } }, true);
+  q('fileProj').addEventListener('change', e => { if (st.classList.contains('on') && e.target.files && e.target.files.length) secure().then(hide); }, true);
+  // anything that opens a design hides the start page
+  const _lw = loadWorkspace; loadWorkspace = function () { const r = _lw.apply(this, arguments); if (!st._quiet) hide(); return r; };
+  new MutationObserver(() => { if (document.body.classList.contains('lx-on')) hide(); }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  q('wmPasteGo') && q('wmPasteGo').addEventListener('click', () => hide());
+  // dropping a design file on the tool
+  document.addEventListener('drop', e => { if (st.classList.contains('on') && [...(e.dataTransfer?.files || [])].some(f => /\.(json|zip|docx)$/i.test(f.name))) secure().then(hide); }, true);
+  // File menu: «صفحة البداية»
+  q('fileMenu').addEventListener('click', e => { const b = e.target.closest('[data-v2]'); if (!b) return; q('fileMenu').style.display = 'none'; if (b.dataset.v2 === 'start') show(); });
+  window.v2Start = { show, hide };
+  // every open starts here
+  show();
+
+  /* ---------------- share by Outlook ---------------- */
+  const em = q('expMenu');
+  if (em) {
+    em.querySelectorAll('[data-exp="openDesign"]').forEach(x => x.remove());   // opening lives in «ملف»
+    const hr = document.createElement('hr'); em.appendChild(hr);
+    const b = document.createElement('button'); b.className = 'v2share'; b.dataset.v2exp = 'share';
+    b.innerHTML = `${IC('mail')}<span><b>مشاركة عبر Outlook</b><small>رسالة جديدة فيها ملف التصميم، يفتحه زميلك في مصمم التواصل الداخلي ويكمل عليه</small></span>`;
+    em.appendChild(b);
+    em.addEventListener('click', e => { if (!e.target.closest('[data-v2exp]')) return; em.style.display = 'none'; share(); });
+  }
+  async function share() {
+    if (!window.JEDMAIL) { toast('ميزة المشاركة ما انحملت، افتح الأداة من «أدوات مطارات جدة»'); return; }
+    let o; try { o = designFile(); } catch (e) { console.error(e); toast('تعذّر تجهيز ملف التصميم'); return; }
+    const name = fileBase() + DF.ext;
+    const title = (o.boards && o.boards[0] && o.boards[0].title) || 'Announcement';
+    const blob = new Blob([JSON.stringify(o)], { type: 'application/json' });
+    const body = `Hi,\n\nPlease find attached the design file "${name}".\n\nTo open and edit it: Internal Comms Designer > File > Open a file from your device.\n\nBest regards,`;
+    try { await JEDMAIL.draft({ subject: `Design file: ${title}`, body, fileName: fileBase(), files: [{ name, blob }] }); }
+    catch (e) { console.error(e); toast('تعذّر تجهيز الرسالة'); }
+  }
+  window.v2Share = share;
 })();
 
 </script>

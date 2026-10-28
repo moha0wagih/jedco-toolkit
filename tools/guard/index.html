@@ -291,7 +291,7 @@ footer .sig{direction:ltr;font-family:var(--f-num);font-size:11px;letter-spacing
 
 <footer>
   <div class="wrap">
-    <span class="sig">Designed by Mohammed Wagih · 2026 · v1.0 Beta</span>
+    <span class="sig">Designed by Mohammed Wagih · 2026 · v2.0</span>
     <button class="linkbtn" id="reportBtn">الإبلاغ عن مشكلة</button>
   </div>
 </footer>
@@ -2975,7 +2975,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:right;
 <main><div class="k"><div>الدرجة<b>${res.score}</b></div><div>أخطاء<b>${sc[3]}</b></div><div>تنبيهات<b>${sc[2]}</b></div><div>ملاحظات<b>${sc[1]}</b></div></div>
 ${rows ? `<h2>المخالفات</h2><table><thead><tr><th>المكان</th><th>المستوى</th><th>الملاحظة</th><th>العدد</th><th>التصليح</th></tr></thead><tbody>${rows}</tbody></table>` : '<p>الملف مطابق للهوية، ما فيه أي مخالفة.</p>'}
 ${logRows ? `<h2>التعديلات اللي صارت على الملف</h2><table><thead><tr><th>المكان</th><th>التعديل</th></tr></thead><tbody>${logRows}</tbody></table>` : ''}
-</main><footer>Brand Guard · Jeddah Airports · Designed by Mohammed Wagih · 2026 · v1.0 Beta</footer></body></html>`;
+</main><footer>Brand Guard · Jeddah Airports · Designed by Mohammed Wagih · 2026 · v2.0</footer></body></html>`;
     saveFile(new Blob([html], { type: 'text/html' }), 'تقرير الهوية - ' + S.file.name.replace(/\.[^.]+$/, '') + '.html');
   }
 

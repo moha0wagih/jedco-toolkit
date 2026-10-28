@@ -103,7 +103,7 @@ PM.applyLayout = function (deck, si, L, opt = {}) {
   if (opt.tone) s.tone = opt.tone;
   const c = PM.slideCtx(deck, si);
   const r = PM.renderLayout(L, s.spec, c);
-  s.layout = L.id;
+  s.layout = L.id; s.asis = false;   // a design picked for a «كما هو» slide takes over from here
   s.objs = PM.explodeText ? PM.explodeText(r.objs) : r.objs;
   s.edited = false;
   s.overflow = r.overflow;
@@ -112,6 +112,7 @@ PM.applyLayout = function (deck, si, L, opt = {}) {
 };
 PM.relayout = function (deck, si) {
   const s = deck.slides[si];
+  if (s.asis) return { objs: s.objs };   // «كما هو»: the slide keeps its own design until the user picks one
   const L = PM.layoutById(s.layout);
   if (!L) return PM.autoSlide(deck, si);
   return PM.applyLayout(deck, si, L);

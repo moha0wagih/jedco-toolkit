@@ -413,7 +413,7 @@ body.dev-phone .film .fi{width:74px;height:52px}
       <button class="sp-back" id="spBack"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg> رجوع</button>
     </div>
     <label class="sp-remember"><input type="checkbox" id="spRem" checked> تذكّر اختياري في المرة الجاية</label>
-    <div class="sp-sig">Designed by Mohammed Wagih · 2026 · v1.1 Beta</div>
+    <div class="sp-sig">Designed by Mohammed Wagih · 2026 · v2.0</div>
   </div>
 </div>
 
@@ -533,7 +533,7 @@ body.dev-phone .film .fi{width:74px;height:52px}
   </main>
 
   <footer class="foot">
-    <span class="sig">Designed by Mohammed Wagih · 2026 · v1.1 Beta</span>
+    <span class="sig">Designed by Mohammed Wagih · 2026 · v2.0</span>
     <button id="reportBtn"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg> الإبلاغ عن مشكلة</button>
     <span class="sp"></span>
     <span id="footInfo" class="num"></span>
@@ -980,9 +980,9 @@ function initSplash(){
   $$('#spStep2 [data-mode]').forEach(b=>b.onclick=()=>finishSplash(dev||'desktop',b.dataset.mode));
 }
 function report(){
-  if(HOSTED){const em='c.mwagih@jeddahairports.sa';const m=modal(`<h3>${ic('mail')} الإبلاغ عن مشكلة</h3><p style="font-size:13.5px">أرسل ملاحظتك مع لقطة شاشة على الإيميل:</p><div class="note" style="direction:ltr;justify-content:space-between;align-items:center"><span class="fsi" style="user-select:all">${em}</span><button class="btn sm" id="cpEm">نسخ</button></div><p class="hint" style="font-size:12px;color:var(--muted);margin-top:8px">العنوان: حقيبة المصور (v1.1 Beta) – ملاحظة / مشكلة</p><div class="acts"><button class="btn pri" data-close>تمام</button></div>`);m.querySelector('#cpEm').onclick=async()=>{try{await navigator.clipboard.writeText(em);toast('تم نسخ الإيميل')}catch(e){toast('حدد الإيميل وانسخه')}};return}
-  const body=`السلام عليكم،\n\nوصف المشكلة أو الملاحظة:\n\n\nالخطوات اللي سويتها:\n1.\n2.\n\n(فضلاً أرفق لقطة شاشة إن أمكن)\n\n—\nالإصدار: v1.1 Beta\nالمتصفح والنظام: ${navigator.userAgent}\nالتاريخ: ${new Date().toLocaleString('en-GB')}`;
-  location.href=`mailto:c.mwagih@jeddahairports.sa?subject=${encodeURIComponent('حقيبة المصور (v1.1 Beta) – ملاحظة / مشكلة')}&body=${encodeURIComponent(body)}`;
+  if(HOSTED){const em='c.mwagih@jeddahairports.sa';const m=modal(`<h3>${ic('mail')} الإبلاغ عن مشكلة</h3><p style="font-size:13.5px">أرسل ملاحظتك مع لقطة شاشة على الإيميل:</p><div class="note" style="direction:ltr;justify-content:space-between;align-items:center"><span class="fsi" style="user-select:all">${em}</span><button class="btn sm" id="cpEm">نسخ</button></div><p class="hint" style="font-size:12px;color:var(--muted);margin-top:8px">العنوان: حقيبة المصور (v2.0) – ملاحظة / مشكلة</p><div class="acts"><button class="btn pri" data-close>تمام</button></div>`);m.querySelector('#cpEm').onclick=async()=>{try{await navigator.clipboard.writeText(em);toast('تم نسخ الإيميل')}catch(e){toast('حدد الإيميل وانسخه')}};return}
+  const body=`السلام عليكم،\n\nوصف المشكلة أو الملاحظة:\n\n\nالخطوات اللي سويتها:\n1.\n2.\n\n(فضلاً أرفق لقطة شاشة إن أمكن)\n\n—\nالإصدار: v2.0\nالمتصفح والنظام: ${navigator.userAgent}\nالتاريخ: ${new Date().toLocaleString('en-GB')}`;
+  location.href=`mailto:c.mwagih@jeddahairports.sa?subject=${encodeURIComponent('حقيبة المصور (v2.0) – ملاحظة / مشكلة')}&body=${encodeURIComponent(body)}`;
 }
 async function init(){
   await loadLogos();

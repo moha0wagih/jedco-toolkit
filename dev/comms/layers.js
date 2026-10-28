@@ -1304,10 +1304,10 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     const fm = q('fileMenu'); if (fm) {
       const it = (attr, ic, txt, kb) => `<button ${attr}>${IC(ic, 1.9)}<span>${txt}</span>${kb ? `<kbd>${kb}</kbd>` : ''}</button>`;
       fm.classList.add('lxMenu');
-      fm.innerHTML = `<div class="mh">جديد</div>${it('data-act="blank"', 'file-plus', 'إعلان جديد')}${it('data-act="welcome"', 'user', 'رسالة ترحيب')}${it('data-lx="lxNew"', 'layers', 'تصميم حر بالطبقات…')}${it('data-act="newBoard"', 'copy-plus', 'لوحة إضافية في نفس الملف')}${it('data-act="sample"', 'layout-template', 'نموذج جاهز للتجربة')}
+      fm.innerHTML = `<div class="mh">جديد</div>${it('data-act="blank"', 'file-plus', 'إعلان جديد')}${it('data-act="welcome"', 'user', 'رسالة ترحيب')}${it('data-lx="lxNew"', 'layers', 'تصميم حر بالطبقات…')}
         <hr><div class="mh">فتح</div>${it('data-act="lib"', 'folder', 'إعلاناتي')}${it('data-lx="lxLib"', 'layers-3', 'تصاميمي بالطبقات')}${it('data-act="open"', 'folder-open', 'فتح ملف من جهازك…')}
-        <hr><div class="mh">استيراد</div>${it('data-act="word"', 'file-text', 'ملف وورد…')}${it('data-act="paste"', 'clipboard-paste', 'لصق نص…')}
-        <hr><div class="mh">حفظ</div>${it('data-act="libSave"', 'save', 'حفظ في «إعلاناتي»', K('S'))}${it('data-act="save"', 'file-json', 'حفظ ملف للمشاركة')}`;
+        <hr><div class="mh">حفظ</div>${it('data-act="libSave"', 'save', 'حفظ في «إعلاناتي»', K('S'))}${it('data-act="save"', 'download', 'حفظ نسخة على جهازك')}
+        <hr>${it('data-v2="start"', 'house', 'صفحة البداية')}`;
       fm.addEventListener('click', e => { const b = e.target.closest('[data-lx]'); if (!b) return; fm.style.display = 'none'; const k = b.dataset.lx; if (k === 'lxNew') newModal(); if (k === 'lxLib') libModal(); });
     }
     // free designs (guides / infographics) now open fully decomposed into layers
@@ -1318,11 +1318,14 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     if (typeof openDesignText === 'function') { const orig = openDesignText; openDesignText = function (txt, name, confirm) { try { const o = JSON.parse(txt); if (o && o.app === 'jedco-layers') { openObj(o); return; } if (o && o.app === 'jedco-free-design') { fromFree(o); return; } } catch (e) { } return orig.apply(this, arguments); }; }
     // phone: selecting opens the properties sheet
     // back from the toolkit home / a reload: reopen the design you were working on
-    (async () => { let id = null; try { id = localStorage.getItem('jedLX_open'); } catch (e) { } if (id) { await wait(400); const rec = await loadRec(id); if (rec && rec.data && !L.on) { const sp = document.getElementById('splash'); if (sp && sp.classList.contains('on')) { await new Promise(res => { const t = setInterval(() => { if (!document.getElementById('splash') || !document.getElementById('splash').classList.contains('on')) { clearInterval(t); res(); } }, 300); }); } openObj(rec.data, { libId: rec.id, thumb: rec.thumb }); const k = getLinks().find(x => x.lx === rec.id); L.linkedBoard = k || null; say('رجعتك لتصميم الطبقات اللي كنت شغال عليه — كل تعديلاتك موجودة'); } } updLayersBtn(); })();
+    // back from a reload: the start page offers to reopen the layers design you were working on
+    async function resumeLX() { let id = null; try { id = localStorage.getItem('jedLX_open'); } catch (e) { } if (!id) return false; const rec = await loadRec(id); if (!rec || !rec.data || L.on) return false; openObj(rec.data, { libId: rec.id, thumb: rec.thumb }); const k = getLinks().find(x => x.lx === rec.id); L.linkedBoard = k || null; say('رجعتك لتصميم الطبقات اللي كنت شغال عليه، كل تعديلاتك موجودة'); return true; }
+    async function resumeInfo() { let id = null; try { id = localStorage.getItem('jedLX_open'); } catch (e) { } if (!id) return null; try { const rec = await loadRec(id); return rec && rec.data ? { id: rec.id, name: rec.name || rec.title || (rec.data && rec.data.name) || 'تصميم بالطبقات', thumb: rec.thumb || null } : null; } catch (e) { return null; } }
+    updLayersBtn();
     if (typeof activate === 'function') { const _act = activate; activate = function () { const r = _act.apply(this, arguments); setTimeout(updLayersBtn, 300); return r; }; }
     let ubT = 0; const ub = () => { if (L.on) return; clearTimeout(ubT); ubT = setTimeout(updLayersBtn, 900); };
     document.addEventListener('pointerup', ub, true); document.addEventListener('keyup', ub, true);
-    window.__lxApi = { fromBoard, fromFree, openObj, newModal, libModal, exitLX, get state() { return L; }, paint, setSel, groupSel, ungroupSel, flattenAll, exportPNG, get, all, aabb, topSel, undo, redo, alignSel, order, addText, addShape, addIcon, addLogo, decompose, fileObj, applyNum, renderProps, renderPanel };
+    window.__lxApi = { resumeLX, resumeInfo, fromBoard, fromFree, openObj, newModal, libModal, exitLX, get state() { return L; }, paint, setSel, groupSel, ungroupSel, flattenAll, exportPNG, get, all, aabb, topSel, undo, redo, alignSel, order, addText, addShape, addIcon, addLogo, decompose, fileObj, applyNum, renderProps, renderPanel };
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hook); else hook();
 })();

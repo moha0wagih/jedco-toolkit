@@ -7,6 +7,7 @@
         <button data-a="pptx" class="mi-pptx"><svg class="i" data-ic="file-down"></svg><span>حفظ كـ PowerPoint <span class="num ext" dir="ltr">(.pptx)</span></span></button>
         <hr>
         <button data-a="import"><svg class="i" data-ic="upload"></svg>استيراد Word أو PowerPoint…</button>
+        <button data-a="asis"><svg class="i" data-ic="presentation"></svg>فتح PowerPoint كما هو…</button>
         <button data-a="new"><svg class="i" data-ic="file-plus"></svg>عرض جديد…</button>
         <hr>
         <button data-a="saveProj"><svg class="i" data-ic="download"></svg>حفظ ملف المشروع<span class="k">Ctrl+S</span></button>
@@ -27,8 +28,15 @@
     <button class="tbb" id="bStory" title="قصة العرض وكيف تكون أفضل"><svg class="i" data-ic="book-open"></svg><span class="t">القصة</span></button>
     <button class="tbb" id="bCheck" title="فحص العرض"><svg class="i" data-ic="shield-check"></svg><span class="t">فحص</span></button>
     <button class="tbb" id="bShow" title="عرض الشرائح"><svg class="i" data-ic="play"></svg><span class="t">عرض</span></button>
-    <button class="tbb" id="bPdf" title="حفظ PDF"><svg class="i" data-ic="file-text"></svg><span class="t">PDF</span></button>
-    <button class="tbb pri" id="bExport" title="حفظ العرض كملف PowerPoint ‏(.pptx) يفتح ويتعدّل في PowerPoint"><svg class="i" data-ic="file-down"></svg><span class="t">حفظ كـ PowerPoint <span class="num ext" dir="ltr">(.pptx)</span></span><span class="tp num">PPTX</span></button>
+    <div style="position:relative"><button class="tbb pri" id="bExport" title="تصدير العرض: PDF أو PowerPoint، أو افتحه في رسالة Outlook جديدة"><svg class="i" data-ic="file-down"></svg><span class="t">تصدير</span><svg class="i" data-ic="chevron-down" style="width:14px;height:14px;margin-inline-start:-2px"></svg></button>
+      <div class="menu hide" id="mExport" style="left:0;right:auto;min-width:250px">
+        <button data-x="pdf"><svg class="i" data-ic="file-text"></svg><span>PDF</span></button>
+        <button data-x="pptx"><svg class="i" data-ic="presentation"></svg><bdi dir="ltr">PowerPoint <span class="num ext">(.pptx)</span></bdi></button>
+        <hr>
+        <button data-x="pdfMail"><svg class="i" data-ic="mail"></svg><span>PDF في رسالة Outlook</span></button>
+        <button data-x="pptxMail"><svg class="i" data-ic="mail"></svg><span>PowerPoint في رسالة Outlook</span></button>
+      </div>
+    </div>
   </header>
   <main class="body">
     <aside class="strip">
@@ -80,7 +88,7 @@
     <div class="st-opts">
       <label>لغة العرض <div class="seg" id="stLang"><button data-v="auto" class="on">تلقائي</button><button data-v="ar">عربي</button><button data-v="en">English</button></div></label>
       <label>لون الصفحات <div class="seg" id="stBg"><button data-v="white" class="on">أبيض</button><button data-v="grey">رمادي فاتح</button></div></label>
-      <label>قراءة الملف <div class="seg" id="stRead"><button data-v="smart" class="on" title="الأداة تفهم المحتوى وتوزّعه، وتنقل ملاحظات المراجعة للملاحظات">توزيع ذكي</button><button data-v="keep" title="كل سطر في الملف يبقى كما هو بدون أي تعديل، والأداة توزّعه بس">النص كما هو</button></div></label>
+      <label>قراءة الملف <div class="seg" id="stRead"><button data-v="smart" class="on" title="الأداة تفهم المحتوى وتوزّعه، وتنقل ملاحظات المراجعة للملاحظات">توزيع ذكي</button><button data-v="keep" title="كل سطر في الملف يبقى كما هو بدون أي تعديل، والأداة توزّعه بس">النص كما هو</button><button data-v="asis" title="PowerPoint فقط: يفتح العرض بنفس تصميمه بالضبط بدون أي تغيير، وتعدّل عليه بنفسك">العرض كما هو</button></div></label>
       <label>النمط <div class="seg" id="stTone"><button data-v="light" class="on">فاتح</button><button data-v="dark">داكن</button></div></label>
     </div>
     <div class="st-row">
@@ -89,6 +97,6 @@
       <button class="st-btn hide" id="stBack"><svg class="i" data-ic="arrow-right"></svg>رجوع للعرض الحالي</button>
     </div>
     <div class="st-recent hide" id="stRecent"><h5>ملفاتي (محفوظة تلقائياً على هذا الجهاز)</h5><div id="stRecentList"></div></div>
-    <div class="credit">Designed by Mohammed Wagih · 2026 · v2.3</div>
+    <div class="credit">Designed by Mohammed Wagih · 2026 · v2.0</div>
   </div>
 </div>

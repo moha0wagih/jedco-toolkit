@@ -1,5 +1,5 @@
 /* أدوات مطارات جدة — shared layer loaded by every tool.
-   Designed by Mohammed Wagih · 2026 · v1.0 Beta */
+   Designed by Mohammed Wagih · 2026 · v2.0 */
 (function () {
   'use strict';
   var KEY = 'jedHub.os';
@@ -18,7 +18,13 @@
   // keep the hash clean for the tool itself
   if (fromHub && /jedhub/.test(hash)) { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { } }
 
-  window.JEDHUB = { os: os, device: dev, version: 'v1.0 Beta', framed: framed };
+  window.JEDHUB = { os: os, device: dev, version: 'v2.0', framed: framed };
+  /* shared helpers: «فتح في Outlook» everywhere; floating notes when a tool is opened on its own (the toolkit page has its own) */
+  var BASE = (function () { var c = document.currentScript; return c && c.src ? c.src.replace(/[^\/]*$/, '') : '../../shared/'; })();
+  function need(f) { var sc = document.createElement('script'); sc.src = BASE + f + '?v=20261028'; (document.head || root).appendChild(sc); }
+  need('mail.js');
+  if (!document.querySelector('link[rel~="icon"]')) { [['icon', 'icon/icon.svg', 'image/svg+xml'], ['apple-touch-icon', 'icon/apple-touch-icon.png', '']].forEach(function (x) { var l = document.createElement('link'); l.rel = x[0]; l.href = BASE + x[1]; if (x[2]) l.type = x[2]; (document.head || root).appendChild(l); }); }
+  if (!framed) need('notes.js');
 
   var css = document.createElement('style');
   css.textContent =
@@ -31,6 +37,7 @@
     '#hubHome{position:fixed;z-index:2147483645;left:calc(16px + env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 15px 0 12px;' +
     'border-radius:999px;background:#002657;color:#fff;text-decoration:none;font:500 13.5px Tajawal,"Segoe UI",Tahoma,sans-serif;direction:rtl}' +
     '#hubHome svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}' +
+    'html.hub-t-comms:not(.hub-phone) #hubHome{left:316px}html.hub-t-pres:not(.hub-phone) #hubHome{left:300px}' +
     'html.hub-phone #hubHome{left:env(safe-area-inset-left,0px);bottom:auto;top:50%;transform:translateY(-50%);width:30px;height:58px;padding:0;justify-content:center;border-radius:0 14px 14px 0}' +
     'html.hub-phone #hubHome span{display:none}' +
     '[data-needs-online][disabled],html.hub-offline [data-needs-online]{opacity:.38!important;pointer-events:none!important;filter:grayscale(1)}' +

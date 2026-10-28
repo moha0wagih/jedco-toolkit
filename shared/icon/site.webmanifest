@@ -1,0 +1,16 @@
+{
+  "name": "JEDCO Toolkit · أدوات مطارات جدة",
+  "short_name": "JEDCO Toolkit",
+  "start_url": "../../JEDCO%20Toolkit.html",
+  "scope": "../../",
+  "display": "standalone",
+  "dir": "rtl",
+  "lang": "ar",
+  "background_color": "#002657",
+  "theme_color": "#002657",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

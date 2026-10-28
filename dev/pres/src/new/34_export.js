@@ -234,7 +234,7 @@ async function readTemplate(tz) {
     if (/media\/image6\.png/.test(rr) && /Default Slide/.test(nm)) logoLayout = p;
   }
   const contentLayout = logoLayout || blank || (slides[1].rels.match(/Target="([^"]*slideLayout\d+\.xml)"/) || [])[1];
-  return { pres, relsXml, slides, contentLayout };
+  return { pres, relsXml, slides, contentLayout, blankLayout: blank || contentLayout };
 }
 /* v2.3: the official layouts carry a thin blue bar on the slide edge — take it out of every layout */
 async function stripEdgeBars(tz) {
@@ -373,7 +373,7 @@ PM.exportPptx = async function (deck, onProgress) {
       for (const r of sb.rels) { let id = r.id; if (used.has(id)) { const nid = id + 'x'; xml = xml.split(`r:embed="${id}"`).join(`r:embed="${nid}"`).split(`r:id="${id}"`).join(`r:id="${nid}"`); id = nid; } relsXml = relsXml.replace('</Relationships>', `<Relationship Id="${id}" Type="${REL(r.type)}" Target="${r.target}"/></Relationships>`); }
     } else {
       xml = sb.xml();
-      relsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${REL('slideLayout')}" Target="../slideLayouts/${T.contentLayout.split('/').pop()}"/>${sb.rels.map(r => `<Relationship Id="${r.id}" Type="${REL(r.type)}" Target="${r.target}"/>`).join('')}</Relationships>`;
+      relsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${REL('slideLayout')}" Target="../slideLayouts/${(s.asis ? T.blankLayout : T.contentLayout).split('/').pop()}"/>${sb.rels.map(r => `<Relationship Id="${r.id}" Type="${REL(r.type)}" Target="${r.target}"/>`).join('')}</Relationships>`;
     }
     const sugs = s.objs.filter(o => o.t === 'image' && deck.assets[o.src] && deck.assets[o.src].kind === 'sug').map(o => deck.assets[o.src]);
     out.push({ xml, relsXml, notes: [s.spec.notes || '', ...sugs.map(a => (deck.lang !== 'en' ? 'صورة مقترحة: ' + a.note + '\n' : '') + 'Image prompt: ' + a.prompt)].filter(Boolean).join('\n') });

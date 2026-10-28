@@ -11,6 +11,7 @@ fonts = rd(ROOT + '/src/fonts.css')
 css = rd(NEW + '/app.css')
 html = rd(NEW + '/app.html')
 jszip = rd(OLD + '/script1.js')
+h2i = rd(ROOT + '/src/vendor/html-to-image.js')
 icons = rd(OLD + '/script2.js')
 engine = rd(OLD + '/script3.js')
 rest = rd(OLD + '/script6_rest.js')
@@ -52,7 +53,7 @@ for i in range(len(stock)):
 data = 'window.PM = window.PM || {};\nPM.LOGO = ' + logo + ';\nPM.BG = ' + json.dumps(bg) + ';\nPM.STOCK = ' + json.dumps(stock) + ';\nPM.STOCK_SIZE = ' + json.dumps(sizes) + ';\n'
 mods = [NEW + f for f in ['/00_core.js', '/01_analyze.js', '/02_layout.js', '/04_render.js', '/05_chart.js']]
 mods += sorted(glob.glob(NEW + '/lib/*.js'))
-mods += [NEW + f for f in ['/30_state.js', '/31_editor.js', '/36_text.js', '/37_photos.js', '/33_import.js', '/34_export.js', '/32_ui.js', '/35_imagegen.js', '/38_dock.js', '/39_brain.js', '/40_layers.js']]
+mods += [NEW + f for f in ['/30_state.js', '/31_editor.js', '/36_text.js', '/37_photos.js', '/33_import.js', '/34_export.js', '/32_ui.js', '/35_imagegen.js', '/38_dock.js', '/39_brain.js', '/40_layers.js', '/41_asis.js', '/42_pdf.js']]
 app = '\n'.join(f'/* ---- {os.path.relpath(p, NEW)} ---- */\n' + rd(p) for p in mods)
 boot = r'''
 (function () {
@@ -84,6 +85,9 @@ page = f'''<!doctype html>
 {html}
 <script>
 {jszip}
+</script>
+<script>
+{h2i}
 </script>
 <script>
 {icons}
