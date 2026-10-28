@@ -232,3 +232,9 @@ body.phone.lx-on #lxLay{padding-bottom:0}
 body.phone #fileMenu.lxMenu button{padding:10px 12px;font-size:14.5px}
 body.phone #fileMenu.lxMenu{max-height:calc(100dvh - 170px);z-index:95}
 body.phone #fileMenu.lxMenu kbd{display:none}
+/* format painter (ناسخ التنسيق) */
+#lxTop .tb.sticky{background:#FC5C17;border-color:#FC5C17;color:#fff}
+#lxProps .b.on{background:#004EAA;border-color:#004EAA;color:#fff}
+#lxProps .b.sticky{background:#FC5C17;border-color:#FC5C17;color:#fff}
+body.lx-painting #lxHost,body.lx-painting #lxHost .lxL{cursor:var(--lxBrush,copy)!important}
+@media (max-width:1640px){#lxTop #lxPaintB .lbl,#lxTop #lxGroupB .lbl,#lxTop #lxUngroupB .lbl,#lxTop #lxAiB .lbl{display:none}}

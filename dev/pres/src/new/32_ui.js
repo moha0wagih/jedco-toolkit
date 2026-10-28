@@ -786,21 +786,20 @@ UI.renderCtx = function () {
       <button class="cb" data-al="t" title="محاذاة للأعلى">${ic('align-vertical-justify-start')}</button><button class="cb" data-al="m" title="توسيط عمودي">${ic('align-vertical-justify-center')}</button><button class="cb" data-al="b" title="محاذاة للأسفل">${ic('align-vertical-justify-end')}</button>
       <span class="cbs"></span><button class="cb" data-al="dh" title="توزيع أفقي متساوٍ">${ic('align-horizontal-space-around')}</button><button class="cb" data-al="dv" title="توزيع عمودي متساوٍ">${ic('align-vertical-space-around')}</button>
       ${sel.every(o => o.t === 'text') ? `<span class="cbs"></span><button class="cb" data-a="fs-" title="تصغير الخط">A−</button><button class="cb" data-a="fs+" title="تكبير الخط">A+</button>${sw(SW_TEXT, null, 'tc')}` : ''}
-      <span class="cbs"></span><button class="cb" data-a="dup">${ic('copy')}تكرار</button><button class="cb danger" data-a="del">${ic('trash-2')}حذف</button>`;
+      <span class="cbs"></span>${painterBtn()}<button class="cb" data-a="dup">${ic('copy')}تكرار</button><button class="cb danger" data-a="del">${ic('trash-2')}حذف</button>`;
   } else {
     const o = sel[0];
     const more = (extra) => `<button class="cb" data-pop="more" data-extra="${extra || ''}" title="المزيد">${ic('ellipsis')}</button>`;
-    const common = `<span class="cbs"></span>${o.pin ? `<button class="cb on" data-a="pin" title="فك التثبيت">${ic('lock')}</button>` : ''}${more(o.t === 'text' ? 'text' : '')}<button class="cb danger" data-a="del" title="حذف">${ic('trash-2')}</button>`;
+    const common = `<span class="cbs"></span>${painterBtn()}${o.pin ? `<button class="cb on" data-a="pin" title="فك التثبيت">${ic('lock')}</button>` : ''}${more(o.t === 'text' ? 'text' : '')}<button class="cb danger" data-a="del" title="حذف">${ic('trash-2')}</button>`;
     if (o.t === 'text') {
       const p0 = o.paras[0] || {};
-      const painter = `<button class="cb" data-a="paint" title="ناسخ التنسيق: اضغط هنا ثم على نص ثاني">${ic('paintbrush')}</button>`;
       const al = p0.al || (o.align === 'center' ? 'c' : '');
       const TX = PM.TextTools, k = TX.scaleOf(o), wv = p0.sw || 0;
       h = `<span class="lbl">نص</span><button class="cb" data-a="edit">${ic('pencil')}تعديل</button><span class="cbs"></span>
         <button class="cb" data-a="fs-" title="تصغير">A−</button><span class="rng" title="حجم هذا النص"><input type="range" id="txSize" min="0.5" max="2.2" step="0.01" value="${k.toFixed(2)}"><span class="num">${Math.round(p0.size || 0)}</span></span><button class="cb" data-a="fs+" title="تكبير">A+</button>
         <span class="rng" title="سماكة الخط"><span class="rl">سماكة</span><input type="range" id="txW" min="0" max="2" step="0.05" value="${wv}"></span>
         <button class="cb ${p0.bold ? 'on' : ''}" data-a="bold" title="عريض — وأثناء الكتابة: حدد كلمات واضغط B أو ⌘B">${ic('bold')}</button><button class="cb" data-a="txReset" title="إرجاع الحجم والسماكة الأصلية">${ic('rotate-ccw')}</button>${sw(SW_TEXT, p0.color, 'tc')}<span class="cbs"></span>
-        <button class="cb" data-ta="${al === 'r' || !al ? 'c' : al === 'c' ? 'l' : 'r'}" title="المحاذاة (اضغط للتبديل)">${ic(al === 'c' ? 'align-center' : al === 'l' ? 'align-left' : 'align-right')}</button>${painter}${common}`;
+        <button class="cb" data-ta="${al === 'r' || !al ? 'c' : al === 'c' ? 'l' : 'r'}" title="المحاذاة (اضغط للتبديل)">${ic(al === 'c' ? 'align-center' : al === 'l' ? 'align-left' : 'align-right')}</button>${common}`;
     } else if (o.t === 'image' && deck().assets[o.src] && deck().assets[o.src].kind === 'sug') {
       h = `<span class="lbl">صورة مقترحة</span><button class="cb on" data-a="gen">${ic('wand-sparkles')}اصنعها بصانع الصور</button><button class="cb" data-a="tabPhotos">${ic('images')}اختر من المكتبة</button><button class="cb" data-a="replace">${ic('image-up')}من جهازي</button><button class="cb" data-a="unsug" title="رجّع أقرب صورة من المكتبة">${ic('rotate-ccw')}صورة من المكتبة بدلها</button>${common}`;
     } else if (o.t === 'image') {
@@ -831,6 +830,84 @@ UI.renderCtx = function () {
   const live = (fn, label) => { const s = cur(); sel.filter(o => o.t === 'text').forEach(fn); s.edited = true; sel.forEach(o => { if (o.t === 'text') Ed.refreshObj(o); }); Ed.drawOverlay(); clearTimeout(UI.txT); UI.txT = setTimeout(() => { PM.commit(label); scheduleThumb(); }, 350); };
   if (tsz) tsz.oninput = () => { const k = +tsz.value; live(o => PM.TextTools.setScale(o, k), 'size'); const v = tsz.parentElement.querySelector('.num'); if (v && sel[0]) v.textContent = Math.round(sel[0].paras[0].size); };
   if (tw) tw.oninput = () => live(o => PM.TextTools.setWeight(o, +tw.value), 'weight');
+};
+/* ---------- format painter (ناسخ التنسيق) ----------
+   copies the exact look of an element and lands it on others: text = size, colour, bold, thickness, font role,
+   spacing, bullets, alignment · shape = fill, gradient, border, corners · icon / line = colour, weight, dashes ·
+   photo = corners · all = transparency. Colour also crosses kinds (text colour → icon / shape and back).
+   One click = once · double click = stays on until Esc · ⌘/Ctrl + Alt + C / V copy & paste the look. */
+const MACK = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+const KC = MACK ? '⌘⌥C' : 'Ctrl+Alt+C', KV = MACK ? '⌘⌥V' : 'Ctrl+Alt+V';
+const PT = PM.Paint = { on: false, sticky: false, look: null, clip: null };
+const P_KEYS = ['size', 'color', 'bold', 'sw', 'font', 'lh', 'track', 'caps', 'sb', 'sa', 'bullet', 'bc'];
+const kindOf = o => o.t === 'rect' || o.t === 'ellipse' ? 'shape' : o.t;
+const cp = v => v == null ? v : JSON.parse(JSON.stringify(v));
+function painterBtn() { return `<button class="cb${PT.on ? ' on' : ''}${PT.on && PT.sticky ? ' sticky' : ''}" data-a="paint" title="ناسخ التنسيق — كليك: مرة وحدة · دبل كليك: يظل شغّال لين Esc · ${KC} / ${KV}">${ic('paintbrush')}</button>`; }
+PT.lookOf = function (list) {
+  const look = { kinds: {}, col: null };
+  for (const o of list) {
+    const kd = kindOf(o); if (look.kinds[kd]) continue; let k = null;
+    if (o.t === 'text') { k = { paras: o.paras.map(p => { const q = { al: p.al }; P_KEYS.forEach(x => q[x] = p[x]); return q; }), align: o.align, va: o.va, dir: o.dir }; look.col = look.col || (o.paras[0] && o.paras[0].color); }
+    else if (kd === 'shape') { k = { fill: o.fill, fa: o.fa, grad: cp(o.grad), stroke: o.stroke, sw: o.sw, sa: o.sa, r: o.r }; look.col = look.col || o.fill; }
+    else if (o.t === 'icon') { k = { color: o.color, sw: o.sw }; look.col = look.col || o.color; }
+    else if (o.t === 'line') { k = { color: o.color, sw: o.sw, dash: o.dash }; look.col = look.col || o.color; }
+    else if (o.t === 'image') k = { r: o.r };
+    else if (o.t === 'table') k = { style: o.style, fs: o.fs };
+    if (k) { k.op = o.op; look.kinds[kd] = k; }
+  }
+  return Object.keys(look.kinds).length ? look : null;
+};
+PT.apply = function (t, look) {
+  const k = look.kinds[kindOf(t)];
+  if (t.t === 'text') {
+    if (k) {
+      const same = (t.dir || 'rtl') === (k.dir || 'rtl');
+      t.paras.forEach((p, i) => { const q = k.paras[Math.min(i, k.paras.length - 1)]; P_KEYS.forEach(x => { if (q[x] === undefined) delete p[x]; else p[x] = q[x]; }); if (same) p.al = q.al; p.t = PM.plain(p.t); });
+      if (same) t.align = k.align; t.va = k.va; delete t.base;
+    } else if (look.col) t.paras.forEach(p => p.color = look.col); else return false;
+    const need = PM.blockH(t.paras, t.w) + 1; if (t.autoH || need > t.h) t.h = need;
+  } else if (kindOf(t) === 'shape') {
+    if (k) { t.fill = k.fill; t.fa = k.fa; t.grad = cp(k.grad); t.stroke = k.stroke; t.sw = k.sw; t.sa = k.sa; if (t.t === 'rect') t.r = k.r; }
+    else if (look.col) { t.fill = look.col; t.grad = null; } else return false;
+  } else if (t.t === 'icon') { if (k) { t.color = k.color; t.sw = k.sw; } else if (look.col) t.color = look.col; else return false; }
+  else if (t.t === 'line') { if (k) { t.color = k.color; t.sw = k.sw; t.dash = k.dash; } else if (look.col) t.color = look.col; else return false; }
+  else if (t.t === 'image') { if (k) t.r = k.r; else return false; }
+  else if (t.t === 'table') { if (k) { t.style = k.style; t.fs = k.fs; } else return false; }
+  else return false;
+  if (k) { if (k.op == null) delete t.op; else t.op = k.op; }
+  if (t.bind && t.t === 'icon') {} // the icon itself stays, only its look changes
+  return true;
+};
+function brushCursor() { if (document.documentElement.style.getPropertyValue('--pmBrush')) return; try { const inner = icPath('paintbrush'); const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><g stroke="#fff" stroke-width="5">${inner}</g><g stroke="#002657" stroke-width="2">${inner}</g></svg>`; document.documentElement.style.setProperty('--pmBrush', `url("data:image/svg+xml,${encodeURIComponent(svg)}") 3 21, copy`); } catch (x) { } }
+let ptChip = null;
+function ptSync() {
+  brushCursor(); document.body.classList.toggle('painting', PT.on);
+  if (!ptChip) { ptChip = document.createElement('div'); ptChip.id = 'ptChip'; ptChip.innerHTML = `${ic('paintbrush')}<span></span><button type="button" title="إيقاف (Esc)">${ic('x')}</button>`; document.body.appendChild(ptChip); ptChip.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); if (e.target.closest('button')) PT.stop(); }); }
+  ptChip.classList.toggle('on', PT.on); ptChip.querySelector('span').textContent = PT.sticky ? 'ناسخ التنسيق شغّال — اضغط على العناصر · Esc للإيقاف' : 'اضغط على العنصر اللي تبي تنسخ له التنسيق · Esc للإلغاء';
+  $$('#ctx [data-a="paint"]').forEach(b => { b.classList.toggle('on', PT.on); b.classList.toggle('sticky', PT.on && PT.sticky); });
+}
+PT.start = function (sticky) {
+  if (Ed.editing) Ed.endEdit();
+  if (PT.on && sticky) { PT.sticky = true; ptSync(); UI.toast('ناسخ التنسيق شغّال: اضغط على كل عنصر تبي تطبّق عليه — Esc للإيقاف'); return; }
+  const look = PT.lookOf(Ed.selected()); if (!look) { UI.toast('حدد العنصر اللي تبي تنسخ تنسيقه أول، بعدين اضغط الفرشاة'); return; }
+  PT.look = look; PT.on = true; PT.sticky = !!sticky;
+  Ed.painter = o => {
+    if (!o) { PT.stop(); return; }
+    const ok = PT.apply(o, PT.look);
+    if (!PT.sticky) PT.stop();
+    if (!ok) { UI.toast('هذا العنصر ما يقبل هذا التنسيق'); return; }
+    cur().edited = true; PM.commit('paint'); ST.sel = new Set([o.id]); Ed.render(); UI.renderCtx(); scheduleThumb(); UI.toast('تم نسخ التنسيق ✓');
+  };
+  ptSync(); UI.toast(sticky ? 'ناسخ التنسيق شغّال: اضغط على كل عنصر تبي تطبّق عليه — Esc للإيقاف' : 'اضغط على العنصر اللي تبي تنسخ له التنسيق');
+};
+PT.stop = function () { if (!PT.on) return; PT.on = false; PT.sticky = false; Ed.painter = null; ptSync(); };
+PT.copy = function () { const look = PT.lookOf(Ed.selected()); if (!look) return; PT.clip = look; try { localStorage.setItem('pmLook', JSON.stringify(look)); } catch (x) { } UI.toast(`نسخت التنسيق — حدد عنصر ثاني واضغط ${KV}`); };
+PT.paste = function () {
+  let look = PT.clip; if (!look) { try { look = JSON.parse(localStorage.getItem('pmLook') || 'null'); } catch (x) { } }
+  if (!look) { UI.toast(`انسخ تنسيق أول: ${KC}`); return; }
+  let n = 0; Ed.selected().forEach(o => { if (PT.apply(o, look)) n++; });
+  if (!n) { UI.toast('المحدد ما يقبل هذا التنسيق'); return; }
+  cur().edited = true; PM.commit('paint'); Ed.render(); UI.renderCtx(); scheduleThumb(); UI.toast('تم لصق التنسيق ✓');
 };
 /* small pop-over menus of the context bar (colours, more actions) */
 function ctxPop(btn) {
@@ -863,13 +940,7 @@ function ctxClick(e) {
   if (a === 'del') return Ed.del();
   if (a === 'directive') return PM.Brain.directive();
   if (a === 'pin') { sel.forEach(o => o.pin = !o.pin); s.edited = true; PM.commit('pin'); Ed.drawOverlay(); UI.renderCtx(); UI.toast(sel[0].pin ? 'ثبّته مكانه 🔒' : 'فكيت التثبيت'); return; }
-  if (a === 'paint') {
-    const src = sel[0]; const st = src.paras.map(p => ({ size: p.size, color: p.color, bold: p.bold, sw: p.sw || 0, al: p.al, font: p.font, lh: p.lh, track: p.track, caps: p.caps }));
-    document.body.classList.add('painting');
-    UI.toast('اضغط على النص اللي تبي تنسخ له التنسيق');
-    Ed.painter = (t) => { if (t.t !== 'text') return; t.paras.forEach((p, i) => Object.assign(p, st[Math.min(i, st.length - 1)])); t.align = src.align; PM.TextTools.fitH(t); cur().edited = true; PM.commit('paint'); ST.sel = new Set([t.id]); Ed.render(); UI.renderCtx(); UI.toast('نسخت التنسيق ✓'); };
-    return;
-  }
+  if (a === 'paint') { if (e.detail >= 2) return PT.start(true); return PT.on ? PT.stop() : PT.start(false); }
   if (a === 'dup') return Ed.pasteObjs(JSON.parse(JSON.stringify(sel)));
   if (a === 'front') return Ed.zorder('front');
   if (a === 'back') return Ed.zorder('back');

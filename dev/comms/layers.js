@@ -96,7 +96,7 @@
   }
   function textCss(l) {
     const t = l.st || {}; const p = t.pad || [0, 0, 0, 0];
-    return `font-family:${t.ff || 'Tajawal'};font-size:${t.fs || 16}px;font-weight:${t.fw || 400};font-style:${t.fst || 'normal'};color:${t.col || '#002657'};text-align:${t.ta || 'right'};${t.tal ? 'text-align-last:' + t.tal + ';' : ''}line-height:${t.lh ? t.lh : 'normal'};letter-spacing:${t.ls ? t.ls + 'px' : 'normal'};${t.wsp ? 'word-spacing:' + t.wsp + 'px;' : ''}direction:${t.dir || 'rtl'};white-space:${t.ws || 'normal'};${t.tt ? 'text-transform:' + t.tt + ';' : ''}${t.td && t.td !== 'none' ? 'text-decoration:' + t.td + ';' : ''}${t.ti ? 'text-indent:' + t.ti + 'px;' : ''}padding:${p.map(v => v + 'px').join(' ')};${t.bg ? 'background:' + t.bg + ';' : ''}${t.xs ? '-webkit-text-stroke:' + t.xs + ';' : ''}`;
+    return `font-family:${t.ff || 'Tajawal'};font-size:${t.fs || 16}px;font-weight:${t.fw || 400};font-style:${t.fst || 'normal'};color:${t.col || '#002657'};text-align:${t.ta || 'right'};${t.tal ? 'text-align-last:' + t.tal + ';' : ''}line-height:${t.lh ? t.lh : 'normal'};letter-spacing:${t.ls ? t.ls + 'px' : 'normal'};${t.wsp ? 'word-spacing:' + t.wsp + 'px;' : ''}direction:${t.dir || 'rtl'};white-space:${t.ws || 'normal'};overflow-wrap:break-word;${t.tt ? 'text-transform:' + t.tt + ';' : ''}${t.td && t.td !== 'none' ? 'text-decoration:' + t.td + ';' : ''}${t.ti ? 'text-indent:' + t.ti + 'px;' : ''}padding:${p.map(v => v + 'px').join(' ')};${t.bg ? 'background:' + t.bg + ';' : ''}${t.xs ? '-webkit-text-stroke:' + t.xs + ';' : ''}`;
   }
   function build(l, cache, live) {
     let el = cache.get(l.id);
@@ -131,14 +131,17 @@
     for (const [id, el] of cache) if (!seen.has(id)) { el.remove(); cache.delete(id); }
   }
   function measureTexts(cache, layers) {
-    const out = []; const w = arr => arr.forEach(l => { if (l.type === 'group') w(l.children); else if (l.type === 'text' && (l.ah !== false || l.aw)) { const el = cache.get(l.id); if (el && !l.hidden) out.push([l, el]); } }); w(layers);
+    const out = []; const w = arr => arr.forEach(l => { if (l.type === 'group') w(l.children); else if (l.type === 'text') { const el = cache.get(l.id); if (el && !l.hidden) out.push([l, el]); } }); w(layers);
+    let moved = false;
     out.forEach(([l, el]) => {
-      if (l.aw) { const nw = el.offsetWidth; if (nw && Math.abs(nw - l.w) > .2) { const ta = (l.st && l.st.ta) || 'right'; if (ta === 'center') l.x += (l.w - nw) / 2; else if (ta === 'right' || (ta === 'justify' && l.st.dir !== 'ltr')) l.x += l.w - nw; l.w = nw; } }
+      if (l.aw) { const nw = el.offsetWidth; if (nw && Math.abs(nw - l.w) > .2) { const ta = (l.st && l.st.ta) || 'right'; if (ta === 'center') l.x += (l.w - nw) / 2; else if (ta === 'right' || (ta === 'justify' && l.st.dir !== 'ltr')) l.x += l.w - nw; l.w = nw; moved = true; } }
       if (l.ah !== false) { const h = el.offsetHeight; if (h && Math.abs(h - l.h) > .2) l.h = h; }
+      else if (!l.clip) { const fixed = el.style.height; el.style.height = 'auto'; const need = el.offsetHeight; el.style.height = fixed; if (need && need > l.h + .5) { l.h = R2(need); moved = true; } }
     });
+    return moved;
   }
   let rafP = 0;
-  function paint(now) { if (!L.on) return; if (!now) { if (!rafP) rafP = requestAnimationFrame(() => { rafP = 0; paint(true); }); return; } const pg = PG(); pg.style.width = L.doc.w + 'px'; pg.style.height = L.doc.h + 'px'; pg.style.background = L.doc.bg || '#fff'; paintInto(pg, L.doc.layers, L.cache, true); measureTexts(L.cache, L.doc.layers); sizeStage(); drawOv(); }
+  function paint(now) { if (!L.on) return; if (!now) { if (!rafP) rafP = requestAnimationFrame(() => { rafP = 0; paint(true); }); return; } const pg = PG(); pg.style.width = L.doc.w + 'px'; pg.style.height = L.doc.h + 'px'; pg.style.background = L.doc.bg || '#fff'; paintInto(pg, L.doc.layers, L.cache, true); if (measureTexts(L.cache, L.doc.layers)) paintInto(pg, L.doc.layers, L.cache, true); sizeStage(); drawOv(); }
 
   /* ---------------- stage / zoom ---------------- */
   function sizeStage() { const h = q('lxHost'), pad = q('lxPad'), wr = q('lxWrap'); const M = 80; const pw = L.doc.w * L.z, ph = L.doc.h * L.z; const ox = Math.max(M, (h.clientWidth - pw) / 2), oy = Math.max(M, (h.clientHeight - ph) / 2); pad.style.width = (pw + ox * 2) + 'px'; pad.style.height = (ph + oy * 2) + 'px'; wr.style.left = ox + 'px'; wr.style.top = oy + 'px'; PG().style.transform = `scale(${L.z})`; q('lxZl') && (q('lxZl').textContent = Math.round(L.z * 100) + '%'); }
@@ -165,9 +168,7 @@
     const locked = ts.some(effLocked);
     if (!L.editing && !locked && !(L.drag && L.drag.mode === 'move')) {
       const W = box.w * L.z, H = box.h * L.z;
-      const autoText = single && single.type === 'text' && single.ah !== false;
       HND.forEach(([k, u, v]) => {
-        if (autoText && (k === 'n' || k === 's')) return;
         if ((k.length === 1) && ((u && H < 26) || (v && W < 26))) return;
         const h = document.createElement('i'); h.className = 'lxH' + (k.length === 1 ? ' side' + (v ? ' hz' : '') : ''); h.dataset.h = k; h.style.left = ((u + 1) / 2 * W) + 'px'; h.style.top = ((v + 1) / 2 * H) + 'px'; h.style.cursor = curFor(k, rot); bd.appendChild(h);
       });
@@ -248,6 +249,8 @@
     if (e.pointerType === 'touch') { touchDown(e); if (L.drag || (L.touch && L.touch.size >= 2)) return; }
     if (L.editing) { if (L.editing.contains(e.target)) return; finishEdit(true); }
     const [px0, py0] = toPg(e.clientX, e.clientY);
+    // format painter: the click lands the copied look on what was clicked
+    if (L.paint) { e.preventDefault(); const lf = hitId(e.target); if (!lf) { endPaint(); return; } paintOn(pickFrom(lf, MOD(e))); return; }
     const hd = e.target.closest && e.target.closest('.lxH,.lxRot');
     if (hd) { startXform(e, hd.dataset.h, px0, py0); return; }
     if (L.crop) { const l = get(L.crop); const id = hitId(e.target); if (l && (id === l.id || inBox(l, px0, py0, 0) || (px0 >= l.x + l.ix && px0 <= l.x + l.ix + l.iw && py0 >= l.y + l.iy && py0 <= l.y + l.iy + l.ih))) { L.drag = { mode: 'crop', x0: px0, y0: py0, s: CL(l) }; host.setPointerCapture(e.pointerId); e.preventDefault(); return; } L.crop = null; drawOv(); renderProps(); }
@@ -256,6 +259,9 @@
     const deep = MOD(e) && !e.shiftKey; const id = pickFrom(leaf, deep);
     let clickSel = null;
     if (e.shiftKey) { L.drag = { mode: 'band', x0: px0, y0: py0, add: true, base: L.sel.slice(), toggle: id }; host.setPointerCapture(e.pointerId); e.preventDefault(); return; }
+    // pressing on a background (a big photo / colour block that is not selected) and dragging draws a selection box
+    // like PowerPoint / Figma; a plain click on it still selects it
+    if (!(L.sel.includes(id) || L.sel.some(s => isIn(id, s))) && isBackdrop(get(leaf))) { L.drag = { mode: 'band', x0: px0, y0: py0, add: false, base: [], clickId: id }; host.setPointerCapture(e.pointerId); e.preventDefault(); return; }
     else if (L.sel.includes(id) || L.sel.some(s => isIn(id, s))) { clickSel = id; }
     else setSel([id]);
     if (!L.sel.length) return;
@@ -263,6 +269,28 @@
     const lv = []; items.forEach(l => leaves(l, lv));
     L.drag = { mode: 'move', x0: px0, y0: py0, items, start: new Map(lv.map(l => [l.id, { x: l.x, y: l.y }])), b0: selBox(), moved: false, alt: e.altKey, clickSel, T: null };
     host.setPointerCapture(e.pointerId); e.preventDefault();
+  }
+  /* the narrowest a text box can be dragged: its longest word (measured once per drag) */
+  function minTextW(s0) {
+    const el = L.cache.get(s0.id); if (!el || s0.rot) return 8;
+    const key = s0.id + '|' + s0.html.length + '|' + s0.st.fs + '|' + s0.st.ff; if (L._mw && L._mw.k === key) return L._mw.v;
+    const keep = el.style.width, ws = el.style.whiteSpace; el.style.width = 'min-content'; if (/nowrap|^pre$/.test(ws)) el.style.whiteSpace = ws === 'pre' ? 'pre-wrap' : 'normal'; const v = el.offsetWidth; el.style.width = keep; el.style.whiteSpace = ws;
+    L._mw = { k: key, v: Math.max(8, v || 8) }; return L._mw.v;
+  }
+  /* a background-like layer: a big photo / colour block (never a text) */
+  function isBackdrop(l) { if (!l || l.type === 'text' || l.type === 'group') return false; const b = aabb(l); return !!b && b.w * b.h >= L.doc.w * L.doc.h * .22; }
+  /* what a selection box picks: anything it touches; big backgrounds only when fully inside.
+     «طبقة» mode picks the layers themselves (inside groups too), «مجموعة» mode picks whole groups */
+  function bandHits(r) {
+    const deep = L.pick !== 'group';
+    const pool = deep ? (L.ctx && get(L.ctx) ? leaves(get(L.ctx)) : all().filter(l => l.type !== 'group')) : (L.ctx && get(L.ctx) ? get(L.ctx).children : L.doc.layers);
+    const big = L.doc.w * L.doc.h * .22;
+    return pool.filter(l => !effHidden(l) && !effLocked(l)).filter(l => {
+      const b = aabb(l); if (!b) return false;
+      const inside = b.x >= r.x - .5 && b.y >= r.y - .5 && b.x + b.w <= r.x + r.w + .5 && b.y + b.h <= r.y + r.h + .5;
+      if (b.w * b.h >= big) return inside;
+      return b.x < r.x + r.w && b.x + b.w > r.x && b.y < r.y + r.h && b.y + b.h > r.y;
+    }).map(l => l.id);
   }
   function inBox(l, x, y, pad) { const b = aabb(l); return b && x >= b.x - pad && x <= b.x + b.w + pad && y >= b.y - pad && y <= b.y + b.h + pad; }
   function startXform(e, h, px0, py0) {
@@ -284,7 +312,7 @@
     const [px1, py1] = toPg(e.clientX, e.clientY); let dx = px1 - d.x0, dy = py1 - d.y0;
     if (!d.moved && Math.abs(dx) * L.z + Math.abs(dy) * L.z < 3) return;
     d.moved = true; const thr = 6 / L.z;
-    if (d.mode === 'band') { const x = Math.min(d.x0, px1), y = Math.min(d.y0, py1); d.band = { x, y, w: Math.abs(dx), h: Math.abs(dy) }; const scope = L.ctx ? get(L.ctx).children : L.doc.layers; const hit = scope.filter(l => !effHidden(l) && !effLocked(l)).filter(l => { const b = aabb(l); return b && b.x >= x - .5 && b.y >= y - .5 && b.x + b.w <= x + d.band.w + .5 && b.y + b.h <= y + d.band.h + .5; }).map(l => l.id); L.sel = d.add ? [...new Set(d.base.concat(hit))] : hit; drawOv(); return; }
+    if (d.mode === 'band') { const x = Math.min(d.x0, px1), y = Math.min(d.y0, py1); d.band = { x, y, w: Math.abs(dx), h: Math.abs(dy) }; const hit = bandHits(d.band); L.sel = d.add ? [...new Set(d.base.concat(hit))] : hit; drawOv(); return; }
     if (d.mode === 'crop') { const l = get(L.crop); l.ix = d.s.ix + dx; l.iy = d.s.iy + dy; paint(); return; }
     if (d.mode === 'move') {
       if (d.alt && !d.duped) { d.duped = true; const copies = duplicateItems(d.items, 0); d.items = copies; const lv = []; copies.forEach(l => leaves(l, lv)); d.start = new Map(lv.map(l => [l.id, { x: l.x, y: l.y }])); L.sel = copies.map(l => l.id); }
@@ -309,18 +337,21 @@
       let w = s0.w + hx * lx * k, hh = s0.h + hy * ly * k;
       // snap the moving edges (unrotated only)
       if (!s0.rot && d.T && L.snap !== false) { if (hx) { const edge = hx > 0 ? s0.x + w : s0.x + s0.w - w; const sx = snap1([edge], d.T.xs, thr); if (sx) { w += hx * sx.d * (fromC ? 2 : 1); d.guides.push({ t: 'v', v: sx.t, a: 0, b: L.doc.h }); } } if (hy) { const edge = hy > 0 ? s0.y + hh : s0.y + s0.h - hh; const sy = snap1([edge], d.T.ys, thr); if (sy) { hh += hy * sy.d * (fromC ? 2 : 1); d.guides.push({ t: 'h', v: sy.t, a: 0, b: L.doc.w }); } } }
-      const keepRatio = corner && (s.type === 'image' || s.type === 'svg' || s.type === 'text' ? !e.shiftKey : e.shiftKey);
+      // a text box reflows like a real text frame: the words wrap to the new width and the height follows them
+      // (Shift on a corner scales the text itself instead)
+      const keepRatio = corner && (s.type === 'image' || s.type === 'svg' ? !e.shiftKey : e.shiftKey);
       if (keepRatio) { const r = Math.max(.02, 1 + ((w - s0.w) * s0.w + (hh - s0.h) * s0.h) / (s0.w * s0.w + s0.h * s0.h)); w = s0.w * r; hh = s0.h * r; }
       w = Math.max(4, w); hh = Math.max(4, hh);
-      if (s.type === 'text' && s0.ah !== false && !corner) hh = s0.h;
+      if (s.type === 'text' && !keepRatio) { w = Math.max(minTextW(s0), w); if (s0.ah !== false && hx) hh = s0.h; }
       // anchor = opposite edge (or center with Alt)
       const ncx = fromC ? 0 : (hx ? hx * (w - s0.w) / 2 : 0), ncy = fromC ? 0 : (hy ? hy * (hh - s0.h) / 2 : 0);
       const cx = s0.x + s0.w / 2 + ncx * c - ncy * sn, cy = s0.y + s0.h / 2 + ncx * sn + ncy * c;
       Object.assign(s, { x: cx - w / 2, y: cy - hh / 2, w, h: hh });
       if (s0.clip) { const crop = s.type === 'image' && !corner; s.clip = crop ? clipXform(s0.clip, 1, 1, -(fromC ? (s0.w - w) / 2 : (hx < 0 ? s0.w - w : 0)), -(fromC ? (s0.h - hh) / 2 : (hy < 0 ? s0.h - hh : 0))) : clipXform(s0.clip, w / s0.w, hh / s0.h, 0, 0); }
-      if (s.type === 'text') { if (hx && !corner) s.aw = false; if (corner && keepRatio) { const r = w / s0.w; s.st.fs = R2(s0.st.fs * r); if (s0.st.ls) s.st.ls = R2(s0.st.ls * r); if (s0.st.pad) s.st.pad = s0.st.pad.map(v => R2(v * r)); s.html = scaleHtmlPx(s0.html, r); } else if (hy) s.ah = false; }
+      if (s.type === 'text' && !keepRatio) { if (hx) { s.aw = false; if (s0.st.ws === 'nowrap') s.st.ws = ''; else if (s0.st.ws === 'pre') s.st.ws = 'pre-wrap'; } if (hy && !hx) s.ah = false; }
+      else if (s.type === 'text') { if (corner && keepRatio) { const r = w / s0.w; s.st.fs = R2(s0.st.fs * r); if (s0.st.ls) s.st.ls = R2(s0.st.ls * r); if (s0.st.pad) s.st.pad = s0.st.pad.map(v => R2(v * r)); s.html = scaleHtmlPx(s0.html, r); } else if (hy) s.ah = false; }
       else if (s.type === 'image') { if (corner && keepRatio) { const r = w / s0.w; s.ix = s0.ix * r; s.iy = s0.iy * r; s.iw = s0.iw * r; s.ih = s0.ih * r; } else if (corner) { const rx = w / s0.w, ry = hh / s0.h; s.ix = s0.ix * rx; s.iy = s0.iy * ry; s.iw = s0.iw * rx; s.ih = s0.ih * ry; } else { /* side = crop: the picture stays where it is */ const dl = fromC ? (s0.w - w) / 2 : (hx < 0 ? s0.w - w : 0), dt = fromC ? (s0.h - hh) / 2 : (hy < 0 ? s0.h - hh : 0); s.ix = s0.ix - dl; s.iy = s0.iy - dt; } }
-      d.tip = `${Math.round(w)} × ${Math.round(hh)}`;
+      d.tip = s.type === 'text' && s.ah !== false && !keepRatio ? `W ${Math.round(w)}` : `${Math.round(w)} × ${Math.round(hh)}`;
       return;
     }
     // several items / a group: scale everything around the opposite edge of the selection box
@@ -340,7 +371,7 @@
     const d = L.drag; if (!d) return; L.drag = null; q('lxHost').classList.remove('grabbing');
     try { q('lxHost').releasePointerCapture(e.pointerId); } catch (x) { }
     if (d.mode === 'pan') return;
-    if (d.mode === 'band') { if (!d.moved && d.toggle) { const id = d.toggle; setSel(L.sel.includes(id) ? L.sel.filter(x => x !== id) : L.sel.concat(id), true); return; } setSel(L.sel, false); drawOv(); return; }
+    if (d.mode === 'band') { if (!d.moved && d.toggle) { const id = d.toggle; setSel(L.sel.includes(id) ? L.sel.filter(x => x !== id) : L.sel.concat(id), true); return; } if (!d.moved && d.clickId) { setSel([d.clickId]); return; } setSel(L.sel, false); drawOv(); return; }
     if (d.moved) { changed(); renderProps(); }
     else if (d.mode === 'move' && d.clickSel) { setSel([d.clickSel]); }
     drawOv();
@@ -381,6 +412,90 @@
   }
   function rangeInEdit() { if (!L.editing) return null; const s = getSelection(); if (!s.rangeCount) return null; const r = s.getRangeAt(0); if (r.collapsed || !L.editing.contains(r.commonAncestorContainer)) return null; return r; }
   function styleRange(prop, val) { const r = rangeInEdit(); if (!r) return false; const sp = document.createElement('span'); sp.style[prop] = val; try { sp.appendChild(r.extractContents()); sp.querySelectorAll('*').forEach(c => { if (c.style) c.style[prop] = ''; }); r.insertNode(sp); const s = getSelection(); s.removeAllRanges(); const nr = document.createRange(); nr.selectNodeContents(sp); s.addRange(nr); } catch (x) { return false; } L.cache.get(L.editing.dataset.id) && measureTexts(L.cache, L.doc.layers); drawOv(); return true; }
+
+  /* ---------------- format painter (ناسخ التنسيق) ----------------
+     copies the exact look of one layer (or a group: one look per kind of layer inside it) and lands it on others:
+     text = font, size, weight, colour, spacing, alignment · shape = fill, gradient, border, corners · icon = colour, line weight
+     · picture = corners, border, colour corrections · all = transparency. Colour also crosses kinds (text colour → icon / shape). */
+  const TXT_STRIP = ['font-family', 'font-size', 'font-weight', 'font-style', 'color', 'letter-spacing', 'word-spacing', 'line-height', 'text-transform', '-webkit-text-stroke'];
+  function firstRunStyle(el) {
+    if (!el) return null; const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) { if (n.data.trim()) return getComputedStyle(n.parentElement); } return getComputedStyle(el);
+  }
+  function lookOf(list) {
+    const look = { kinds: {} };
+    const lv = []; list.forEach(l => leaves(l, lv));
+    lv.forEach(l => {
+      if (look.kinds[l.type]) return;
+      const o = { op: l.op ?? 1 };
+      if (l.type === 'text') {
+        const t = l.st || {}; const cs = firstRunStyle(L.cache.get(l.id)); const fs = cs ? px(cs.fontSize) : t.fs;
+        Object.assign(o, { ff: cs ? cs.fontFamily.replace(/"/g, "'") : t.ff, fs: R2(fs || t.fs || 16), fw: cs ? cs.fontWeight : t.fw, fst: cs && cs.fontStyle !== 'normal' ? cs.fontStyle : '', col: cs ? toHex(cs.color) : t.col,
+          lh: t.lh || (cs && cs.lineHeight !== 'normal' ? R2(px(cs.lineHeight) / fs) : null), ls: cs && cs.letterSpacing !== 'normal' ? R2(px(cs.letterSpacing)) : (t.ls || 0), wsp: t.wsp || 0,
+          tt: cs && cs.textTransform !== 'none' ? cs.textTransform : '', td: t.td || '', xs: t.xs || '', bg: t.bg || '', ta: t.ta, tal: t.tal, dir: t.dir || 'rtl' });
+        look.col = look.col || o.col;
+      } else if (l.type === 'shape') { Object.assign(o, { fill: l.fill, grad: l.grad || '', bd: l.bd ? CL(l.bd) : null, rad: l.rad ? CL(l.rad) : null, shape: l.shape }); look.col = look.col || (l.fill && l.fill !== 'transparent' ? l.fill : null); }
+      else if (l.type === 'svg') { Object.assign(o, { col: l.col, sw: l.sw }); look.col = look.col || l.col; }
+      else if (l.type === 'image') Object.assign(o, { rad: l.rad ? CL(l.rad) : null, bd: l.bd ? CL(l.bd) : null, filt: l.filt || '' });
+      look.kinds[l.type] = o;
+    });
+    look.name = list.length === 1 ? nameOf(list[0]) : list.length + ' طبقات';
+    return look;
+  }
+  function stripTextLook(html) {
+    const t = document.createElement('template'); t.innerHTML = html;
+    t.content.querySelectorAll('b,strong,i,em').forEach(n => { const p = n.parentNode; while (n.firstChild) p.insertBefore(n.firstChild, n); n.remove(); });
+    t.content.querySelectorAll('[style]').forEach(n => { TXT_STRIP.forEach(k => n.style.removeProperty(k)); if (!n.getAttribute('style').trim()) n.removeAttribute('style'); });
+    t.content.querySelectorAll('font').forEach(n => { n.removeAttribute('color'); n.removeAttribute('face'); n.removeAttribute('size'); });
+    return t.innerHTML;
+  }
+  function applyLook(l, look) {
+    const k = look.kinds[l.type];
+    if (l.type === 'text') {
+      if (k) {
+        // Arabic keeps its Arabic font and English its English font (brand rule); everything else is copied as is
+        const sameDir = (l.st.dir || 'rtl') === k.dir;
+        if (sameDir) l.st.ff = k.ff;
+        Object.assign(l.st, { fs: k.fs, fw: k.fw, fst: k.fst, col: k.col, lh: k.lh, ls: k.ls, wsp: k.wsp, tt: k.tt, td: k.td, xs: k.xs, bg: k.bg });
+        if (sameDir) { l.st.ta = k.ta; l.st.tal = k.tal; }
+        l.html = sameDir ? stripTextLook(l.html) : stripProp(stripTextLook(l.html), 'font-family'); l.op = k.op;
+      } else if (look.col) { l.st.col = look.col; l.html = stripProp(l.html, 'color'); } else return false;
+      return true;
+    }
+    if (l.type === 'shape') {
+      if (k) { l.fill = k.fill; l.grad = k.grad; l.bd = k.bd ? CL(k.bd) : null; if (k.rad && l.shape !== 'ellipse' && k.shape !== 'ellipse') l.rad = CL(k.rad); l.op = k.op; }
+      else if (look.col) { l.fill = look.col; l.grad = ''; } else return false;
+      return true;
+    }
+    if (l.type === 'svg') {
+      if (k) { l.col = k.col; l.op = k.op; if (k.sw && /stroke-width/.test(l.svg || '')) { l.sw = k.sw; l.svg = l.svg.replace(/stroke-width="[^"]*"/, `stroke-width="${k.sw}"`); } }
+      else if (look.col) l.col = look.col; else return false;
+      return true;
+    }
+    if (l.type === 'image' && k) { l.rad = k.rad ? CL(k.rad) : [0, 0, 0, 0]; l.bd = k.bd ? CL(k.bd) : null; l.filt = k.filt; l.op = k.op; return true; }
+    return false;
+  }
+  function lookTo(ids, look) {
+    let n = 0; ids.map(get).filter(Boolean).forEach(t => leaves(t).forEach(l => { if (!effLocked(l) && applyLook(l, look)) n++; }));
+    return n;
+  }
+  // the mouse pointer becomes a small paint brush while the painter is on
+  function brushCursor() { if (document.documentElement.style.getPropertyValue('--lxBrush')) return; try { const inner = svgIcon('paintbrush', 2).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, ''); const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><g stroke="#fff" stroke-width="5">${inner}</g><g stroke="#002657" stroke-width="2">${inner}</g></svg>`; document.documentElement.style.setProperty('--lxBrush', `url("data:image/svg+xml,${encodeURIComponent(svg)}") 3 21, copy`); } catch (x) { } }
+  function paintBtn() { brushCursor(); [q('lxPaintB'), document.querySelector('#lxProps [data-a="paint"]')].forEach(b => { if (b) { b.classList.toggle('on', !!L.paint); b.classList.toggle('sticky', !!(L.paint && L.paint.sticky)); } }); document.body.classList.toggle('lx-painting', !!L.paint); }
+  function startPaint(sticky) {
+    if (L.editing) finishEdit(true);
+    const ts = topSel(); if (!ts.length && !(L.paint && sticky)) { say('حدد العنصر اللي تبي تنسخ تنسيقه أول، بعدين اضغط «ناسخ التنسيق»'); return; }
+    L.paint = { look: ts.length ? lookOf(ts) : L.paint.look, sticky: !!sticky }; paintBtn();
+    say(sticky ? 'ناسخ التنسيق شغّال: اضغط على كل عنصر تبي تطبّق عليه — Esc للإيقاف' : 'اضغط على العنصر اللي تبي تنسخ له التنسيق');
+  }
+  function endPaint() { if (!L.paint) return; L.paint = null; paintBtn(); }
+  function paintOn(id) {
+    const look = L.paint.look; const n = lookTo([id], look);
+    if (!L.paint.sticky) endPaint();
+    if (!n) { say('هذا العنصر ما يقبل هذا التنسيق'); return; }
+    setSel([id]); changed(); renderProps(); say('تم نسخ التنسيق ✓');
+  }
+  function copyLook() { const ts = topSel(); if (!ts.length) return; L.lookClip = lookOf(ts); try { localStorage.setItem('jedLX_look', JSON.stringify(L.lookClip)); } catch (x) { } say('نسخت التنسيق — حدد عنصر ثاني واضغط ' + (MAC ? '⌘⌥V' : 'Ctrl+Alt+V')); }
+  function pasteLook() { let look = L.lookClip; if (!look) { try { look = JSON.parse(localStorage.getItem('jedLX_look') || 'null'); } catch (x) { } } if (!look) { say('انسخ تنسيق أول: ' + (MAC ? '⌘⌥C' : 'Ctrl+Alt+C')); return; } const ts = topSel(); if (!ts.length) return; const n = lookTo(ts.map(l => l.id), look); if (!n) { say('المحدد ما يقبل هذا التنسيق'); return; } changed(); renderProps(); say('تم لصق التنسيق ✓'); }
 
   /* ---------------- structural actions ---------------- */
   function removeIds(ids) { ids.forEach(id => { const a = arrOf(id); if (!a) return; const i = a.findIndex(x => x.id === id); if (i >= 0) a.splice(i, 1); reindex(); }); pruneGroups(); L.sel = L.sel.filter(get); if (L.ctx && !get(L.ctx)) L.ctx = null; changed(); renderPanel(); renderProps(); }
@@ -550,6 +665,7 @@
     if (!ts.length) { h += pageProps(); p.innerHTML = h; afterProps(p, keepAi); return; }
     const one = ts.length === 1 ? ts[0] : null; const { b, rot, single } = geomVals();
     h += selHead(ts);
+    h += `<div class="row"><button class="b${L.paint ? ' on' : ''}" data-a="paint" style="flex:1" title="كليك: مرة وحدة · دبل كليك: يظل شغّال لين Esc">${IC('paintbrush')} ناسخ التنسيق</button><button class="b ic" data-a="lookCopy" title="نسخ التنسيق (${MAC ? '⌘⌥C' : 'Ctrl+Alt+C'})">${IC('copy')}</button><button class="b ic" data-a="lookPaste" title="لصق التنسيق على المحدد (${MAC ? '⌘⌥V' : 'Ctrl+Alt+V'})">${IC('clipboard-paste')}</button></div>`;
     h += `<h4>المحاذاة ${ts.length === 1 ? '<small style="font-weight:400;color:#7A8AA3">(بالنسبة للصفحة)</small>' : ''}</h4><div class="row"><div class="seg">${[['r', 'align-end-vertical', 'يمين'], ['c', 'align-center-vertical', 'وسط أفقي'], ['l', 'align-start-vertical', 'يسار'], ['t', 'align-start-horizontal', 'أعلى'], ['m', 'align-center-horizontal', 'وسط عمودي'], ['b', 'align-end-horizontal', 'أسفل']].map(([k, i, t]) => `<button data-al="${k}" title="${t}">${IC(i)}</button>`).join('')}</div></div>`;
     if (ts.length >= 3) h += `<div class="row"><button class="b" data-a="disH" style="flex:1">${IC('align-horizontal-distribute-center')} توزيع أفقي</button><button class="b" data-a="disV" style="flex:1">${IC('align-vertical-distribute-center')} توزيع عمودي</button></div>`;
     h += `<h4>المقاس والمكان</h4><div class="grid4">${num('x', 'X', R1(b.x))}${num('y', 'Y', R1(b.y))}${num('w', 'W', R1(b.w))}${num('h', 'H', R1(b.h), single && single.type === 'text' && single.ah !== false)}</div><div class="grid4">${num('r', '°', R1(rot), !single)}<button class="b" data-a="lockRatio" title="تكبير وتصغير بنفس النسبة">${IC(L.ratio === false ? 'lock-open' : 'lock')} ${L.ratio === false ? 'نسبة حرة' : 'نفس النسبة'}</button></div>`;
@@ -617,7 +733,7 @@
     <h4>أدوات</h4><div class="row"><button class="b" data-a="lint" style="flex:1">${IC('shield-check')} فحص الهوية</button><button class="b" data-a="flatAll" style="flex:1">${IC('layers-3')} فك كل المجموعات</button></div>
     <div class="row"><button class="b" data-a="selAll" style="flex:1">${IC('square-dashed')} تحديد الكل</button><button class="b" data-a="snapT" style="flex:1">${IC('magnet' in ICONS ? 'magnet' : 'move')} ${L.snap === false ? 'تشغيل المغناطيس' : 'إيقاف المغناطيس'}</button></div>
     <div id="lxLint"></div>
-    <h4>طريقة الشغل</h4><div class="hint"><b>كليك</b> يحدد الطبقة (أو مجموعتها) · <b>دبل كليك</b> يدخل للمجموعة، ويعدّل النص، ويقص الصورة<br><b>${MAC ? '⌘' : 'Ctrl'} + كليك</b> يحدد أي طبقة مباشرة حتى لو داخل مجموعة<br><b>Shift + كليك</b> أو <b>اسحب مربع</b> من مكان فاضي لتحديد أكثر من طبقة<br>المربعات الصغيرة: تكبير وتصغير · الدائرة فوق: تدوير · <b>Alt</b> من المنتصف · <b>Shift</b> يلغي/يثبت النسبة<br>في الصورة: الأطراف الجانبية <b>تقص</b> والزوايا <b>تكبّر</b><br>اسحب الطبقات في القائمة لتغيير ترتيبها أو لإدخالها داخل مجموعة<br><kbd>${K('G')}</kbd> تجميع · <kbd>${K('⇧G')}</kbd> فك · <kbd>${K('D')}</kbd> نسخ · <kbd>${K('C')}</kbd>/<kbd>${K('V')}</kbd> نسخ ولصق · <kbd>Del</kbd> حذف · الأسهم للتحريك الدقيق · <kbd>Space</kbd> + سحب للتنقل · <kbd>${K('Z')}</kbd> تراجع</div>`;
+    <h4>طريقة الشغل</h4><div class="hint"><b>كليك</b> يحدد الطبقة (أو مجموعتها) · <b>دبل كليك</b> يدخل للمجموعة، ويعدّل النص، ويقص الصورة<br><b>${MAC ? '⌘' : 'Ctrl'} + كليك</b> يحدد أي طبقة مباشرة حتى لو داخل مجموعة<br><b>Shift + كليك</b> أو <b>اسحب مربع</b> من مكان فاضي أو من فوق الخلفية لتحديد أكثر من طبقة<br><b>مربع النص</b>: اسحب أطرافه والكلام ينزل ويطلع معه تلقائياً · <b>Shift</b> على الزاوية يكبّر الخط نفسه<br><b>ناسخ التنسيق</b>: حدد عنصر واضغط الفرشاة ثم اضغط على عنصر ثاني (دبل كليك على الفرشاة يخليها شغّالة لين Esc) · <kbd>${MAC ? '⌘⌥C' : 'Ctrl+Alt+C'}</kbd>/<kbd>${MAC ? '⌘⌥V' : 'Ctrl+Alt+V'}</kbd> نسخ ولصق التنسيق<br>المربعات الصغيرة: تكبير وتصغير · الدائرة فوق: تدوير · <b>Alt</b> من المنتصف · <b>Shift</b> يلغي/يثبت النسبة<br>في الصورة: الأطراف الجانبية <b>تقص</b> والزوايا <b>تكبّر</b><br>اسحب الطبقات في القائمة لتغيير ترتيبها أو لإدخالها داخل مجموعة<br><kbd>${K('G')}</kbd> تجميع · <kbd>${K('⇧G')}</kbd> فك · <kbd>${K('D')}</kbd> نسخ · <kbd>${K('C')}</kbd>/<kbd>${K('V')}</kbd> نسخ ولصق · <kbd>Del</kbd> حذف · الأسهم للتحريك الدقيق · <kbd>Space</kbd> + سحب للتنقل · <kbd>${K('Z')}</kbd> تراجع</div>`;
   }
   function afterProps(p, keepAi) {
     if (q('lxAiReq') && keepAi && !q('lxAiReq').value) q('lxAiReq').value = keepAi;
@@ -691,6 +807,7 @@
     const a = b.dataset.a; if (!a) return;
     const fsStep = (l, f) => setFs(l, l.st.fs * f);
     const A = {
+      paint: () => { if (e.detail >= 2) { startPaint(true); return; } if (L.paint) endPaint(); else startPaint(false); }, lookCopy: copyLook, lookPaste: pasteLook,
       disH: () => distribute('h'), disV: () => distribute('v'), lockRatio: () => { L.ratio = L.ratio === false; renderProps(); },
       edit: () => startEdit(one), endEdit: () => finishEdit(true),
       fw4: () => { if (L.editing && rangeInEdit()) { styleRange('fontWeight', '400'); return; } one.st.fw = 400; one.html = stripProp(one.html, 'font-weight'); changed(); renderProps(); },
@@ -802,7 +919,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
   function offsetLayers(layers, dx, dy) { return layers.map(l => { const c = CL(l); moveLayer(c, dx, dy); return c; }); }
   async function renderNode(layers, w, h, bg) {
     const host = document.createElement('div'); host.style.cssText = 'position:fixed;left:-100000px;top:0;z-index:-1'; const pg = document.createElement('div'); pg.style.cssText = `position:relative;width:${w}px;height:${h}px;overflow:hidden;background:${bg || 'transparent'}`; host.appendChild(pg); document.body.appendChild(host);
-    const cache = new Map(); paintInto(pg, layers, cache, false); pg.querySelectorAll('.hid').forEach(x => x.remove()); measureTexts(cache, layers);
+    const cache = new Map(); paintInto(pg, layers, cache, false); if (measureTexts(cache, layers)) paintInto(pg, layers, cache, false); pg.querySelectorAll('.hid').forEach(x => x.remove());
     await document.fonts.ready; await Promise.all([...pg.querySelectorAll('img')].map(i => i.decode().catch(() => { })));
     return { host, pg };
   }
@@ -826,7 +943,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
   }
   async function exportPDF() {
     finishEdit(true); const box = q('lxPrint'); box.innerHTML = ''; const pg = document.createElement('div'); pg.style.cssText = `position:relative;width:${L.doc.w}px;height:${L.doc.h}px;overflow:hidden;background:${L.doc.bg || '#fff'}`; box.appendChild(pg); const cache = new Map(); paintInto(pg, L.doc.layers, cache, false); pg.querySelectorAll('.hid').forEach(x => x.remove());
-    box.style.display = 'block'; measureTexts(cache, L.doc.layers); box.style.display = '';
+    box.style.display = 'block'; if (measureTexts(cache, L.doc.layers)) { paintInto(pg, L.doc.layers, cache, false); pg.querySelectorAll('.hid').forEach(x => x.remove()); } box.style.display = '';
     let st = q('lxPageSize'); if (!st) { st = document.createElement('style'); st.id = 'lxPageSize'; document.head.appendChild(st); } st.textContent = `@media print{@page{size:${L.doc.w}px ${L.doc.h}px;margin:0}html,body{height:auto!important;overflow:visible!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}`;
     document.body.classList.add('lx-printing'); const t = document.title; document.title = fname('');
     await document.fonts.ready; await wait(80); window.print(); document.title = t; document.body.classList.remove('lx-printing'); box.innerHTML = ''; say('اختر «حفظ كـ PDF» من نافذة الطباعة');
@@ -903,7 +1020,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
   function sanitizeLayers(arr) { return (arr || []).filter(l => l && /^(text|image|shape|svg|group)$/.test(l.type)).map(l => { l.id = l.id || uid(); if (l.type === 'text') l.html = cleanHtml(String(l.html || '')); if (l.type === 'svg') { const t = document.createElement('template'); t.innerHTML = String(l.svg || ''); t.content.querySelectorAll('script,foreignObject').forEach(x => x.remove()); t.content.querySelectorAll('*').forEach(n => [...n.attributes].forEach(a => { if (/^on/i.test(a.name) || /javascript:/i.test(a.value)) n.removeAttribute(a.name); })); l.svg = t.innerHTML; } if (l.type === 'group') l.children = sanitizeLayers(l.children); return l; }); }
   function injectFonts(css) { let st = q('lxFonts'); if (!st) { st = document.createElement('style'); st.id = 'lxFonts'; document.head.appendChild(st); } st.textContent = css || ''; }
   function enter() { if (L.on) return; L.on = true; if (typeof closeSheets === 'function') closeSheets(); if (typeof qaClose === 'function') try { qaClose(); } catch (e) { } if (typeof libClose === 'function') try { libClose(); } catch (e) { } if (typeof deselect === 'function') try { deselect(); } catch (e) { } document.body.classList.add('lx-on', 'lx-tab-layers'); const sh = document.querySelector('#iconPanel .shead b'); if (sh) { sh._t = sh._t || sh.textContent; sh.textContent = 'الطبقات والأيقونات'; } const sh2 = document.querySelector('#blockPanel .shead b'); if (sh2) { sh2._t = sh2._t || sh2.textContent; sh2.textContent = 'الخصائص'; } if (document.body.classList.contains('free-on') && q('fmBack')) { document.body.classList.remove('free-on'); } setTimeout(() => { sizeStage(); fitZoom(); }, 30); }
-  async function exitLX() { finishEdit(true); if (L.doc) { await autosave(true); saveThumb(); } L.on = false; document.body.classList.remove('lx-on', 'lx-tab-layers', 'lx-tab-icons'); document.querySelectorAll('#iconPanel .shead b, #blockPanel .shead b').forEach(x => { if (x._t) x.textContent = x._t; }); L.cache.forEach(el => el.remove()); L.cache.clear(); q('lxOv').innerHTML = ''; if (typeof closeSheets === 'function') closeSheets(); try { localStorage.removeItem('jedLX_open'); } catch (e) { } setTimeout(() => { try { fit(); } catch (e) { } updLayersBtn(); }, 30); say(L.linkedBoard ? 'تعديلاتك محفوظة — اضغط «متابعة الطبقات» وترجع لها بنفس المكان' : 'تعديلاتك محفوظة في «تصاميمي»'); }
+  async function exitLX() { endPaint(); finishEdit(true); if (L.doc) { await autosave(true); saveThumb(); } L.on = false; document.body.classList.remove('lx-on', 'lx-tab-layers', 'lx-tab-icons'); document.querySelectorAll('#iconPanel .shead b, #blockPanel .shead b').forEach(x => { if (x._t) x.textContent = x._t; }); L.cache.forEach(el => el.remove()); L.cache.clear(); q('lxOv').innerHTML = ''; if (typeof closeSheets === 'function') closeSheets(); try { localStorage.removeItem('jedLX_open'); } catch (e) { } setTimeout(() => { try { fit(); } catch (e) { } updLayersBtn(); }, 30); say(L.linkedBoard ? 'تعديلاتك محفوظة — اضغط «متابعة الطبقات» وترجع لها بنفس المكان' : 'تعديلاتك محفوظة في «تصاميمي»'); }
   function setTab(t) { document.body.classList.toggle('lx-tab-layers', t === 'layers'); document.body.classList.toggle('lx-tab-icons', t === 'icons'); q('lxTabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === t)); }
   const isPh = () => document.body.classList.contains('phone');
 
@@ -1197,6 +1314,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
       <button class="tb dis" id="lxUndo" title="تراجع (${K('Z')})">${IC('undo-2')}</button><button class="tb dis" id="lxRedo" title="إعادة (${K('⇧Z')})">${IC('redo-2')}</button>
       <span class="sep dsk"></span>
       <button class="tb dsk" id="lxGroupB" title="تجميع (${K('G')})">${IC('group')}<span class="lbl">تجميع</span></button><button class="tb dsk" id="lxUngroupB" title="فك التجميع (${K('⇧G')})">${IC('ungroup')}<span class="lbl">فك</span></button>
+      <button class="tb dsk" id="lxPaintB" title="ناسخ التنسيق — كليك: ينسخ مرة وحدة · دبل كليك: يظل شغّال لين تضغط Esc · ${MAC ? '⌘⌥C / ⌘⌥V' : 'Ctrl+Alt+C / Ctrl+Alt+V'} نسخ ولصق التنسيق">${IC('paintbrush')}<span class="lbl">ناسخ التنسيق</span></button>
       <button class="tb dsk" id="lxPickB" title="ايش يحدد الكليك على التصميم؟ (اضغط للتبديل) — ${MAC ? '⌘' : 'Ctrl'} + كليك يسوي العكس"></button>
       <button class="tb dsk" id="lxAiB" title="تعديل ذكي">${IC('sparkles')}<span class="lbl">تعديل ذكي</span></button>
       <span class="sp"></span>
@@ -1223,6 +1341,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     tabs.addEventListener('click', e => { const b = e.target.closest('[data-t]'); if (b) setTab(b.dataset.t); });
     lay.addEventListener('click', e => { const b = e.target.closest('[data-lb]'); if (!b) return; const k = b.dataset.lb; if (k === 'expand') { all().forEach(l => { if (l.type === 'group') L.open[l.id] = true; }); renderPanel(); } if (k === 'collapse') { L.open = {}; renderPanel(); } if (k === 'group') groupSel(); if (k === 'ungroup') ungroupSel(); if (k === 'dup') dupSel(); if (k === 'up') order(1); if (k === 'down') order(-1); if (k === 'del') delSel(); });
     wirePanel();
+    q('lxPaintB').onclick = e => { if (e.detail >= 2) { startPaint(true); return; } if (L.paint) { endPaint(); return; } startPaint(false); };
     q('lxBack').onclick = exitLX; q('lxUndo').onclick = undo; q('lxRedo').onclick = redo; q('lxGroupB').onclick = groupSel; q('lxUngroupB').onclick = ungroupSel; q('lxAiB').onclick = () => { L.aiMode = !L.aiMode; renderProps(); if (isPh()) openSheet('blocks'); };
     const pickLbl = () => { q('lxPickB').innerHTML = `${IC(L.pick === 'group' ? 'folder' : 'layers')}<span class="lbl">الكليك يحدد: ${L.pick === 'group' ? 'المجموعة' : 'الطبقة'}</span>`; }; pickLbl(); q('lxPickB').onclick = () => { L.pick = L.pick === 'group' ? 'layer' : 'group'; try { localStorage.setItem('jedLX_pick', L.pick); } catch (x) { } pickLbl(); say(L.pick === 'group' ? 'الكليك الحين يحدد المجموعة كاملة (دبل كليك يدخل لعناصرها)' : 'الكليك الحين يحدد الطبقة نفسها حتى لو داخل مجموعة'); };
     q('lxZi').onclick = () => setZoom(L.z * 1.2); q('lxZo').onclick = () => setZoom(L.z / 1.2); q('lxFit').onclick = fitZoom;
@@ -1260,10 +1379,10 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     if (!L.on) return; e.preventDefault(); e.stopPropagation(); const leaf = hitId(e.target); if (leaf) { const id = pickFrom(leaf, MOD(e)); if (!L.sel.includes(id) && !L.sel.some(s => isIn(id, s))) setSel([id]); }
     const ts = topSel(); const m = q('lxCtx'); const it = (a, t, k, dn) => `<button data-c="${a}"${dn ? ' class="dn"' : ''}><span>${t}</span>${k ? `<kbd>${k}</kbd>` : ''}</button>`;
     let h = '';
-    if (ts.length) { h += it('copy', 'نسخ', K('C')) + it('cut', 'قص', K('X')) + it('paste', 'لصق', K('V')) + it('dup', 'تكرار', K('D')) + '<hr>' + it('front', 'للأمام تماماً', K('⇧]')) + it('fwd', 'خطوة للأمام', K(']')) + it('bwd', 'خطوة للخلف', K('[')) + it('back', 'للخلف تماماً', K('⇧[')) + '<hr>' + (ts.length > 1 ? it('group', 'تجميع', K('G')) : '') + (ts.some(l => l.type === 'group') ? it('ungroup', 'فك التجميع', K('⇧G')) : '') + (ts.length === 1 && parentOf(ts[0].id) ? it('outG', 'إخراج من المجموعة', '') : '') + it('lock', ts.every(l => l.locked) ? 'فتح القفل' : 'قفل', K('L')) + it('hide', 'إخفاء', K('⇧H')) + it('raster', 'تحويل لصورة', '') + it('expSel', 'تصدير المحدد PNG', '') + '<hr>' + it('del', 'حذف', 'Del', true); }
+    if (ts.length) { h += it('copy', 'نسخ', K('C')) + it('cut', 'قص', K('X')) + it('paste', 'لصق', K('V')) + it('dup', 'تكرار', K('D')) + '<hr>' + it('lookCopy', 'نسخ التنسيق', MAC ? '⌘⌥C' : 'Ctrl+Alt+C') + it('lookPaste', 'لصق التنسيق', MAC ? '⌘⌥V' : 'Ctrl+Alt+V') + it('paintT', 'ناسخ التنسيق (فرشاة)', '') + '<hr>' + it('front', 'للأمام تماماً', K('⇧]')) + it('fwd', 'خطوة للأمام', K(']')) + it('bwd', 'خطوة للخلف', K('[')) + it('back', 'للخلف تماماً', K('⇧[')) + '<hr>' + (ts.length > 1 ? it('group', 'تجميع', K('G')) : '') + (ts.some(l => l.type === 'group') ? it('ungroup', 'فك التجميع', K('⇧G')) : '') + (ts.length === 1 && parentOf(ts[0].id) ? it('outG', 'إخراج من المجموعة', '') : '') + it('lock', ts.every(l => l.locked) ? 'فتح القفل' : 'قفل', K('L')) + it('hide', 'إخفاء', K('⇧H')) + it('raster', 'تحويل لصورة', '') + it('expSel', 'تصدير المحدد PNG', '') + '<hr>' + it('del', 'حذف', 'Del', true); }
     else h += it('paste', 'لصق', K('V')) + it('selAll', 'تحديد الكل', K('A')) + '<hr>' + it('addT', 'إضافة نص', '') + it('addI', 'إضافة صورة', '') + it('addR', 'إضافة مستطيل', '');
     m.innerHTML = h; m.classList.add('on'); const r = m.getBoundingClientRect(); m.style.left = Math.min(e.clientX, innerWidth - r.width - 8) + 'px'; m.style.top = Math.min(e.clientY, innerHeight - r.height - 8) + 'px';
-    m.onclick = ev => { const b = ev.target.closest('[data-c]'); if (!b) return; closeCtx(); const a = b.dataset.c; const map = { copy: () => copySel(), cut: () => copySel(true), paste: () => { if (!pasteClip()) say('ما فيه شي منسوخ'); }, dup: dupSel, front: () => order(2), fwd: () => order(1), bwd: () => order(-1), back: () => order(-2), group: groupSel, ungroup: ungroupSel, outG: () => { const l = ts[0]; const g = parentOf(l.id); moveTo([l.id], g.id, 'above'); }, lock: () => { const v = !ts.every(l => l.locked); ts.forEach(l => l.locked = v); if (v) L.sel = []; changed(); }, hide: () => { ts.forEach(l => l.hidden = true); L.sel = []; changed(); }, raster: rasterSel, expSel: () => exportPNG(4, { sel: true }), del: delSel, selAll: () => setSel(L.doc.layers.filter(l => !l.locked && !l.hidden).map(l => l.id)), addT: () => addText('ar'), addI: () => pickImage(s => addImageData(s)), addR: () => addShape('rect') }; map[a] && map[a](); };
+    m.onclick = ev => { const b = ev.target.closest('[data-c]'); if (!b) return; closeCtx(); const a = b.dataset.c; const map = { lookCopy: copyLook, lookPaste: pasteLook, paintT: () => startPaint(false), copy: () => copySel(), cut: () => copySel(true), paste: () => { if (!pasteClip()) say('ما فيه شي منسوخ'); }, dup: dupSel, front: () => order(2), fwd: () => order(1), bwd: () => order(-1), back: () => order(-2), group: groupSel, ungroup: ungroupSel, outG: () => { const l = ts[0]; const g = parentOf(l.id); moveTo([l.id], g.id, 'above'); }, lock: () => { const v = !ts.every(l => l.locked); ts.forEach(l => l.locked = v); if (v) L.sel = []; changed(); }, hide: () => { ts.forEach(l => l.hidden = true); L.sel = []; changed(); }, raster: rasterSel, expSel: () => exportPNG(4, { sel: true }), del: delSel, selAll: () => setSel(L.doc.layers.filter(l => !l.locked && !l.hidden).map(l => l.id)), addT: () => addText('ar'), addI: () => pickImage(s => addImageData(s)), addR: () => addShape('rect') }; map[a] && map[a](); };
   }
   function closeCtx() { const m = q('lxCtx'); if (m) m.classList.remove('on'); }
   /* keyboard */
@@ -1283,10 +1402,12 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     if (mod && k === '0') { stop(); fitZoom(); return; }
     if (mod && k === '1') { stop(); setZoom(1); return; }
     if (mod && k === 'a') { stop(); const scope = L.ctx && get(L.ctx) ? get(L.ctx).children : L.doc.layers; setSel(scope.filter(l => !l.locked && !l.hidden).map(l => l.id), true); return; }
+    if (mod && e.altKey && e.code === 'KeyC') { stop(); copyLook(); return; }
+    if (mod && e.altKey && e.code === 'KeyV') { stop(); pasteLook(); return; }
     if (mod && k === 'v') return; // handled by paste event
     if (mod && k === 'c') { if (L.sel.length) { stop(); copySel(); } return; }
     if (mod && k === 'x') { if (L.sel.length) { stop(); copySel(true); } return; }
-    if (e.key === 'Escape') { stop(); if (L.crop) { L.crop = null; drawOv(); renderProps(); return; } if (L.aiMode) { L.aiMode = false; renderProps(); return; } const p0 = L.sel.length === 1 && parentOf(L.sel[0]); if (p0) { setSel([p0.id]); return; } if (L.ctx) { const g = L.ctx; setSel([g]); return; } setSel([]); return; }
+    if (e.key === 'Escape') { stop(); if (L.paint) { endPaint(); say('وقّفت ناسخ التنسيق'); return; } if (L.crop) { L.crop = null; drawOv(); renderProps(); return; } if (L.aiMode) { L.aiMode = false; renderProps(); return; } const p0 = L.sel.length === 1 && parentOf(L.sel[0]); if (p0) { setSel([p0.id]); return; } if (L.ctx) { const g = L.ctx; setSel([g]); return; } setSel([]); return; }
     if (!L.sel.length) return;
     if (mod && k === 'g') { stop(); e.shiftKey ? ungroupSel() : groupSel(); return; }
     if (mod && k === 'd') { stop(); dupSel(); return; }

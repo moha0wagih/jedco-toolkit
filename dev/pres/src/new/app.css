@@ -287,7 +287,14 @@ html[dir=ltr] .dk-t{transform-origin:left center}
 .issue .dot.i{background:var(--sky)}
 .cb.dirb{background:linear-gradient(90deg,#002657,#004EAA);color:#fff;font-weight:700}
 .cb.dirb:hover{background:#004EAA;color:#fff}
-body.painting .ed-frame{cursor:copy}
+body.painting .ed-frame,body.painting .ed-frame *{cursor:var(--pmBrush,copy)!important}
+.cb.sticky{background:#FC5C17;color:#fff}
+#ptChip{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:300;display:none;align-items:center;gap:10px;padding:8px 10px 8px 16px;background:#002657;color:#fff;border-radius:999px;font:13px SanTaj,Tajawal,sans-serif;direction:rtl;box-shadow:0 8px 24px rgba(0,38,87,.3)}
+#ptChip.on{display:flex}
+#ptChip>svg{width:17px;height:17px;flex:none;color:#2FC0C7}
+#ptChip button{width:26px;height:26px;border:0;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+#ptChip button:hover{background:#FC5C17}
+#ptChip button svg{width:14px;height:14px}
 .dir-scope{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);margin-bottom:10px;flex-wrap:wrap}
 .bc-pre{direction:rtl;white-space:pre-wrap;font-size:12px;background:var(--soft);border-radius:10px;padding:12px;max-height:220px;overflow:auto;margin:10px 0 0}
 .rv-top{display:flex;gap:18px;align-items:center;margin-bottom:14px}

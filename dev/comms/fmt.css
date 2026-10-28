@@ -1,0 +1,14 @@
+/* ناسخ التنسيق (format painter) — announcement editor */
+#selbar button[data-ms="paint"].on{background:#004EAA;color:#fff}
+#selbar button[data-ms="paint"].sticky{background:#FC5C17;color:#fff}
+#tbar button[data-t="paint"] svg{width:15px;height:15px;display:block}
+#tbar button[data-t="paint"].on{background:#2FC0C7;color:#002657}
+#tbar button[data-t="paint"].sticky{background:#FC5C17;color:#fff}
+body.fmt-painting #page,body.fmt-painting #page *{cursor:var(--fmtBrush,copy)!important}
+#fmtChip{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:130;display:none;align-items:center;gap:10px;padding:8px 10px 8px 16px;background:#002657;color:#fff;border-radius:999px;font:13px Tajawal;direction:rtl;box-shadow:0 8px 24px rgba(0,38,87,.3)}
+#fmtChip.on{display:flex}
+#fmtChip>svg{width:17px;height:17px;flex:none;color:#2FC0C7}
+#fmtChip button{width:26px;height:26px;border:0;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#fmtChip button:hover{background:#FC5C17}
+#fmtChip button svg{width:14px;height:14px}
+body.phone #fmtChip{bottom:84px}

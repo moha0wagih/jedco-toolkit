@@ -271,10 +271,26 @@ function stripText(xml) {
 }
 const maxId = xml => { let m = 1; for (const x of xml.matchAll(/ id="(\d+)"/g)) m = Math.max(m, +x[1]); return m; };
 
+/* ---------- official template: loaded only when a deck is exported (keeps the tool quick to open) ---------- */
+PM._tplWait = {};
+PM.loadTpl = function (lang) {
+  const key = lang === 'en' ? '__TPL_EN' : '__TPL_AR';
+  if (window[key]) return Promise.resolve();
+  if (PM._tplWait[lang]) return PM._tplWait[lang];
+  try { if (PM.UI && PM.UI.progress) PM.UI.progress('أجهّز القالب الرسمي…', 'أول مرة فقط، بعدها يصير أسرع'); } catch (e) {}
+  return PM._tplWait[lang] = new Promise(res => {
+    const sc = document.createElement('script');
+    sc.src = (lang === 'en' ? 'tpl_en.js' : 'tpl_ar.js');
+    sc.onload = () => res();
+    sc.onerror = () => { delete PM._tplWait[lang]; sc.remove(); res(); };
+    document.head.appendChild(sc);
+  });
+};
 /* ---------- build the deck ---------- */
 PM.exportPptx = async function (deck, onProgress) {
   if (PM.ensurePhotos) await PM.ensurePhotos(deck);
   const lang = deck.lang === 'en' ? 'en' : 'ar';
+  await PM.loadTpl(lang);
   const tplB64 = lang === 'en' ? (window.__TPL_EN || '') : (window.__TPL_AR || '');
   if (!tplB64) throw new Error('ملف التمبلت الرسمي غير موجود بجانب الأداة (tpl_ar.js / tpl_en.js)');
   const tz = await JSZip.loadAsync(PM.b64ToBytes(tplB64));

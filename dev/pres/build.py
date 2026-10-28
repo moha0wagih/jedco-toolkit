@@ -95,8 +95,6 @@ page = f'''<!doctype html>
 <script>
 {engine}
 </script>
-<script src="tpl_ar.js"></script>
-<script src="tpl_en.js"></script>
 <script src="photos/lib.js"></script>
 <script>
 {data}

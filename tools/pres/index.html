@@ -297,7 +297,14 @@ html[dir=ltr] .dk-t{transform-origin:left center}
 .issue .dot.i{background:var(--sky)}
 .cb.dirb{background:linear-gradient(90deg,#002657,#004EAA);color:#fff;font-weight:700}
 .cb.dirb:hover{background:#004EAA;color:#fff}
-body.painting .ed-frame{cursor:copy}
+body.painting .ed-frame,body.painting .ed-frame *{cursor:var(--pmBrush,copy)!important}
+.cb.sticky{background:#FC5C17;color:#fff}
+#ptChip{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:300;display:none;align-items:center;gap:10px;padding:8px 10px 8px 16px;background:#002657;color:#fff;border-radius:999px;font:13px SanTaj,Tajawal,sans-serif;direction:rtl;box-shadow:0 8px 24px rgba(0,38,87,.3)}
+#ptChip.on{display:flex}
+#ptChip>svg{width:17px;height:17px;flex:none;color:#2FC0C7}
+#ptChip button{width:26px;height:26px;border:0;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+#ptChip button:hover{background:#FC5C17}
+#ptChip button svg{width:14px;height:14px}
 .dir-scope{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);margin-bottom:10px;flex-wrap:wrap}
 .bc-pre{direction:rtl;white-space:pre-wrap;font-size:12px;background:var(--soft);border-radius:10px;padding:12px;max-height:220px;overflow:auto;margin:10px 0 0}
 .rv-top{display:flex;gap:18px;align-items:center;margin-bottom:14px}
@@ -14368,6 +14375,9 @@ function hit(e) {
   for (const el of els) { const o = objById(el.dataset.id); if (selectable(o, e)) return o; }
   return null;
 }
+/* a background-like object: a big photo or colour block (never a text) */
+function isBackdrop(o) { return !!o && o.t !== 'text' && o.t !== 'chart' && o.t !== 'table' && o.w * o.h >= W * H * 0.22; }
+Ed.isBackdrop = isBackdrop;
 function bounds(list) {
   const x = Math.min(...list.map(o => o.x)), y = Math.min(...list.map(o => o.y));
   return { x, y, w: Math.max(...list.map(o => o.x + o.w)) - x, h: Math.max(...list.map(o => o.y + o.h)) - y };
@@ -14469,20 +14479,24 @@ function onDown(e) {
   if (Ed.editing) { if (e.target.closest('.pm-text.editing')) return; Ed.endEdit(); }
   const t = e.target.closest ? (e.target.closest('.mvh') || e.target) : e.target;
   const p = pt(e);
+  // format painter: the click lands the copied look (a click on nothing puts the brush down)
+  if (Ed.painter) { e.preventDefault(); Ed.painter(hit(e)); return; }
   if (t.classList.contains('mvh')) { startGrip(e, t.dataset.mv, p); return; }
   // value handles (charts / bars)
   if (t.classList.contains('vh')) { startValueDrag(e, t, p); return; }
   if (t.classList.contains('hdl')) { startResize(e, t.dataset.h, p); return; }
   const o = hit(e);
-  if (!o) {
+  // pressing on a background (a big photo / colour block that is not selected) and dragging draws a selection box;
+  // a plain click on it still selects it
+  const backdrop = o && !ST.sel.has(o.id) && !(e.shiftKey || e.ctrlKey || e.metaKey) && isBackdrop(o);
+  if (!o || backdrop) {
     if (!(e.shiftKey || e.ctrlKey || e.metaKey)) ST.sel.clear();
     Ed.marquee = { x0: p.x, y0: p.y, x1: p.x, y1: p.y, add: new Set(ST.sel) };
-    drag = { kind: 'marq' };
+    drag = { kind: 'marq', clickId: backdrop ? o.id : null };
     capture(e);
     Ed.drawOverlay(); PM.emit('sel');
     return;
   }
-  if (Ed.painter) { const f = Ed.painter; Ed.painter = null; document.body.classList.remove('painting'); f(o); return; }
   // image focus mode: drag inside the frame to move the photo
   if (Ed.tool === 'focus' && o.t === 'image' && ST.sel.has(o.id)) { startFocus(e, o, p); return; }
   const wasOnly = ST.sel.size === 1 && ST.sel.has(o.id);
@@ -14517,7 +14531,13 @@ function onMove(e) {
     const m = Ed.marquee; m.x1 = p.x; m.y1 = p.y;
     const r = { x: Math.min(m.x0, m.x1), y: Math.min(m.y0, m.y1), w: Math.abs(m.x1 - m.x0), h: Math.abs(m.y1 - m.y0) };
     ST.sel = new Set(m.add);
-    if (r.w > 3 || r.h > 3) for (const o of slide().objs) if (selectable(o) && o.x < r.x + r.w && o.x + o.w > r.x && o.y < r.y + r.h && o.y + o.h > r.y && !(o.w > W * 0.95 && o.h > H * 0.95)) ST.sel.add(o.id);
+    // anything the box touches; big backgrounds only when the box covers them completely
+    if (r.w > 3 || r.h > 3) for (const o of slide().objs) {
+      if (!selectable(o) || !(o.x < r.x + r.w && o.x + o.w > r.x && o.y < r.y + r.h && o.y + o.h > r.y)) continue;
+      if (isBackdrop(o) && !(o.x >= r.x - .5 && o.y >= r.y - .5 && o.x + o.w <= r.x + r.w + .5 && o.y + o.h <= r.y + r.h + .5)) continue;
+      ST.sel.add(o.id);
+    }
+    drag.moved = drag.moved || r.w * Ed.scale > 3 || r.h * Ed.scale > 3;
     Ed.drawOverlay();
     return;
   }
@@ -14543,7 +14563,7 @@ function onUp(e) {
   const d = drag; drag = null;
   document.body.classList.remove('grabbing');
   if (!d) return;
-  if (d.kind === 'marq') { Ed.marquee = null; Ed.drawOverlay(); PM.emit('sel'); return; }
+  if (d.kind === 'marq') { Ed.marquee = null; if (!d.moved && d.clickId && objById(d.clickId)) { ST.sel = new Set([d.clickId]); } Ed.drawOverlay(); PM.emit('sel'); return; }
   if (d.kind === 'move' && d.moved) { slide().edited = true; PM.commit('move'); Ed.drawOverlay(); PM.emit('change'); return; }
   if (d.kind === 'move' && !d.moved) {
     if (d.grip) { Ed.drawOverlay(); return; }
@@ -14589,7 +14609,7 @@ function doResize(e, p) {
   let x = o0.x, y = o0.y, w = o0.w, h = o0.h;
   if (d.includes('e')) w = o0.w + dx; if (d.includes('w')) { w = o0.w - dx; x = o0.x + dx; }
   if (d.includes('s')) h = o0.h + dy; if (d.includes('n')) { h = o0.h - dy; y = o0.y + dy; }
-  const keep = e.shiftKey || o.t === 'icon' || o.t === 'logo' || (o.t === 'text' && d.length === 2) || (o.t === 'chart' && o.ring);
+  const keep = e.shiftKey || o.t === 'icon' || o.t === 'logo' || (o.t === 'chart' && o.ring);
   if (keep && d.length === 2) {
     // project the pointer onto the box diagonal: smooth for long thin boxes too
     const sx = d.includes('w') ? -1 : 1, sy = d.includes('n') ? -1 : 1;
@@ -14598,6 +14618,8 @@ function doResize(e, p) {
     if (d.includes('w')) x = o0.x + o0.w - w; if (d.includes('n')) y = o0.y + o0.h - h;
   }
   w = Math.max(o.t === 'line' ? 0 : 8, w); h = Math.max(o.t === 'line' ? 0 : 8, h);
+  // a text box never gets narrower than its longest word (it would push words outside the box)
+  if (o.t === 'text' && !(keep && d.length === 2) && (d.includes('e') || d.includes('w'))) { const mw = minTextW(o); if (w < mw) { if (d.includes('w')) x = o0.x + o0.w - mw; w = mw; } }
   if (o.t === 'line') { if (Math.abs(o0.h) < 1) h = 0; else w = 0; }
   // edge snapping for the moving sides
   if (!e.altKey) {
@@ -14612,11 +14634,29 @@ function doResize(e, p) {
     const k = w / o0.w;
     o.paras.forEach((pp, i) => { const q = o0.paras[i]; pp.size = Math.max(5, Math.round(q.size * k * 4) / 4); pp.sb = (q.sb || 0) * k; pp.sa = (q.sa || 0) * k; });
   }
-  if (o.t === 'text' && d.length === 1 && (d === 'e' || d === 'w')) o.h = Math.max(o.h, PM.blockH(o.paras, o.w) + 1);
+  if (o.t === 'text' && !(keep && d.length === 2)) fitTextBox(o, o0, d);
   Ed.refreshObj(o);
   Ed.drawOverlay(drag.guides);
 }
 
+/* the words reflow to the new width and the box height follows them — never shorter than the words
+   (a box that was taller than its words keeps that room unless it was set to follow the text) */
+function fitTextBox(o, o0, d) {
+  const need = PM.blockH(o.paras, o.w) + 1;
+  const vert = d.includes('n') || d.includes('s');
+  let h;
+  if (vert) { h = Math.max(o.h, need); o.autoH = h <= need + 0.5; }
+  else h = o0.autoH || o0.h <= PM.blockH(o0.paras, o0.w) + 1.5 ? need : Math.max(o0.h, need);
+  if (d.includes('n')) o.y = o0.y + o0.h - h;
+  o.h = h;
+  if (!vert && h === need) o.autoH = true;
+}
+function minTextW(o) {
+  let m = 8;
+  for (const p of o.paras) { const ind = p.bullet ? p.size * 1.25 : 0; for (const wd of String(PM.plain ? PM.plain(p.t) : p.t).split(/\s+/)) if (wd) m = Math.max(m, PM.textW(p.caps ? wd.toUpperCase() : wd, p, p.size) + ind + 1); }
+  return m;
+}
+Ed.fitTextBox = fitTextBox;
 /* ---------- image focus (pan inside the frame) ---------- */
 function startFocus(e, o, p) { drag = { kind: 'focus', id: o.id, p0: p, fx: o.fx, fy: o.fy }; capture(e); }
 function doFocus(e, p) {
@@ -14803,6 +14843,9 @@ function onKey(e) {
   if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); PM.redo(); return; }
   if (mod && e.key.toLowerCase() === 's') { e.preventDefault(); PM.emit('save'); return; }
   if (mod && e.key.toLowerCase() === 'a') { e.preventDefault(); ST.sel = new Set(slide().objs.filter(o => selectable(o)).map(o => o.id)); Ed.drawOverlay(); PM.emit('sel'); return; }
+  if (mod && e.altKey && e.code === 'KeyC') { e.preventDefault(); if (sel.length) PM.Paint.copy(); return; }
+  if (mod && e.altKey && e.code === 'KeyV') { e.preventDefault(); if (sel.length) PM.Paint.paste(); return; }
+  if (e.key === 'Escape' && PM.Paint && PM.Paint.on) { e.preventDefault(); PM.Paint.stop(); return; }
   if (mod && e.key.toLowerCase() === 'c' && sel.length) { e.preventDefault(); Ed.clip = JSON.stringify(sel); return; }
   if (mod && e.key.toLowerCase() === 'x' && sel.length) { e.preventDefault(); Ed.clip = JSON.stringify(sel); Ed.del(); return; }
   if (mod && e.key.toLowerCase() === 'v' && Ed.clip) { e.preventDefault(); Ed.pasteObjs(JSON.parse(Ed.clip)); return; }
@@ -16560,21 +16603,20 @@ UI.renderCtx = function () {
       <button class="cb" data-al="t" title="محاذاة للأعلى">${ic('align-vertical-justify-start')}</button><button class="cb" data-al="m" title="توسيط عمودي">${ic('align-vertical-justify-center')}</button><button class="cb" data-al="b" title="محاذاة للأسفل">${ic('align-vertical-justify-end')}</button>
       <span class="cbs"></span><button class="cb" data-al="dh" title="توزيع أفقي متساوٍ">${ic('align-horizontal-space-around')}</button><button class="cb" data-al="dv" title="توزيع عمودي متساوٍ">${ic('align-vertical-space-around')}</button>
       ${sel.every(o => o.t === 'text') ? `<span class="cbs"></span><button class="cb" data-a="fs-" title="تصغير الخط">A−</button><button class="cb" data-a="fs+" title="تكبير الخط">A+</button>${sw(SW_TEXT, null, 'tc')}` : ''}
-      <span class="cbs"></span><button class="cb" data-a="dup">${ic('copy')}تكرار</button><button class="cb danger" data-a="del">${ic('trash-2')}حذف</button>`;
+      <span class="cbs"></span>${painterBtn()}<button class="cb" data-a="dup">${ic('copy')}تكرار</button><button class="cb danger" data-a="del">${ic('trash-2')}حذف</button>`;
   } else {
     const o = sel[0];
     const more = (extra) => `<button class="cb" data-pop="more" data-extra="${extra || ''}" title="المزيد">${ic('ellipsis')}</button>`;
-    const common = `<span class="cbs"></span>${o.pin ? `<button class="cb on" data-a="pin" title="فك التثبيت">${ic('lock')}</button>` : ''}${more(o.t === 'text' ? 'text' : '')}<button class="cb danger" data-a="del" title="حذف">${ic('trash-2')}</button>`;
+    const common = `<span class="cbs"></span>${painterBtn()}${o.pin ? `<button class="cb on" data-a="pin" title="فك التثبيت">${ic('lock')}</button>` : ''}${more(o.t === 'text' ? 'text' : '')}<button class="cb danger" data-a="del" title="حذف">${ic('trash-2')}</button>`;
     if (o.t === 'text') {
       const p0 = o.paras[0] || {};
-      const painter = `<button class="cb" data-a="paint" title="ناسخ التنسيق: اضغط هنا ثم على نص ثاني">${ic('paintbrush')}</button>`;
       const al = p0.al || (o.align === 'center' ? 'c' : '');
       const TX = PM.TextTools, k = TX.scaleOf(o), wv = p0.sw || 0;
       h = `<span class="lbl">نص</span><button class="cb" data-a="edit">${ic('pencil')}تعديل</button><span class="cbs"></span>
         <button class="cb" data-a="fs-" title="تصغير">A−</button><span class="rng" title="حجم هذا النص"><input type="range" id="txSize" min="0.5" max="2.2" step="0.01" value="${k.toFixed(2)}"><span class="num">${Math.round(p0.size || 0)}</span></span><button class="cb" data-a="fs+" title="تكبير">A+</button>
         <span class="rng" title="سماكة الخط"><span class="rl">سماكة</span><input type="range" id="txW" min="0" max="2" step="0.05" value="${wv}"></span>
         <button class="cb ${p0.bold ? 'on' : ''}" data-a="bold" title="عريض — وأثناء الكتابة: حدد كلمات واضغط B أو ⌘B">${ic('bold')}</button><button class="cb" data-a="txReset" title="إرجاع الحجم والسماكة الأصلية">${ic('rotate-ccw')}</button>${sw(SW_TEXT, p0.color, 'tc')}<span class="cbs"></span>
-        <button class="cb" data-ta="${al === 'r' || !al ? 'c' : al === 'c' ? 'l' : 'r'}" title="المحاذاة (اضغط للتبديل)">${ic(al === 'c' ? 'align-center' : al === 'l' ? 'align-left' : 'align-right')}</button>${painter}${common}`;
+        <button class="cb" data-ta="${al === 'r' || !al ? 'c' : al === 'c' ? 'l' : 'r'}" title="المحاذاة (اضغط للتبديل)">${ic(al === 'c' ? 'align-center' : al === 'l' ? 'align-left' : 'align-right')}</button>${common}`;
     } else if (o.t === 'image' && deck().assets[o.src] && deck().assets[o.src].kind === 'sug') {
       h = `<span class="lbl">صورة مقترحة</span><button class="cb on" data-a="gen">${ic('wand-sparkles')}اصنعها بصانع الصور</button><button class="cb" data-a="tabPhotos">${ic('images')}اختر من المكتبة</button><button class="cb" data-a="replace">${ic('image-up')}من جهازي</button><button class="cb" data-a="unsug" title="رجّع أقرب صورة من المكتبة">${ic('rotate-ccw')}صورة من المكتبة بدلها</button>${common}`;
     } else if (o.t === 'image') {
@@ -16605,6 +16647,84 @@ UI.renderCtx = function () {
   const live = (fn, label) => { const s = cur(); sel.filter(o => o.t === 'text').forEach(fn); s.edited = true; sel.forEach(o => { if (o.t === 'text') Ed.refreshObj(o); }); Ed.drawOverlay(); clearTimeout(UI.txT); UI.txT = setTimeout(() => { PM.commit(label); scheduleThumb(); }, 350); };
   if (tsz) tsz.oninput = () => { const k = +tsz.value; live(o => PM.TextTools.setScale(o, k), 'size'); const v = tsz.parentElement.querySelector('.num'); if (v && sel[0]) v.textContent = Math.round(sel[0].paras[0].size); };
   if (tw) tw.oninput = () => live(o => PM.TextTools.setWeight(o, +tw.value), 'weight');
+};
+/* ---------- format painter (ناسخ التنسيق) ----------
+   copies the exact look of an element and lands it on others: text = size, colour, bold, thickness, font role,
+   spacing, bullets, alignment · shape = fill, gradient, border, corners · icon / line = colour, weight, dashes ·
+   photo = corners · all = transparency. Colour also crosses kinds (text colour → icon / shape and back).
+   One click = once · double click = stays on until Esc · ⌘/Ctrl + Alt + C / V copy & paste the look. */
+const MACK = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+const KC = MACK ? '⌘⌥C' : 'Ctrl+Alt+C', KV = MACK ? '⌘⌥V' : 'Ctrl+Alt+V';
+const PT = PM.Paint = { on: false, sticky: false, look: null, clip: null };
+const P_KEYS = ['size', 'color', 'bold', 'sw', 'font', 'lh', 'track', 'caps', 'sb', 'sa', 'bullet', 'bc'];
+const kindOf = o => o.t === 'rect' || o.t === 'ellipse' ? 'shape' : o.t;
+const cp = v => v == null ? v : JSON.parse(JSON.stringify(v));
+function painterBtn() { return `<button class="cb${PT.on ? ' on' : ''}${PT.on && PT.sticky ? ' sticky' : ''}" data-a="paint" title="ناسخ التنسيق — كليك: مرة وحدة · دبل كليك: يظل شغّال لين Esc · ${KC} / ${KV}">${ic('paintbrush')}</button>`; }
+PT.lookOf = function (list) {
+  const look = { kinds: {}, col: null };
+  for (const o of list) {
+    const kd = kindOf(o); if (look.kinds[kd]) continue; let k = null;
+    if (o.t === 'text') { k = { paras: o.paras.map(p => { const q = { al: p.al }; P_KEYS.forEach(x => q[x] = p[x]); return q; }), align: o.align, va: o.va, dir: o.dir }; look.col = look.col || (o.paras[0] && o.paras[0].color); }
+    else if (kd === 'shape') { k = { fill: o.fill, fa: o.fa, grad: cp(o.grad), stroke: o.stroke, sw: o.sw, sa: o.sa, r: o.r }; look.col = look.col || o.fill; }
+    else if (o.t === 'icon') { k = { color: o.color, sw: o.sw }; look.col = look.col || o.color; }
+    else if (o.t === 'line') { k = { color: o.color, sw: o.sw, dash: o.dash }; look.col = look.col || o.color; }
+    else if (o.t === 'image') k = { r: o.r };
+    else if (o.t === 'table') k = { style: o.style, fs: o.fs };
+    if (k) { k.op = o.op; look.kinds[kd] = k; }
+  }
+  return Object.keys(look.kinds).length ? look : null;
+};
+PT.apply = function (t, look) {
+  const k = look.kinds[kindOf(t)];
+  if (t.t === 'text') {
+    if (k) {
+      const same = (t.dir || 'rtl') === (k.dir || 'rtl');
+      t.paras.forEach((p, i) => { const q = k.paras[Math.min(i, k.paras.length - 1)]; P_KEYS.forEach(x => { if (q[x] === undefined) delete p[x]; else p[x] = q[x]; }); if (same) p.al = q.al; p.t = PM.plain(p.t); });
+      if (same) t.align = k.align; t.va = k.va; delete t.base;
+    } else if (look.col) t.paras.forEach(p => p.color = look.col); else return false;
+    const need = PM.blockH(t.paras, t.w) + 1; if (t.autoH || need > t.h) t.h = need;
+  } else if (kindOf(t) === 'shape') {
+    if (k) { t.fill = k.fill; t.fa = k.fa; t.grad = cp(k.grad); t.stroke = k.stroke; t.sw = k.sw; t.sa = k.sa; if (t.t === 'rect') t.r = k.r; }
+    else if (look.col) { t.fill = look.col; t.grad = null; } else return false;
+  } else if (t.t === 'icon') { if (k) { t.color = k.color; t.sw = k.sw; } else if (look.col) t.color = look.col; else return false; }
+  else if (t.t === 'line') { if (k) { t.color = k.color; t.sw = k.sw; t.dash = k.dash; } else if (look.col) t.color = look.col; else return false; }
+  else if (t.t === 'image') { if (k) t.r = k.r; else return false; }
+  else if (t.t === 'table') { if (k) { t.style = k.style; t.fs = k.fs; } else return false; }
+  else return false;
+  if (k) { if (k.op == null) delete t.op; else t.op = k.op; }
+  if (t.bind && t.t === 'icon') {} // the icon itself stays, only its look changes
+  return true;
+};
+function brushCursor() { if (document.documentElement.style.getPropertyValue('--pmBrush')) return; try { const inner = icPath('paintbrush'); const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><g stroke="#fff" stroke-width="5">${inner}</g><g stroke="#002657" stroke-width="2">${inner}</g></svg>`; document.documentElement.style.setProperty('--pmBrush', `url("data:image/svg+xml,${encodeURIComponent(svg)}") 3 21, copy`); } catch (x) { } }
+let ptChip = null;
+function ptSync() {
+  brushCursor(); document.body.classList.toggle('painting', PT.on);
+  if (!ptChip) { ptChip = document.createElement('div'); ptChip.id = 'ptChip'; ptChip.innerHTML = `${ic('paintbrush')}<span></span><button type="button" title="إيقاف (Esc)">${ic('x')}</button>`; document.body.appendChild(ptChip); ptChip.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); if (e.target.closest('button')) PT.stop(); }); }
+  ptChip.classList.toggle('on', PT.on); ptChip.querySelector('span').textContent = PT.sticky ? 'ناسخ التنسيق شغّال — اضغط على العناصر · Esc للإيقاف' : 'اضغط على العنصر اللي تبي تنسخ له التنسيق · Esc للإلغاء';
+  $$('#ctx [data-a="paint"]').forEach(b => { b.classList.toggle('on', PT.on); b.classList.toggle('sticky', PT.on && PT.sticky); });
+}
+PT.start = function (sticky) {
+  if (Ed.editing) Ed.endEdit();
+  if (PT.on && sticky) { PT.sticky = true; ptSync(); UI.toast('ناسخ التنسيق شغّال: اضغط على كل عنصر تبي تطبّق عليه — Esc للإيقاف'); return; }
+  const look = PT.lookOf(Ed.selected()); if (!look) { UI.toast('حدد العنصر اللي تبي تنسخ تنسيقه أول، بعدين اضغط الفرشاة'); return; }
+  PT.look = look; PT.on = true; PT.sticky = !!sticky;
+  Ed.painter = o => {
+    if (!o) { PT.stop(); return; }
+    const ok = PT.apply(o, PT.look);
+    if (!PT.sticky) PT.stop();
+    if (!ok) { UI.toast('هذا العنصر ما يقبل هذا التنسيق'); return; }
+    cur().edited = true; PM.commit('paint'); ST.sel = new Set([o.id]); Ed.render(); UI.renderCtx(); scheduleThumb(); UI.toast('تم نسخ التنسيق ✓');
+  };
+  ptSync(); UI.toast(sticky ? 'ناسخ التنسيق شغّال: اضغط على كل عنصر تبي تطبّق عليه — Esc للإيقاف' : 'اضغط على العنصر اللي تبي تنسخ له التنسيق');
+};
+PT.stop = function () { if (!PT.on) return; PT.on = false; PT.sticky = false; Ed.painter = null; ptSync(); };
+PT.copy = function () { const look = PT.lookOf(Ed.selected()); if (!look) return; PT.clip = look; try { localStorage.setItem('pmLook', JSON.stringify(look)); } catch (x) { } UI.toast(`نسخت التنسيق — حدد عنصر ثاني واضغط ${KV}`); };
+PT.paste = function () {
+  let look = PT.clip; if (!look) { try { look = JSON.parse(localStorage.getItem('pmLook') || 'null'); } catch (x) { } }
+  if (!look) { UI.toast(`انسخ تنسيق أول: ${KC}`); return; }
+  let n = 0; Ed.selected().forEach(o => { if (PT.apply(o, look)) n++; });
+  if (!n) { UI.toast('المحدد ما يقبل هذا التنسيق'); return; }
+  cur().edited = true; PM.commit('paint'); Ed.render(); UI.renderCtx(); scheduleThumb(); UI.toast('تم لصق التنسيق ✓');
 };
 /* small pop-over menus of the context bar (colours, more actions) */
 function ctxPop(btn) {
@@ -16637,13 +16757,7 @@ function ctxClick(e) {
   if (a === 'del') return Ed.del();
   if (a === 'directive') return PM.Brain.directive();
   if (a === 'pin') { sel.forEach(o => o.pin = !o.pin); s.edited = true; PM.commit('pin'); Ed.drawOverlay(); UI.renderCtx(); UI.toast(sel[0].pin ? 'ثبّته مكانه 🔒' : 'فكيت التثبيت'); return; }
-  if (a === 'paint') {
-    const src = sel[0]; const st = src.paras.map(p => ({ size: p.size, color: p.color, bold: p.bold, sw: p.sw || 0, al: p.al, font: p.font, lh: p.lh, track: p.track, caps: p.caps }));
-    document.body.classList.add('painting');
-    UI.toast('اضغط على النص اللي تبي تنسخ له التنسيق');
-    Ed.painter = (t) => { if (t.t !== 'text') return; t.paras.forEach((p, i) => Object.assign(p, st[Math.min(i, st.length - 1)])); t.align = src.align; PM.TextTools.fitH(t); cur().edited = true; PM.commit('paint'); ST.sel = new Set([t.id]); Ed.render(); UI.renderCtx(); UI.toast('نسخت التنسيق ✓'); };
-    return;
-  }
+  if (a === 'paint') { if (e.detail >= 2) return PT.start(true); return PT.on ? PT.stop() : PT.start(false); }
   if (a === 'dup') return Ed.pasteObjs(JSON.parse(JSON.stringify(sel)));
   if (a === 'front') return Ed.zorder('front');
   if (a === 'back') return Ed.zorder('back');

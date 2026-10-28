@@ -157,6 +157,9 @@ function hit(e) {
   for (const el of els) { const o = objById(el.dataset.id); if (selectable(o, e)) return o; }
   return null;
 }
+/* a background-like object: a big photo or colour block (never a text) */
+function isBackdrop(o) { return !!o && o.t !== 'text' && o.t !== 'chart' && o.t !== 'table' && o.w * o.h >= W * H * 0.22; }
+Ed.isBackdrop = isBackdrop;
 function bounds(list) {
   const x = Math.min(...list.map(o => o.x)), y = Math.min(...list.map(o => o.y));
   return { x, y, w: Math.max(...list.map(o => o.x + o.w)) - x, h: Math.max(...list.map(o => o.y + o.h)) - y };
@@ -258,20 +261,24 @@ function onDown(e) {
   if (Ed.editing) { if (e.target.closest('.pm-text.editing')) return; Ed.endEdit(); }
   const t = e.target.closest ? (e.target.closest('.mvh') || e.target) : e.target;
   const p = pt(e);
+  // format painter: the click lands the copied look (a click on nothing puts the brush down)
+  if (Ed.painter) { e.preventDefault(); Ed.painter(hit(e)); return; }
   if (t.classList.contains('mvh')) { startGrip(e, t.dataset.mv, p); return; }
   // value handles (charts / bars)
   if (t.classList.contains('vh')) { startValueDrag(e, t, p); return; }
   if (t.classList.contains('hdl')) { startResize(e, t.dataset.h, p); return; }
   const o = hit(e);
-  if (!o) {
+  // pressing on a background (a big photo / colour block that is not selected) and dragging draws a selection box;
+  // a plain click on it still selects it
+  const backdrop = o && !ST.sel.has(o.id) && !(e.shiftKey || e.ctrlKey || e.metaKey) && isBackdrop(o);
+  if (!o || backdrop) {
     if (!(e.shiftKey || e.ctrlKey || e.metaKey)) ST.sel.clear();
     Ed.marquee = { x0: p.x, y0: p.y, x1: p.x, y1: p.y, add: new Set(ST.sel) };
-    drag = { kind: 'marq' };
+    drag = { kind: 'marq', clickId: backdrop ? o.id : null };
     capture(e);
     Ed.drawOverlay(); PM.emit('sel');
     return;
   }
-  if (Ed.painter) { const f = Ed.painter; Ed.painter = null; document.body.classList.remove('painting'); f(o); return; }
   // image focus mode: drag inside the frame to move the photo
   if (Ed.tool === 'focus' && o.t === 'image' && ST.sel.has(o.id)) { startFocus(e, o, p); return; }
   const wasOnly = ST.sel.size === 1 && ST.sel.has(o.id);
@@ -306,7 +313,13 @@ function onMove(e) {
     const m = Ed.marquee; m.x1 = p.x; m.y1 = p.y;
     const r = { x: Math.min(m.x0, m.x1), y: Math.min(m.y0, m.y1), w: Math.abs(m.x1 - m.x0), h: Math.abs(m.y1 - m.y0) };
     ST.sel = new Set(m.add);
-    if (r.w > 3 || r.h > 3) for (const o of slide().objs) if (selectable(o) && o.x < r.x + r.w && o.x + o.w > r.x && o.y < r.y + r.h && o.y + o.h > r.y && !(o.w > W * 0.95 && o.h > H * 0.95)) ST.sel.add(o.id);
+    // anything the box touches; big backgrounds only when the box covers them completely
+    if (r.w > 3 || r.h > 3) for (const o of slide().objs) {
+      if (!selectable(o) || !(o.x < r.x + r.w && o.x + o.w > r.x && o.y < r.y + r.h && o.y + o.h > r.y)) continue;
+      if (isBackdrop(o) && !(o.x >= r.x - .5 && o.y >= r.y - .5 && o.x + o.w <= r.x + r.w + .5 && o.y + o.h <= r.y + r.h + .5)) continue;
+      ST.sel.add(o.id);
+    }
+    drag.moved = drag.moved || r.w * Ed.scale > 3 || r.h * Ed.scale > 3;
     Ed.drawOverlay();
     return;
   }
@@ -332,7 +345,7 @@ function onUp(e) {
   const d = drag; drag = null;
   document.body.classList.remove('grabbing');
   if (!d) return;
-  if (d.kind === 'marq') { Ed.marquee = null; Ed.drawOverlay(); PM.emit('sel'); return; }
+  if (d.kind === 'marq') { Ed.marquee = null; if (!d.moved && d.clickId && objById(d.clickId)) { ST.sel = new Set([d.clickId]); } Ed.drawOverlay(); PM.emit('sel'); return; }
   if (d.kind === 'move' && d.moved) { slide().edited = true; PM.commit('move'); Ed.drawOverlay(); PM.emit('change'); return; }
   if (d.kind === 'move' && !d.moved) {
     if (d.grip) { Ed.drawOverlay(); return; }
@@ -378,7 +391,7 @@ function doResize(e, p) {
   let x = o0.x, y = o0.y, w = o0.w, h = o0.h;
   if (d.includes('e')) w = o0.w + dx; if (d.includes('w')) { w = o0.w - dx; x = o0.x + dx; }
   if (d.includes('s')) h = o0.h + dy; if (d.includes('n')) { h = o0.h - dy; y = o0.y + dy; }
-  const keep = e.shiftKey || o.t === 'icon' || o.t === 'logo' || (o.t === 'text' && d.length === 2) || (o.t === 'chart' && o.ring);
+  const keep = e.shiftKey || o.t === 'icon' || o.t === 'logo' || (o.t === 'chart' && o.ring);
   if (keep && d.length === 2) {
     // project the pointer onto the box diagonal: smooth for long thin boxes too
     const sx = d.includes('w') ? -1 : 1, sy = d.includes('n') ? -1 : 1;
@@ -387,6 +400,8 @@ function doResize(e, p) {
     if (d.includes('w')) x = o0.x + o0.w - w; if (d.includes('n')) y = o0.y + o0.h - h;
   }
   w = Math.max(o.t === 'line' ? 0 : 8, w); h = Math.max(o.t === 'line' ? 0 : 8, h);
+  // a text box never gets narrower than its longest word (it would push words outside the box)
+  if (o.t === 'text' && !(keep && d.length === 2) && (d.includes('e') || d.includes('w'))) { const mw = minTextW(o); if (w < mw) { if (d.includes('w')) x = o0.x + o0.w - mw; w = mw; } }
   if (o.t === 'line') { if (Math.abs(o0.h) < 1) h = 0; else w = 0; }
   // edge snapping for the moving sides
   if (!e.altKey) {
@@ -401,11 +416,29 @@ function doResize(e, p) {
     const k = w / o0.w;
     o.paras.forEach((pp, i) => { const q = o0.paras[i]; pp.size = Math.max(5, Math.round(q.size * k * 4) / 4); pp.sb = (q.sb || 0) * k; pp.sa = (q.sa || 0) * k; });
   }
-  if (o.t === 'text' && d.length === 1 && (d === 'e' || d === 'w')) o.h = Math.max(o.h, PM.blockH(o.paras, o.w) + 1);
+  if (o.t === 'text' && !(keep && d.length === 2)) fitTextBox(o, o0, d);
   Ed.refreshObj(o);
   Ed.drawOverlay(drag.guides);
 }
 
+/* the words reflow to the new width and the box height follows them — never shorter than the words
+   (a box that was taller than its words keeps that room unless it was set to follow the text) */
+function fitTextBox(o, o0, d) {
+  const need = PM.blockH(o.paras, o.w) + 1;
+  const vert = d.includes('n') || d.includes('s');
+  let h;
+  if (vert) { h = Math.max(o.h, need); o.autoH = h <= need + 0.5; }
+  else h = o0.autoH || o0.h <= PM.blockH(o0.paras, o0.w) + 1.5 ? need : Math.max(o0.h, need);
+  if (d.includes('n')) o.y = o0.y + o0.h - h;
+  o.h = h;
+  if (!vert && h === need) o.autoH = true;
+}
+function minTextW(o) {
+  let m = 8;
+  for (const p of o.paras) { const ind = p.bullet ? p.size * 1.25 : 0; for (const wd of String(PM.plain ? PM.plain(p.t) : p.t).split(/\s+/)) if (wd) m = Math.max(m, PM.textW(p.caps ? wd.toUpperCase() : wd, p, p.size) + ind + 1); }
+  return m;
+}
+Ed.fitTextBox = fitTextBox;
 /* ---------- image focus (pan inside the frame) ---------- */
 function startFocus(e, o, p) { drag = { kind: 'focus', id: o.id, p0: p, fx: o.fx, fy: o.fy }; capture(e); }
 function doFocus(e, p) {
@@ -592,6 +625,9 @@ function onKey(e) {
   if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); PM.redo(); return; }
   if (mod && e.key.toLowerCase() === 's') { e.preventDefault(); PM.emit('save'); return; }
   if (mod && e.key.toLowerCase() === 'a') { e.preventDefault(); ST.sel = new Set(slide().objs.filter(o => selectable(o)).map(o => o.id)); Ed.drawOverlay(); PM.emit('sel'); return; }
+  if (mod && e.altKey && e.code === 'KeyC') { e.preventDefault(); if (sel.length) PM.Paint.copy(); return; }
+  if (mod && e.altKey && e.code === 'KeyV') { e.preventDefault(); if (sel.length) PM.Paint.paste(); return; }
+  if (e.key === 'Escape' && PM.Paint && PM.Paint.on) { e.preventDefault(); PM.Paint.stop(); return; }
   if (mod && e.key.toLowerCase() === 'c' && sel.length) { e.preventDefault(); Ed.clip = JSON.stringify(sel); return; }
   if (mod && e.key.toLowerCase() === 'x' && sel.length) { e.preventDefault(); Ed.clip = JSON.stringify(sel); Ed.del(); return; }
   if (mod && e.key.toLowerCase() === 'v' && Ed.clip) { e.preventDefault(); Ed.pasteObjs(JSON.parse(Ed.clip)); return; }
