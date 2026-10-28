@@ -185,15 +185,22 @@
   const _msBar = msBar;
   msBar = function () {
     _msBar.apply(this, arguments);
-    if (!selbar.classList.contains('on') || MS.sel.length !== 1) return;
-    const u = MS.sel[0]; if (!(u.matches('.ed') || u.querySelector('.ed') || u.matches(ICON_SEL) || u.querySelector(ICON_SEL))) return;
-    if (selbar.querySelector('[data-ms="paint"]')) return;
-    const w0 = selbar.offsetWidth;
-    const b = document.createElement('button'); b.dataset.ms = 'paint'; b.title = BRUSH_T; b.innerHTML = svgIcon('paintbrush', 2) + '<span>ناسخ التنسيق</span>';
-    b.classList.toggle('on', F.on); b.classList.toggle('sticky', F.on && F.sticky);
-    selbar.prepend(b); if (selbar.children.length > 1) b.insertAdjacentHTML('afterend', '<i class="mss"></i>');
+    if (!selbar.classList.contains('on') || !MS.sel.length) return;
+    const w0 = selbar.offsetWidth; let added = false;
+    // «فك الكل»: every group in the design comes apart
+    if (!selbar.querySelector('[data-ms="ungroupAll"]') && $$('[data-grp]', page).length) {
+      selbar.insertAdjacentHTML('beforeend', `<i class="mss"></i><button data-ms="ungroupAll" title="فك كل المجموعات في التصميم">${svgIcon('layers-3', 2)}<span>فك الكل</span></button>`); added = true;
+    }
+    const u = MS.sel[0];
+    if (MS.sel.length === 1 && (u.matches('.ed') || u.querySelector('.ed') || u.matches(ICON_SEL) || u.querySelector(ICON_SEL)) && !selbar.querySelector('[data-ms="paint"]')) {
+      const b = document.createElement('button'); b.dataset.ms = 'paint'; b.title = BRUSH_T; b.innerHTML = svgIcon('paintbrush', 2) + '<span>ناسخ التنسيق</span>';
+      b.classList.toggle('on', F.on); b.classList.toggle('sticky', F.on && F.sticky);
+      selbar.prepend(b); if (selbar.children.length > 1) b.insertAdjacentHTML('afterend', '<i class="mss"></i>'); added = true;
+    }
+    if (!added) return;
     const w = selbar.offsetWidth, st = stage.getBoundingClientRect(), x = (parseFloat(selbar.style.left) || 0) - (w - w0) / 2; selbar.style.left = Math.max(st.left + 6, Math.min(st.right - w - 6, x)) + 'px';
   };
+  selbar.addEventListener('click', e => { if (e.target.closest('[data-ms="ungroupAll"]')) { const n = new Set($$('[data-grp]', page).map(el => el.dataset.grp)).size; $$('[data-grp]', page).forEach(el => el.removeAttribute('data-grp')); MS.gIn = null; msRender(); toast(n ? `تم فك ${n} مجموعة — كل عنصر صار مستقل` : 'ما فيه مجموعات'); } });
   selbar.addEventListener('click', e => { const b = e.target.closest('[data-ms="paint"]'); if (b) toggle(e); });
   { const row = tbar.querySelector('.tr'); if (row) { row.insertAdjacentHTML('beforeend', `<span class="tsep"></span><button data-t="paint" title="${BRUSH_T}">${svgIcon('paintbrush', 2.2)}</button>`); } }
   tbar.addEventListener('click', e => { const b = e.target.closest('[data-t="paint"]'); if (b) { e.stopPropagation(); toggle(e); } }, true);

@@ -158,8 +158,8 @@
   function drawOv() {
     const ov = q('lxOv'); if (!ov) return; ov.innerHTML = '';
     if (L.hover && !L.sel.includes(L.hover) && !L.drag) { const h = get(L.hover); if (h && !effHidden(h)) { const d = outlineOf(h, 'lxHov'); d && ov.appendChild(d); } }
-    const ts = topSel(); if (!ts.length) { drawGuides(ov); return; }
-    if (L.crop) { const l = get(L.crop); if (l) { const gi = document.createElement('img'); gi.className = 'lxCropImg'; gi.src = assetSrc(l.src); const c = { x: l.x + l.ix, y: l.y + l.iy, w: l.iw, h: l.ih }; Object.assign(gi.style, { left: c.x * L.z + 'px', top: c.y * L.z + 'px', width: c.w * L.z + 'px', height: c.h * L.z + 'px' }); if (l.rot) { gi.style.transformOrigin = `${(l.w / 2 - l.ix) * L.z}px ${(l.h / 2 - l.iy) * L.z}px`; gi.style.transform = `rotate(${l.rot}deg)`; } ov.appendChild(gi); ov.appendChild(boxDiv(l, 'lxBox crop', l.rot)); } drawGuides(ov); return; }
+    const ts = topSel(); if (!ts.length) { drawGuides(ov); tbRefresh(); return; }
+    if (L.crop) { tbHide(); const l = get(L.crop); if (l) { const gi = document.createElement('img'); gi.className = 'lxCropImg'; gi.src = assetSrc(l.src); const c = { x: l.x + l.ix, y: l.y + l.iy, w: l.iw, h: l.ih }; Object.assign(gi.style, { left: c.x * L.z + 'px', top: c.y * L.z + 'px', width: c.w * L.z + 'px', height: c.h * L.z + 'px' }); if (l.rot) { gi.style.transformOrigin = `${(l.w / 2 - l.ix) * L.z}px ${(l.h / 2 - l.iy) * L.z}px`; gi.style.transform = `rotate(${l.rot}deg)`; } ov.appendChild(gi); ov.appendChild(boxDiv(l, 'lxBox crop', l.rot)); } drawGuides(ov); return; }
     const single = ts.length === 1 && ts[0].type !== 'group' ? ts[0] : null;
     let box, rot = 0;
     if (single) { box = { x: single.x, y: single.y, w: single.w, h: single.h }; rot = single.rot || 0; }
@@ -176,7 +176,7 @@
       const rh = document.createElement('i'); rh.className = 'lxRot'; rh.dataset.h = 'rot'; rh.title = 'تدوير (Shift للقفز كل 15°)'; rh.innerHTML = IC('rotate-cw', 2.2); rh.style.left = W / 2 + 'px'; rh.style.top = '-30px'; bd.appendChild(rh);
     }
     if (L.drag && L.drag.tip) { const t = document.createElement('div'); t.className = 'lxTip'; t.textContent = L.drag.tip; const b2 = selBox() || box; t.style.left = (b2.x + b2.w / 2) * L.z + 'px'; t.style.top = (b2.y + b2.h) * L.z + 12 + 'px'; ov.appendChild(t); }
-    drawGuides(ov);
+    drawGuides(ov); tbRefresh();
   }
   function drawGuides(ov) {
     const d = L.drag; if (d && d.band) { const b = d.band; ov.appendChild(boxDiv(b, 'lxBand')); }
@@ -480,7 +480,7 @@
   }
   // the mouse pointer becomes a small paint brush while the painter is on
   function brushCursor() { if (document.documentElement.style.getPropertyValue('--lxBrush')) return; try { const inner = svgIcon('paintbrush', 2).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, ''); const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><g stroke="#fff" stroke-width="5">${inner}</g><g stroke="#002657" stroke-width="2">${inner}</g></svg>`; document.documentElement.style.setProperty('--lxBrush', `url("data:image/svg+xml,${encodeURIComponent(svg)}") 3 21, copy`); } catch (x) { } }
-  function paintBtn() { brushCursor(); [q('lxPaintB'), document.querySelector('#lxProps [data-a="paint"]')].forEach(b => { if (b) { b.classList.toggle('on', !!L.paint); b.classList.toggle('sticky', !!(L.paint && L.paint.sticky)); } }); document.body.classList.toggle('lx-painting', !!L.paint); }
+  function paintBtn() { brushCursor(); [q('lxPaintB'), document.querySelector('#lxProps [data-a="paint"]')].forEach(b => { if (b) { b.classList.toggle('on', !!L.paint); b.classList.toggle('sticky', !!(L.paint && L.paint.sticky)); } }); document.body.classList.toggle('lx-painting', !!L.paint); if (TB && TB.classList.contains('on')) tbSync(); }
   function startPaint(sticky) {
     if (L.editing) finishEdit(true);
     const ts = topSel(); if (!ts.length && !(L.paint && sticky)) { say('حدد العنصر اللي تبي تنسخ تنسيقه أول، بعدين اضغط «ناسخ التنسيق»'); return; }
@@ -1020,7 +1020,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
   function sanitizeLayers(arr) { return (arr || []).filter(l => l && /^(text|image|shape|svg|group)$/.test(l.type)).map(l => { l.id = l.id || uid(); if (l.type === 'text') l.html = cleanHtml(String(l.html || '')); if (l.type === 'svg') { const t = document.createElement('template'); t.innerHTML = String(l.svg || ''); t.content.querySelectorAll('script,foreignObject').forEach(x => x.remove()); t.content.querySelectorAll('*').forEach(n => [...n.attributes].forEach(a => { if (/^on/i.test(a.name) || /javascript:/i.test(a.value)) n.removeAttribute(a.name); })); l.svg = t.innerHTML; } if (l.type === 'group') l.children = sanitizeLayers(l.children); return l; }); }
   function injectFonts(css) { let st = q('lxFonts'); if (!st) { st = document.createElement('style'); st.id = 'lxFonts'; document.head.appendChild(st); } st.textContent = css || ''; }
   function enter() { if (L.on) return; L.on = true; if (typeof closeSheets === 'function') closeSheets(); if (typeof qaClose === 'function') try { qaClose(); } catch (e) { } if (typeof libClose === 'function') try { libClose(); } catch (e) { } if (typeof deselect === 'function') try { deselect(); } catch (e) { } document.body.classList.add('lx-on', 'lx-tab-layers'); const sh = document.querySelector('#iconPanel .shead b'); if (sh) { sh._t = sh._t || sh.textContent; sh.textContent = 'الطبقات والأيقونات'; } const sh2 = document.querySelector('#blockPanel .shead b'); if (sh2) { sh2._t = sh2._t || sh2.textContent; sh2.textContent = 'الخصائص'; } if (document.body.classList.contains('free-on') && q('fmBack')) { document.body.classList.remove('free-on'); } setTimeout(() => { sizeStage(); fitZoom(); }, 30); }
-  async function exitLX() { endPaint(); finishEdit(true); if (L.doc) { await autosave(true); saveThumb(); } L.on = false; document.body.classList.remove('lx-on', 'lx-tab-layers', 'lx-tab-icons'); document.querySelectorAll('#iconPanel .shead b, #blockPanel .shead b').forEach(x => { if (x._t) x.textContent = x._t; }); L.cache.forEach(el => el.remove()); L.cache.clear(); q('lxOv').innerHTML = ''; if (typeof closeSheets === 'function') closeSheets(); try { localStorage.removeItem('jedLX_open'); } catch (e) { } setTimeout(() => { try { fit(); } catch (e) { } updLayersBtn(); }, 30); say(L.linkedBoard ? 'تعديلاتك محفوظة — اضغط «متابعة الطبقات» وترجع لها بنفس المكان' : 'تعديلاتك محفوظة في «تصاميمي»'); }
+  async function exitLX() { endPaint(); tbHide(); finishEdit(true); if (L.doc) { await autosave(true); saveThumb(); } L.on = false; document.body.classList.remove('lx-on', 'lx-tab-layers', 'lx-tab-icons'); document.querySelectorAll('#iconPanel .shead b, #blockPanel .shead b').forEach(x => { if (x._t) x.textContent = x._t; }); L.cache.forEach(el => el.remove()); L.cache.clear(); q('lxOv').innerHTML = ''; if (typeof closeSheets === 'function') closeSheets(); try { localStorage.removeItem('jedLX_open'); } catch (e) { } setTimeout(() => { try { fit(); } catch (e) { } updLayersBtn(); }, 30); say(L.linkedBoard ? 'تعديلاتك محفوظة — اضغط «متابعة الطبقات» وترجع لها بنفس المكان' : 'تعديلاتك محفوظة في «تصاميمي»'); }
   function setTab(t) { document.body.classList.toggle('lx-tab-layers', t === 'layers'); document.body.classList.toggle('lx-tab-icons', t === 'icons'); q('lxTabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === t)); }
   const isPh = () => document.body.classList.contains('phone');
 
@@ -1301,52 +1301,79 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     busy(false);
   }
 
-  /* ---------------- floating text bar while typing (same bar as the announcement editor) ----------------
-     B · A− size A+ · reset · brush / Weight / Leading — words selected: size and bold go on those words only */
+  /* ---------------- floating bar: shows on any selection and while typing ----------------
+     text: B · A− size A+ · reset / Weight / Leading (words selected while typing: size and bold go on those words only)
+     always: ناسخ التنسيق · تجميع · فك التجميع · فك الكل */
   let TB = null;
   function tbBuild() {
     TB = document.createElement('div'); TB.id = 'lxTb';
-    TB.innerHTML = `<div class="tr"><button data-t="bold" title="عريض — على الكلمات المحددة أو النص كامل">B</button><span class="tsep"></span><button data-t="down" title="أصغر">A−</button><input type="range" data-r="size" min="0.5" max="3" step="0.01" value="1"><button data-t="up" title="أكبر">A+</button><span class="tv" data-v="size">100%</span><span class="tsep"></span><button data-t="reset" title="إرجاع الحجم والسماكة والتباعد">↺</button><span class="tsep"></span><button data-t="paint" title="ناسخ التنسيق: اضغط هنا ثم على العنصر اللي تبي تنسخ له">${IC('paintbrush', 2.2)}</button></div>
-      <div class="tr"><span class="tl">Weight</span><button data-t="wdown">−</button><input type="range" data-r="w" min="0" max="2" step="0.05" value="0"><button data-t="wup">+</button><span class="tv" data-v="w">0.00</span></div>
-      <div class="tr"><span class="tl">Leading</span><button data-t="ldown">−</button><input type="range" data-r="lh" min="0.8" max="2.6" step="0.05" value="1.4"><button data-t="lup">+</button><span class="tv" data-v="lh">1.40</span></div>`;
+    TB.innerHTML = `<div class="tr rt"><button data-t="bold" title="عريض — على الكلمات المحددة أو النص كامل">B</button><span class="tsep"></span><button data-t="down" title="أصغر">A−</button><input type="range" data-r="size" min="0.5" max="3" step="0.01" value="1"><button data-t="up" title="أكبر">A+</button><span class="tv" data-v="size">100%</span><span class="tsep"></span><button data-t="reset" title="إرجاع الحجم والسماكة والتباعد">↺</button></div>
+      <div class="tr rt"><span class="tl">Weight</span><button data-t="wdown">−</button><input type="range" data-r="w" min="0" max="2" step="0.05" value="0"><button data-t="wup">+</button><span class="tv" data-v="w">0.00</span></div>
+      <div class="tr rt"><span class="tl">Leading</span><button data-t="ldown">−</button><input type="range" data-r="lh" min="0.8" max="2.6" step="0.05" value="1.4"><button data-t="lup">+</button><span class="tv" data-v="lh">1.40</span></div>
+      <div class="tr rg"><button class="lb" data-t="paint" title="ناسخ التنسيق — كليك: مرة وحدة · دبل كليك: يظل شغّال لين Esc · ${MAC ? '⌘⌥C / ⌘⌥V' : 'Ctrl+Alt+C / Ctrl+Alt+V'}">${IC('paintbrush', 2.2)}<span>ناسخ التنسيق</span></button><span class="tsep"></span><button class="lb" data-t="group" title="تجميع (${K('G')})">${IC('group', 2.2)}<span>تجميع</span></button><button class="lb" data-t="ungroup" title="فك التجميع (${K('⇧G')})">${IC('ungroup', 2.2)}<span>فك التجميع</span></button><button class="lb" data-t="flat" title="فك كل المجموعات: كل عنصر يصير طبقة مستقلة">${IC('layers-3', 2.2)}<span>فك الكل</span></button></div>`;
     document.body.appendChild(TB);
     TB.addEventListener('mousedown', e => { if (!e.target.closest('input')) e.preventDefault(); });
     TB.addEventListener('pointerdown', e => { e.stopPropagation(); if (e.target.matches('input')) { TB.drag = true; const up = () => { TB.drag = false; removeEventListener('pointerup', up); tbPlace(); push(true); renderProps(); }; addEventListener('pointerup', up); } });
     TB.addEventListener('input', e => { const l = tbLayer(); if (!l) return; const k = e.target.dataset.r, v = +e.target.value; if (k === 'size') tbSize(l, TB.base.fs * v); if (k === 'w') tbWeight(l, v); if (k === 'lh') { l.st.lh = v; paint(); } tbSync(); });
     TB.addEventListener('click', e => {
-      const b = e.target.closest('[data-t]'); if (!b) return; const a = b.dataset.t; const l = tbLayer(); if (!l) return;
-      if (a === 'bold') { const r = rangeInEdit(); if (r) { const n = r.startContainer.nodeType === 3 ? r.startContainer.parentElement : r.startContainer; styleRange('fontWeight', +getComputedStyle(n).fontWeight >= 600 ? '400' : '700'); } else { l.st.fw = +l.st.fw >= 600 ? 400 : 700; L.editing.querySelectorAll('[style]').forEach(c => c.style.fontWeight = ''); paint(); } }
+      const b = e.target.closest('[data-t]'); if (!b || b.disabled) return; const a = b.dataset.t;
+      if (a === 'paint') { if (L.editing) { const id = L.editing.dataset.id; finishEdit(true); setSel([id]); } if (e.detail >= 2) startPaint(true); else if (L.paint) endPaint(); else startPaint(false); return; }
+      if (a === 'group' || a === 'ungroup' || a === 'flat') {
+        if (L.editing) { const id = L.editing.dataset.id; finishEdit(true); setSel([id]); }
+        if (a === 'group') groupSel(); if (a === 'ungroup') ungroupSel();
+        if (a === 'flat') { const gs = topSel().filter(l => l.type === 'group'); if (gs.length) { const ids = []; gs.forEach(g => { leaves(g).forEach(c => ids.push(c.id)); }); gs.forEach(g => { if (get(g.id)) flattenAll(get(g.id)); }); setSel(ids.filter(get)); } else flattenAll(null); }
+        return;
+      }
+      const l = tbLayer(); if (!l) return;
+      if (a === 'bold') { const r = rangeInEdit(); if (r) { const n = r.startContainer.nodeType === 3 ? r.startContainer.parentElement : r.startContainer; styleRange('fontWeight', +getComputedStyle(n).fontWeight >= 600 ? '400' : '700'); } else { l.st.fw = +l.st.fw >= 600 ? 400 : 700; if (L.editing) L.editing.querySelectorAll('[style]').forEach(c => c.style.fontWeight = ''); else l.html = stripProp(l.html, 'font-weight'); paint(); } }
       if (a === 'up' || a === 'down') { const r = rangeInEdit(); const f = a === 'up' ? 1.1 : 1 / 1.1; if (r) { const n = r.startContainer.nodeType === 3 ? r.startContainer.parentElement : r.startContainer; styleRange('fontSize', R1(px(getComputedStyle(n).fontSize) * f) + 'px'); } else tbSize(l, l.st.fs * f); }
       if (a === 'wup' || a === 'wdown') tbWeight(l, clamp(tbW(l) + (a === 'wup' ? .15 : -.15), 0, 2));
       if (a === 'lup' || a === 'ldown') { l.st.lh = R2(clamp((l.st.lh || 1.4) + (a === 'lup' ? .1 : -.1), .8, 2.6)); paint(); }
       if (a === 'reset') { tbSize(l, TB.base.fs); l.st.xs = TB.base.xs; l.st.lh = TB.base.lh; paint(); }
-      if (a === 'paint') { const id = l.id; finishEdit(true); setSel([id]); startPaint(false); return; }
       tbSync(); push(true); renderProps();
     });
     document.addEventListener('selectionchange', () => { if (L.editing && TB.classList.contains('on') && !TB.drag) requestAnimationFrame(tbPlace); });
     q('lxHost').addEventListener('scroll', () => { if (TB.classList.contains('on')) tbPlace(); });
   }
-  const tbLayer = () => L.editing ? get(L.editing.dataset.id) : null;
+  // the text the bar works on: the one being typed in, or one selected text layer
+  const tbLayer = () => { if (L.editing) return get(L.editing.dataset.id); const ts = topSel(); return ts.length === 1 && ts[0].type === 'text' ? ts[0] : null; };
   const tbW = l => { const m = String(l.st.xs || '').match(/([\d.]+)px/); return m ? +m[1] : 0; };
   function tbWeight(l, v) { l.st.xs = v > 0.001 ? `${R2(v)}px currentColor` : ''; paint(); }
   // the whole text: box size + any sized words inside it keep their proportion
-  function tbSize(l, v) { v = clamp(v, 4, 600); const r = v / (l.st.fs || 16); l.st.fs = R1(v); if (L.editing) L.editing.querySelectorAll('[style*="font-size"]').forEach(c => { c.style.fontSize = R2(px(c.style.fontSize) * r) + 'px'; }); paint(); }
+  function tbSize(l, v) { v = clamp(v, 4, 600); if (!L.editing) { setFs(l, v); paint(); return; } const r = v / (l.st.fs || 16); l.st.fs = R1(v); L.editing.querySelectorAll('[style*="font-size"]').forEach(c => { c.style.fontSize = R2(px(c.style.fontSize) * r) + 'px'; }); paint(); }
   function tbSync() {
-    const l = tbLayer(); if (!l || !TB) return; const k = (l.st.fs || 16) / (TB.base.fs || 16), w = tbW(l), lh = l.st.lh || 1.4;
+    if (!TB) return; const l = tbLayer(); const ts = topSel();
+    TB.querySelectorAll('.rt').forEach(r => r.style.display = l ? '' : 'none');
+    const en = (a, on) => { const b = TB.querySelector(`[data-t="${a}"]`); b.disabled = !on; };
+    en('group', !L.editing && ts.length >= 2); en('ungroup', !L.editing && ts.some(x => x.type === 'group')); en('flat', all().some(x => x.type === 'group'));
+    const pb = TB.querySelector('[data-t="paint"]'); pb.classList.toggle('on', !!L.paint); pb.classList.toggle('sticky', !!(L.paint && L.paint.sticky));
+    if (!l) return;
+    if (!TB.base || TB.base.id !== l.id) TB.base = { id: l.id, fs: l.st.fs || 16, xs: l.st.xs || '', lh: l.st.lh };
+    const k = (l.st.fs || 16) / (TB.base.fs || 16), w = tbW(l), lh = l.st.lh || 1.4;
     const set = (r, v) => { const i = TB.querySelector(`[data-r="${r}"]`); if (i && !TB.drag) i.value = v; };
     set('size', k); set('w', w); set('lh', lh);
     TB.querySelector('[data-v="size"]').textContent = Math.round(k * 100) + '%'; TB.querySelector('[data-v="w"]').textContent = w.toFixed(2); TB.querySelector('[data-v="lh"]').textContent = (+lh).toFixed(2);
     TB.querySelector('[data-t="bold"]').classList.toggle('on', +l.st.fw >= 600);
   }
   function tbPlace() {
-    if (!TB || !L.editing || TB.drag) return; const s = getSelection(); let r = null;
-    if (s.rangeCount && L.editing.contains(s.anchorNode)) { r = s.getRangeAt(0).getBoundingClientRect(); if (!r.width && !r.height) r = null; }
-    const box = L.editing.getBoundingClientRect(); if (!r) r = { left: box.left + box.width / 2, right: box.left + box.width / 2, top: box.top, bottom: box.top + 20 };
-    const w = TB.offsetWidth, h = TB.offsetHeight; let x = (r.left + r.right) / 2 - w / 2, y = r.top - h - 14; if (y < 64) y = Math.max(r.bottom, box.top + 10) + 14;
-    TB.style.left = Math.max(8, Math.min(innerWidth - w - 8, x)) + 'px'; TB.style.top = Math.max(8, Math.min(innerHeight - h - 8, y)) + 'px';
+    if (!TB || TB.drag || !TB.classList.contains('on')) return; let r = null, box;
+    if (L.editing) {
+      const s = getSelection(); if (s.rangeCount && L.editing.contains(s.anchorNode)) { r = s.getRangeAt(0).getBoundingClientRect(); if (!r.width && !r.height) r = null; }
+      box = L.editing.getBoundingClientRect();
+    } else { const b = selBox(); if (!b) return; const pg = PG().getBoundingClientRect(); box = { left: pg.left + b.x * L.z, top: pg.top + b.y * L.z, width: b.w * L.z, height: b.h * L.z }; box.right = box.left + box.width; box.bottom = box.top + box.height; }
+    if (!r) r = { left: box.left + box.width / 2, right: box.left + box.width / 2, top: box.top - (L.editing ? 0 : 34), bottom: (box.bottom != null ? box.bottom : box.top + box.height) };
+    const hr = q('lxHost').getBoundingClientRect();
+    const w = TB.offsetWidth, h = TB.offsetHeight; let x = (r.left + r.right) / 2 - w / 2, y = r.top - h - 14; if (y < hr.top + 6) y = r.bottom + 14;
+    if (y + h > hr.bottom - 6) y = Math.max(hr.top + 6, hr.bottom - h - 6);
+    TB.style.left = Math.max(hr.left + 6, Math.min(hr.right - w - 6, x)) + 'px'; TB.style.top = y + 'px';
   }
-  function tbShow(l) { if (!TB) tbBuild(); if (isPh()) return; TB.base = { fs: l.st.fs || 16, xs: l.st.xs || '', lh: l.st.lh }; TB.classList.add('on'); tbSync(); tbPlace(); }
+  function tbShow() { tbRefresh(); }
   function tbHide() { if (TB) TB.classList.remove('on'); }
+  // called after every overlay redraw: the bar follows the selection
+  function tbRefresh() {
+    if (!L.on || isPh() || L.crop || (L.drag && L.drag.mode !== 'pan') || q('lxModal').classList.contains('on') || (!L.editing && !L.sel.length)) { tbHide(); return; }
+    if (!TB) tbBuild(); TB.classList.add('on'); tbSync(); tbPlace();
+  }
 
   /* ======================================================================
      UI shell

@@ -250,3 +250,9 @@ body.lx-painting #lxHost,body.lx-painting #lxHost .lxL{cursor:var(--lxBrush,copy
 #lxTb input{width:120px;accent-color:#2FC0C7}
 #lxTb .tv{font-family:FSI;font-size:12px;min-width:40px;text-align:center;opacity:.9}
 #lxTb .tsep{width:1px;height:18px;background:rgba(255,255,255,.2)}
+#lxTb .rg{direction:rtl;justify-content:flex-start}
+#lxTb .rt+.rg{border-top:1px solid rgba(255,255,255,.14);padding-top:6px}
+#lxTb button.lb{gap:6px;font:13px Tajawal;padding:0 10px}
+#lxTb button.lb span{white-space:nowrap}
+#lxTb button[disabled]{opacity:.35;cursor:default;background:rgba(255,255,255,.06)!important;color:#fff!important}
+#lxTb button.sticky{background:#FC5C17;color:#fff}
