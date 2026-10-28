@@ -440,8 +440,8 @@
     insertLayer(l); setTimeout(() => startEdit(get(l.id)), 30);
   }
   function addShape(kind) {
-    const [cx, cy] = viewCenter(); const line = kind === 'line'; const w = line ? 260 : kind === 'ellipse' ? 160 : 260, h = line ? 2 : kind === 'ellipse' ? 160 : 150;
-    insertLayer({ id: uid(), type: 'shape', shape: kind === 'ellipse' ? 'ellipse' : 'rect', name: line ? 'خط' : kind === 'ellipse' ? 'دائرة' : 'مربع', x: cx - w / 2, y: cy - h / 2, w, h, rot: 0, op: 1, fill: line ? '#D6D9D4' : kind === 'ellipse' ? '#62B6F3' : '#EEF2F6', rad: line ? [1, 1, 1, 1] : [16, 16, 16, 16], bd: null });
+    const [cx, cy] = viewCenter(); const line = kind === 'line'; const sq = kind === 'square'; const w = line ? 260 : kind === 'ellipse' || sq ? 180 : 260, h = line ? 2 : kind === 'ellipse' || sq ? 180 : 150;
+    insertLayer({ id: uid(), type: 'shape', shape: kind === 'ellipse' ? 'ellipse' : 'rect', name: line ? 'خط' : kind === 'ellipse' ? 'دائرة' : sq ? 'مربع' : 'مستطيل', x: cx - w / 2, y: cy - h / 2, w, h, rot: 0, op: 1, fill: line ? '#D6D9D4' : kind === 'ellipse' ? '#62B6F3' : sq ? '#004EAA' : '#EEF2F6', rad: line ? [1, 1, 1, 1] : [16, 16, 16, 16], bd: null });
   }
   function iconSvg(name, sw) { let s = svgIcon(name, sw || 1.8); return s.replace('<svg ', '<svg preserveAspectRatio="xMidYMid meet" '); }
   function addIcon(name, x, y) {
@@ -586,14 +586,15 @@
   function multiTextProps(ts) { return `<h4>النص (لكل المحدد)</h4><div class="row"><select data-s="ffAll"><option value="">— الخط —</option>${FONTS.map(([v, n]) => `<option value="${v}">${n}</option>`).join('')}</select></div><div class="row"><button class="b ic" data-a="fsAll-">A−</button><button class="b ic" data-a="fsAll+">A+</button><div class="seg"><button data-a="fwAll4">عادي</button><button data-a="fwAll7"><b>عريض</b></button></div></div><div class="row"><label>لون النص</label></div>${swatches('tcolAll', null)}`; }
   function shapeProps(l) {
     const r = (l.rad || [0])[0]; const rn = typeof r === 'number' ? r : px(r); const b = (l.bd || []).find(x => x && x.w > 0); const mixed = l.bd && l.bd.some(x => x && x.w > 0) && !l.bd.every(x => x && x.w > 0);
-    return `<h4>الشكل</h4><div class="row"><div class="seg"><button data-sh="rect" class="${l.shape !== 'ellipse' ? 'on' : ''}">${IC('square')} مستطيل</button><button data-sh="ellipse" class="${l.shape === 'ellipse' ? 'on' : ''}">${IC('circle')} دائرة</button></div></div>
+    return `${l._img ? `<div class="row"><button class="b" data-a="backImg" style="flex:1">${IC('image')} رجوع للصورة</button></div>` : ''}<h4>الشكل</h4><div class="row"><div class="seg"><button data-sh="rect" class="${l.shape !== 'ellipse' ? 'on' : ''}">${IC('square')} مستطيل</button><button data-sh="ellipse" class="${l.shape === 'ellipse' ? 'on' : ''}">${IC('circle')} دائرة</button></div></div>
     <div class="row"><label>التعبئة</label>${l.grad ? `<button class="b" data-a="noGrad" title="فيه تدرج لوني — اضغط لتحويله للون واحد">${IC('x')} إزالة التدرج</button>` : ''}</div>${swatches('fill', l.grad ? null : l.fill, true)}
     ${l.shape !== 'ellipse' ? `<div class="row" style="margin-top:8px"><label>الزوايا</label><input type="range" min="0" max="${Math.round(Math.min(l.w, l.h) / 2)}" value="${R1(rn)}" data-r="rad"><span class="rv">${R1(rn)}</span></div>` : ''}
     <div class="row" style="margin-top:6px"><label>الإطار</label>${b ? `<input type="range" min="0.5" max="20" step="0.5" value="${b.w}" data-r="bw"><span class="rv">${b.w}</span>` : ''}${mixed ? `<button class="b" data-a="bdAll">إطار كامل</button>` : ''}</div>${swatches('bd', b ? b.c : null, true)}`;
   }
   function imageProps(l) {
     const crop = L.crop === l.id; const f = parseFilt(l.filt);
-    return `<h4>الصورة</h4><div class="row"><button class="b pri" data-a="imgRep" style="flex:1">${IC('replace')} استبدال الصورة</button></div>
+    return `<h4>الصورة</h4><div class="row"><button class="b pri" data-a="imgRep" style="flex:1">${IC('replace')} استبدال الصورة</button><button class="b${L.imgFill ? ' on' : ''}" data-a="imgFillT" style="flex:1" title="تبدّل الصورة بلون تختاره، بنفس الإطار والزوايا">${IC('paint-bucket')} تعبئة بلون</button></div>
+    ${L.imgFill ? `<div class="row"><label>اختر لون التعبئة</label></div>${swatches('imgfill', null)}` : ''}
     <div class="row"><button class="b${crop ? ' on' : ''}" data-a="crop" style="flex:1">${IC('crop')} ${crop ? 'إنهاء القص' : 'قص / تحريك داخل الإطار'}</button></div>
     ${crop ? `<div class="row"><label>تكبير</label><button class="b ic" data-a="iz-">−</button><button class="b ic" data-a="iz+">+</button></div>` : ''}
     <div class="row"><div class="seg"><button data-a="cover" title="تعبئة الإطار كامل">ملء الإطار</button><button data-a="contain" title="الصورة كاملة داخل الإطار">احتواء</button><button data-a="toImg" title="الإطار بحجم الصورة">إطار بحجم الصورة</button></div></div>
@@ -610,7 +611,7 @@
   function parseFilt(f) { const o = { b: 100, c: 100, s: 100 }; if (!f) return o; const m1 = f.match(/brightness\(([\d.]+)\)/), m2 = f.match(/contrast\(([\d.]+)\)/), m3 = f.match(/saturate\(([\d.]+)\)/); if (m1) o.b = Math.round(m1[1] * 100); if (m2) o.c = Math.round(m2[1] * 100); if (m3) o.s = Math.round(m3[1] * 100); return o; }
   function pageProps() {
     const d = L.doc; return `<div class="sel"><span class="th">${IC('frame')}</span><div><b>الصفحة</b><small>${ESC(d.name || 'تصميم')} · ${Math.round(d.w)} × ${Math.round(d.h)}</small></div></div>
-    <h4>إضافة</h4><div class="addg"><button class="b" data-a="addTextAr">${IC('type')}نص عربي</button><button class="b" data-a="addTextEn">${IC('text')}English text</button><button class="b" data-a="addImg">${IC('image-plus')}صورة</button><button class="b" data-a="addRect">${IC('square')}مستطيل</button><button class="b" data-a="addEllipse">${IC('circle')}دائرة</button><button class="b" data-a="addLine">${IC('minus')}خط فاصل</button><button class="b" data-a="addLogo">${IC('badge-check')}شعار مطارات جدة</button><button class="b" data-a="tabIcons">${IC('shapes')}أيقونة</button></div>
+    <h4>إضافة</h4><div class="addg"><button class="b" data-a="addTextAr">${IC('type')}نص عربي</button><button class="b" data-a="addTextEn">${IC('text')}English text</button><button class="b" data-a="addImg">${IC('image-plus')}صورة</button><button class="b" data-a="addSquare">${IC('square')}مربع</button><button class="b" data-a="addRect">${IC('rectangle-horizontal')}مستطيل</button><button class="b" data-a="addEllipse">${IC('circle')}دائرة</button><button class="b" data-a="addLine">${IC('minus')}خط فاصل</button><button class="b" data-a="addLogo">${IC('badge-check')}شعار مطارات جدة</button><button class="b" data-a="tabIcons">${IC('shapes')}أيقونة</button></div>
     <h4>مقاس الصفحة</h4><div class="grid4">${num('pw', 'W', Math.round(d.w))}${num('ph', 'H', Math.round(d.h))}</div><div class="row"><button class="b" data-a="fitH" style="flex:1" title="يقص أو يمد الصفحة لآخر عنصر">${IC('maximize')} ملاءمة الارتفاع للمحتوى</button></div>
     <div class="row"><label>لون الخلفية</label></div>${swatches('pbg', d.bg)}
     <h4>أدوات</h4><div class="row"><button class="b" data-a="lint" style="flex:1">${IC('shield-check')} فحص الهوية</button><button class="b" data-a="flatAll" style="flex:1">${IC('layers-3')} فك كل المجموعات</button></div>
@@ -668,6 +669,9 @@
     if (fn === 'tcol') { one.st.col = v; one.html = stripProp(one.html, 'color'); if (L.editing) { L.editing.style.color = v; L.editing.querySelectorAll('[style]').forEach(c => c.style.color = ''); } }
     if (fn === 'tbg') one.st.bg = v === 'transparent' ? '' : v;
     if (fn === 'fill') { one.fill = v; if (v !== 'transparent') one.grad = ''; }
+    // v2.0: a picture becomes a colour fill in the same frame (the picture is kept, «رجوع للصورة» brings it back)
+    if (fn === 'imgfill' && one.type === 'shape' && one._img) one.fill = v;
+    if (fn === 'imgfill' && one.type === 'image') { one._img = { src: one.src, ix: one.ix, iy: one.iy, iw: one.iw, ih: one.ih, filt: one.filt, flipX: one.flipX, flipY: one.flipY }; one.type = 'shape'; one.shape = 'rect'; one.fill = v; one.grad = ''; one.bd = one.bd || null; one.rad = one.rad || [0, 0, 0, 0]; one.name = one.name && one.name !== 'صورة' ? one.name : 'تعبئة'; L.imgFill = false; if (L.crop === one.id) L.crop = null; }
     if (fn === 'bd') { if (v === 'transparent') one.bd = null; else { const cur = (one.bd || []).find(b => b && b.w > 0); const w = cur ? cur.w : 1.5; one.bd = (one.bd && one.bd.some(b => b && b.w > 0) ? one.bd : [1, 1, 1, 1].map(() => ({ w, s: 'solid', c: v }))).map(b => b && b.w > 0 ? Object.assign({}, b, { c: v }) : b); } }
     if (fn === 'icol') one.col = v;
     paint(); if (!live) { push(true); renderProps(); }
@@ -699,6 +703,9 @@
       noGrad: () => { one.grad = ''; if (!one.fill || one.fill === 'transparent') one.fill = '#EEF2F6'; changed(); renderProps(); },
       bdAll: () => { const c = (one.bd || []).find(x => x && x.w > 0); one.bd = [0, 0, 0, 0].map(() => Object.assign({ s: 'solid' }, c)); changed(); renderProps(); },
       imgRep: () => pickImage(src => replaceImage(one, src)),
+      imgFillT: () => { L.imgFill = !L.imgFill; renderProps(); },
+      backImg: () => { if (!one._img) return; Object.assign(one, one._img, { type: 'image' }); delete one._img; delete one.shape; delete one.fill; delete one.grad; changed(); renderProps(); },
+      addSquare: () => addShape('square'),
       crop: () => { L.crop = L.crop === one.id ? null : one.id; drawOv(); renderProps(); },
       'iz-': () => { zoomInner(one, 1 / 1.1); push(true); }, 'iz+': () => { zoomInner(one, 1.1); push(true); },
       cover: () => fitImage(one, 'cover'), contain: () => fitImage(one, 'contain'), toImg: () => frameToImage(one),
