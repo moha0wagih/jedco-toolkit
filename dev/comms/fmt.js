@@ -156,6 +156,30 @@
     else if (e.code === 'KeyV') { e.preventDefault(); e.stopImmediatePropagation(); pasteLook(); }
   }, true);
 
+
+  /* ---------- the text bar also shows while typing (caret only, nothing selected) ----------
+     with no words selected it works on the whole text: size, thickness, leading, bold, brush */
+  TS.whole = false;
+  const _hideTbar = hideTbar; hideTbar = function () { TS.whole = false; TS.caret = null; tbar.classList.remove('whole'); return _hideTbar.apply(this, arguments); };
+  const _placeTbar = placeTbar; placeTbar = function () {
+    if (!TS.whole || !TS.caret || TS.drag) return _placeTbar.apply(this, arguments);
+    const r = TS.caret; const w = tbar.offsetWidth, h = tbar.offsetHeight;
+    let x = r.left - w / 2, y = r.top - h - 14; if (y < 64) y = r.bottom + 14;
+    tbar.style.left = Math.max(8, Math.min(innerWidth - w - 8, x)) + 'px'; tbar.style.top = Math.min(innerHeight - h - 8, y) + 'px';
+  };
+  function caretRect(rg) { let r = rg.getBoundingClientRect(); if (!r.width && !r.height) { const n = rg.startContainer; const el = n.nodeType === 1 ? n : n.parentElement; if (el) { const b = el.getBoundingClientRect(); r = { left: b.left + b.width / 2, right: b.left + b.width / 2, top: b.top, bottom: b.top + Math.min(b.height, 24) }; } } return r; }
+  document.addEventListener('selectionchange', () => {
+    if (TS.busy || lxOn() || F.on || !msOn() || tbar.matches(':hover') || tbar.contains(document.activeElement)) return;
+    const sel = getSelection(); if (!sel.rangeCount) return;
+    if (!sel.isCollapsed) { if (TS.whole) { TS.whole = false; tbar.classList.remove('whole'); } return; }
+    const rg = sel.getRangeAt(0), ed = edOf(rg.startContainer);
+    if (!ed || !page.contains(ed) || !ed.isContentEditable || document.activeElement !== ed && !ed.contains(document.activeElement)) return;
+    clearTimeout(TS.hideT);
+    const all = document.createRange(); all.selectNodeContents(ed);
+    TS.range = all; TS.ed = ed; TS.spans = null; TS.whole = true; TS.caret = caretRect(rg);
+    $$('.fs.tsel', page).forEach(x => x.classList.remove('tsel'));
+    syncTbar(); tbar.classList.add('on', 'whole'); placeTbar();
+  });
   /* ---------- buttons: the floating bar of a selection + the bar of selected words ---------- */
   const BRUSH_T = `ناسخ التنسيق — كليك: مرة وحدة · دبل كليك: يظل شغّال لين Esc · ${KC} / ${KV}`;
   const _msBar = msBar;

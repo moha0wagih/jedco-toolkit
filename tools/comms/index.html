@@ -4256,6 +4256,18 @@ body.phone #fileMenu.lxMenu kbd{display:none}
 #lxProps .b.sticky{background:#FC5C17;border-color:#FC5C17;color:#fff}
 body.lx-painting #lxHost,body.lx-painting #lxHost .lxL{cursor:var(--lxBrush,copy)!important}
 @media (max-width:1640px){#lxTop #lxPaintB .lbl,#lxTop #lxGroupB .lbl,#lxTop #lxUngroupB .lbl,#lxTop #lxAiB .lbl{display:none}}
+/* floating text bar while typing */
+#lxTb{position:fixed;z-index:400;display:none;flex-direction:column;gap:6px;background:#002657;color:#fff;border-radius:12px;padding:6px 8px;box-shadow:0 10px 30px rgba(0,38,87,.35);direction:ltr}
+#lxTb.on{display:flex}
+#lxTb .tr{display:flex;align-items:center;gap:6px}
+#lxTb .tl{font-family:FSI;font-size:11.5px;opacity:.75;min-width:44px;text-align:center}
+#lxTb button{border:0;background:rgba(255,255,255,.1);color:#fff;border-radius:8px;height:30px;min-width:32px;padding:0 8px;cursor:pointer;font-family:FSI;font-size:13px;display:inline-flex;align-items:center;justify-content:center}
+#lxTb button:hover,#lxTb button.on{background:#2FC0C7;color:#002657}
+#lxTb button[data-t="bold"]{font-weight:700}
+#lxTb button svg{width:15px;height:15px;display:block}
+#lxTb input{width:120px;accent-color:#2FC0C7}
+#lxTb .tv{font-family:FSI;font-size:12px;min-width:40px;text-align:center;opacity:.9}
+#lxTb .tsep{width:1px;height:18px;background:rgba(255,255,255,.2)}
 
 /* ---------- v2.0 · start page: nothing open, one + to begin ---------- */
 #v2Start{position:fixed;inset:0;z-index:97;display:none;flex-direction:column;background:var(--ui-bg);direction:rtl}
@@ -4326,6 +4338,7 @@ body.fmt-painting #page,body.fmt-painting #page *{cursor:var(--fmtBrush,copy)!im
 #fmtChip button:hover{background:#FC5C17}
 #fmtChip button svg{width:14px;height:14px}
 body.phone #fmtChip{bottom:84px}
+#tbar.whole [data-t="del"]{display:none}
 
 </style>
 <script id="lxScript">
@@ -4732,11 +4745,11 @@ body.phone #fmtChip{bottom:84px}
     const sel = getSelection(); let r = null;
     if (e && document.caretRangeFromPoint) r = document.caretRangeFromPoint(e.clientX, e.clientY);
     if (!r || !el.contains(r.startContainer)) { r = document.createRange(); r.selectNodeContents(el); } else if (e && e.detail >= 2) { r = document.createRange(); r.selectNodeContents(el); }
-    sel.removeAllRanges(); sel.addRange(r); drawOv(); renderProps();
+    sel.removeAllRanges(); sel.addRange(r); drawOv(); renderProps(); tbShow(l);
   }
   function cleanHtml(h) { const t = document.createElement('template'); t.innerHTML = h; t.content.querySelectorAll('script,style,iframe,object,embed,link,meta').forEach(x => x.remove()); t.content.querySelectorAll('*').forEach(n => [...n.attributes].forEach(a => { if (/^on/i.test(a.name) || /javascript:/i.test(a.value) || a.name === 'contenteditable' || a.name === 'class') n.removeAttribute(a.name); })); return t.innerHTML; }
   function finishEdit(save) {
-    const el = L.editing; if (!el) return; L.editing = null; el.removeAttribute('contenteditable'); const l = get(el.dataset.id);
+    tbHide(); const el = L.editing; if (!el) return; L.editing = null; el.removeAttribute('contenteditable'); const l = get(el.dataset.id);
     if (l && save) { const h = cleanHtml(el.innerHTML); const empty = !el.textContent.trim() && !el.querySelector('img,svg'); if (empty) { removeIds([l.id]); return; } if (h !== l.html) { l.html = h; el._h = h; changed(); } }
     try { getSelection().removeAllRanges(); } catch (x) { }
     paint(); renderProps();
@@ -5632,6 +5645,53 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     busy(false);
   }
 
+  /* ---------------- floating text bar while typing (same bar as the announcement editor) ----------------
+     B · A− size A+ · reset · brush / Weight / Leading — words selected: size and bold go on those words only */
+  let TB = null;
+  function tbBuild() {
+    TB = document.createElement('div'); TB.id = 'lxTb';
+    TB.innerHTML = `<div class="tr"><button data-t="bold" title="عريض — على الكلمات المحددة أو النص كامل">B</button><span class="tsep"></span><button data-t="down" title="أصغر">A−</button><input type="range" data-r="size" min="0.5" max="3" step="0.01" value="1"><button data-t="up" title="أكبر">A+</button><span class="tv" data-v="size">100%</span><span class="tsep"></span><button data-t="reset" title="إرجاع الحجم والسماكة والتباعد">↺</button><span class="tsep"></span><button data-t="paint" title="ناسخ التنسيق: اضغط هنا ثم على العنصر اللي تبي تنسخ له">${IC('paintbrush', 2.2)}</button></div>
+      <div class="tr"><span class="tl">Weight</span><button data-t="wdown">−</button><input type="range" data-r="w" min="0" max="2" step="0.05" value="0"><button data-t="wup">+</button><span class="tv" data-v="w">0.00</span></div>
+      <div class="tr"><span class="tl">Leading</span><button data-t="ldown">−</button><input type="range" data-r="lh" min="0.8" max="2.6" step="0.05" value="1.4"><button data-t="lup">+</button><span class="tv" data-v="lh">1.40</span></div>`;
+    document.body.appendChild(TB);
+    TB.addEventListener('mousedown', e => { if (!e.target.closest('input')) e.preventDefault(); });
+    TB.addEventListener('pointerdown', e => { e.stopPropagation(); if (e.target.matches('input')) { TB.drag = true; const up = () => { TB.drag = false; removeEventListener('pointerup', up); tbPlace(); push(true); renderProps(); }; addEventListener('pointerup', up); } });
+    TB.addEventListener('input', e => { const l = tbLayer(); if (!l) return; const k = e.target.dataset.r, v = +e.target.value; if (k === 'size') tbSize(l, TB.base.fs * v); if (k === 'w') tbWeight(l, v); if (k === 'lh') { l.st.lh = v; paint(); } tbSync(); });
+    TB.addEventListener('click', e => {
+      const b = e.target.closest('[data-t]'); if (!b) return; const a = b.dataset.t; const l = tbLayer(); if (!l) return;
+      if (a === 'bold') { const r = rangeInEdit(); if (r) { const n = r.startContainer.nodeType === 3 ? r.startContainer.parentElement : r.startContainer; styleRange('fontWeight', +getComputedStyle(n).fontWeight >= 600 ? '400' : '700'); } else { l.st.fw = +l.st.fw >= 600 ? 400 : 700; L.editing.querySelectorAll('[style]').forEach(c => c.style.fontWeight = ''); paint(); } }
+      if (a === 'up' || a === 'down') { const r = rangeInEdit(); const f = a === 'up' ? 1.1 : 1 / 1.1; if (r) { const n = r.startContainer.nodeType === 3 ? r.startContainer.parentElement : r.startContainer; styleRange('fontSize', R1(px(getComputedStyle(n).fontSize) * f) + 'px'); } else tbSize(l, l.st.fs * f); }
+      if (a === 'wup' || a === 'wdown') tbWeight(l, clamp(tbW(l) + (a === 'wup' ? .15 : -.15), 0, 2));
+      if (a === 'lup' || a === 'ldown') { l.st.lh = R2(clamp((l.st.lh || 1.4) + (a === 'lup' ? .1 : -.1), .8, 2.6)); paint(); }
+      if (a === 'reset') { tbSize(l, TB.base.fs); l.st.xs = TB.base.xs; l.st.lh = TB.base.lh; paint(); }
+      if (a === 'paint') { const id = l.id; finishEdit(true); setSel([id]); startPaint(false); return; }
+      tbSync(); push(true); renderProps();
+    });
+    document.addEventListener('selectionchange', () => { if (L.editing && TB.classList.contains('on') && !TB.drag) requestAnimationFrame(tbPlace); });
+    q('lxHost').addEventListener('scroll', () => { if (TB.classList.contains('on')) tbPlace(); });
+  }
+  const tbLayer = () => L.editing ? get(L.editing.dataset.id) : null;
+  const tbW = l => { const m = String(l.st.xs || '').match(/([\d.]+)px/); return m ? +m[1] : 0; };
+  function tbWeight(l, v) { l.st.xs = v > 0.001 ? `${R2(v)}px currentColor` : ''; paint(); }
+  // the whole text: box size + any sized words inside it keep their proportion
+  function tbSize(l, v) { v = clamp(v, 4, 600); const r = v / (l.st.fs || 16); l.st.fs = R1(v); if (L.editing) L.editing.querySelectorAll('[style*="font-size"]').forEach(c => { c.style.fontSize = R2(px(c.style.fontSize) * r) + 'px'; }); paint(); }
+  function tbSync() {
+    const l = tbLayer(); if (!l || !TB) return; const k = (l.st.fs || 16) / (TB.base.fs || 16), w = tbW(l), lh = l.st.lh || 1.4;
+    const set = (r, v) => { const i = TB.querySelector(`[data-r="${r}"]`); if (i && !TB.drag) i.value = v; };
+    set('size', k); set('w', w); set('lh', lh);
+    TB.querySelector('[data-v="size"]').textContent = Math.round(k * 100) + '%'; TB.querySelector('[data-v="w"]').textContent = w.toFixed(2); TB.querySelector('[data-v="lh"]').textContent = (+lh).toFixed(2);
+    TB.querySelector('[data-t="bold"]').classList.toggle('on', +l.st.fw >= 600);
+  }
+  function tbPlace() {
+    if (!TB || !L.editing || TB.drag) return; const s = getSelection(); let r = null;
+    if (s.rangeCount && L.editing.contains(s.anchorNode)) { r = s.getRangeAt(0).getBoundingClientRect(); if (!r.width && !r.height) r = null; }
+    const box = L.editing.getBoundingClientRect(); if (!r) r = { left: box.left + box.width / 2, right: box.left + box.width / 2, top: box.top, bottom: box.top + 20 };
+    const w = TB.offsetWidth, h = TB.offsetHeight; let x = (r.left + r.right) / 2 - w / 2, y = r.top - h - 14; if (y < 64) y = Math.max(r.bottom, box.top + 10) + 14;
+    TB.style.left = Math.max(8, Math.min(innerWidth - w - 8, x)) + 'px'; TB.style.top = Math.max(8, Math.min(innerHeight - h - 8, y)) + 'px';
+  }
+  function tbShow(l) { if (!TB) tbBuild(); if (isPh()) return; TB.base = { fs: l.st.fs || 16, xs: l.st.xs || '', lh: l.st.lh }; TB.classList.add('on'); tbSync(); tbPlace(); }
+  function tbHide() { if (TB) TB.classList.remove('on'); }
+
   /* ======================================================================
      UI shell
      ====================================================================== */
@@ -6069,6 +6129,30 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     else if (e.code === 'KeyV') { e.preventDefault(); e.stopImmediatePropagation(); pasteLook(); }
   }, true);
 
+
+  /* ---------- the text bar also shows while typing (caret only, nothing selected) ----------
+     with no words selected it works on the whole text: size, thickness, leading, bold, brush */
+  TS.whole = false;
+  const _hideTbar = hideTbar; hideTbar = function () { TS.whole = false; TS.caret = null; tbar.classList.remove('whole'); return _hideTbar.apply(this, arguments); };
+  const _placeTbar = placeTbar; placeTbar = function () {
+    if (!TS.whole || !TS.caret || TS.drag) return _placeTbar.apply(this, arguments);
+    const r = TS.caret; const w = tbar.offsetWidth, h = tbar.offsetHeight;
+    let x = r.left - w / 2, y = r.top - h - 14; if (y < 64) y = r.bottom + 14;
+    tbar.style.left = Math.max(8, Math.min(innerWidth - w - 8, x)) + 'px'; tbar.style.top = Math.min(innerHeight - h - 8, y) + 'px';
+  };
+  function caretRect(rg) { let r = rg.getBoundingClientRect(); if (!r.width && !r.height) { const n = rg.startContainer; const el = n.nodeType === 1 ? n : n.parentElement; if (el) { const b = el.getBoundingClientRect(); r = { left: b.left + b.width / 2, right: b.left + b.width / 2, top: b.top, bottom: b.top + Math.min(b.height, 24) }; } } return r; }
+  document.addEventListener('selectionchange', () => {
+    if (TS.busy || lxOn() || F.on || !msOn() || tbar.matches(':hover') || tbar.contains(document.activeElement)) return;
+    const sel = getSelection(); if (!sel.rangeCount) return;
+    if (!sel.isCollapsed) { if (TS.whole) { TS.whole = false; tbar.classList.remove('whole'); } return; }
+    const rg = sel.getRangeAt(0), ed = edOf(rg.startContainer);
+    if (!ed || !page.contains(ed) || !ed.isContentEditable || document.activeElement !== ed && !ed.contains(document.activeElement)) return;
+    clearTimeout(TS.hideT);
+    const all = document.createRange(); all.selectNodeContents(ed);
+    TS.range = all; TS.ed = ed; TS.spans = null; TS.whole = true; TS.caret = caretRect(rg);
+    $$('.fs.tsel', page).forEach(x => x.classList.remove('tsel'));
+    syncTbar(); tbar.classList.add('on', 'whole'); placeTbar();
+  });
   /* ---------- buttons: the floating bar of a selection + the bar of selected words ---------- */
   const BRUSH_T = `ناسخ التنسيق — كليك: مرة وحدة · دبل كليك: يظل شغّال لين Esc · ${KC} / ${KV}`;
   const _msBar = msBar;

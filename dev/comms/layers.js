@@ -401,11 +401,11 @@
     const sel = getSelection(); let r = null;
     if (e && document.caretRangeFromPoint) r = document.caretRangeFromPoint(e.clientX, e.clientY);
     if (!r || !el.contains(r.startContainer)) { r = document.createRange(); r.selectNodeContents(el); } else if (e && e.detail >= 2) { r = document.createRange(); r.selectNodeContents(el); }
-    sel.removeAllRanges(); sel.addRange(r); drawOv(); renderProps();
+    sel.removeAllRanges(); sel.addRange(r); drawOv(); renderProps(); tbShow(l);
   }
   function cleanHtml(h) { const t = document.createElement('template'); t.innerHTML = h; t.content.querySelectorAll('script,style,iframe,object,embed,link,meta').forEach(x => x.remove()); t.content.querySelectorAll('*').forEach(n => [...n.attributes].forEach(a => { if (/^on/i.test(a.name) || /javascript:/i.test(a.value) || a.name === 'contenteditable' || a.name === 'class') n.removeAttribute(a.name); })); return t.innerHTML; }
   function finishEdit(save) {
-    const el = L.editing; if (!el) return; L.editing = null; el.removeAttribute('contenteditable'); const l = get(el.dataset.id);
+    tbHide(); const el = L.editing; if (!el) return; L.editing = null; el.removeAttribute('contenteditable'); const l = get(el.dataset.id);
     if (l && save) { const h = cleanHtml(el.innerHTML); const empty = !el.textContent.trim() && !el.querySelector('img,svg'); if (empty) { removeIds([l.id]); return; } if (h !== l.html) { l.html = h; el._h = h; changed(); } }
     try { getSelection().removeAllRanges(); } catch (x) { }
     paint(); renderProps();
@@ -1300,6 +1300,53 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     catch (e) { console.error(e); say('تعذّر فتح التصميم: ' + (e.message || e)); }
     busy(false);
   }
+
+  /* ---------------- floating text bar while typing (same bar as the announcement editor) ----------------
+     B · A− size A+ · reset · brush / Weight / Leading — words selected: size and bold go on those words only */
+  let TB = null;
+  function tbBuild() {
+    TB = document.createElement('div'); TB.id = 'lxTb';
+    TB.innerHTML = `<div class="tr"><button data-t="bold" title="عريض — على الكلمات المحددة أو النص كامل">B</button><span class="tsep"></span><button data-t="down" title="أصغر">A−</button><input type="range" data-r="size" min="0.5" max="3" step="0.01" value="1"><button data-t="up" title="أكبر">A+</button><span class="tv" data-v="size">100%</span><span class="tsep"></span><button data-t="reset" title="إرجاع الحجم والسماكة والتباعد">↺</button><span class="tsep"></span><button data-t="paint" title="ناسخ التنسيق: اضغط هنا ثم على العنصر اللي تبي تنسخ له">${IC('paintbrush', 2.2)}</button></div>
+      <div class="tr"><span class="tl">Weight</span><button data-t="wdown">−</button><input type="range" data-r="w" min="0" max="2" step="0.05" value="0"><button data-t="wup">+</button><span class="tv" data-v="w">0.00</span></div>
+      <div class="tr"><span class="tl">Leading</span><button data-t="ldown">−</button><input type="range" data-r="lh" min="0.8" max="2.6" step="0.05" value="1.4"><button data-t="lup">+</button><span class="tv" data-v="lh">1.40</span></div>`;
+    document.body.appendChild(TB);
+    TB.addEventListener('mousedown', e => { if (!e.target.closest('input')) e.preventDefault(); });
+    TB.addEventListener('pointerdown', e => { e.stopPropagation(); if (e.target.matches('input')) { TB.drag = true; const up = () => { TB.drag = false; removeEventListener('pointerup', up); tbPlace(); push(true); renderProps(); }; addEventListener('pointerup', up); } });
+    TB.addEventListener('input', e => { const l = tbLayer(); if (!l) return; const k = e.target.dataset.r, v = +e.target.value; if (k === 'size') tbSize(l, TB.base.fs * v); if (k === 'w') tbWeight(l, v); if (k === 'lh') { l.st.lh = v; paint(); } tbSync(); });
+    TB.addEventListener('click', e => {
+      const b = e.target.closest('[data-t]'); if (!b) return; const a = b.dataset.t; const l = tbLayer(); if (!l) return;
+      if (a === 'bold') { const r = rangeInEdit(); if (r) { const n = r.startContainer.nodeType === 3 ? r.startContainer.parentElement : r.startContainer; styleRange('fontWeight', +getComputedStyle(n).fontWeight >= 600 ? '400' : '700'); } else { l.st.fw = +l.st.fw >= 600 ? 400 : 700; L.editing.querySelectorAll('[style]').forEach(c => c.style.fontWeight = ''); paint(); } }
+      if (a === 'up' || a === 'down') { const r = rangeInEdit(); const f = a === 'up' ? 1.1 : 1 / 1.1; if (r) { const n = r.startContainer.nodeType === 3 ? r.startContainer.parentElement : r.startContainer; styleRange('fontSize', R1(px(getComputedStyle(n).fontSize) * f) + 'px'); } else tbSize(l, l.st.fs * f); }
+      if (a === 'wup' || a === 'wdown') tbWeight(l, clamp(tbW(l) + (a === 'wup' ? .15 : -.15), 0, 2));
+      if (a === 'lup' || a === 'ldown') { l.st.lh = R2(clamp((l.st.lh || 1.4) + (a === 'lup' ? .1 : -.1), .8, 2.6)); paint(); }
+      if (a === 'reset') { tbSize(l, TB.base.fs); l.st.xs = TB.base.xs; l.st.lh = TB.base.lh; paint(); }
+      if (a === 'paint') { const id = l.id; finishEdit(true); setSel([id]); startPaint(false); return; }
+      tbSync(); push(true); renderProps();
+    });
+    document.addEventListener('selectionchange', () => { if (L.editing && TB.classList.contains('on') && !TB.drag) requestAnimationFrame(tbPlace); });
+    q('lxHost').addEventListener('scroll', () => { if (TB.classList.contains('on')) tbPlace(); });
+  }
+  const tbLayer = () => L.editing ? get(L.editing.dataset.id) : null;
+  const tbW = l => { const m = String(l.st.xs || '').match(/([\d.]+)px/); return m ? +m[1] : 0; };
+  function tbWeight(l, v) { l.st.xs = v > 0.001 ? `${R2(v)}px currentColor` : ''; paint(); }
+  // the whole text: box size + any sized words inside it keep their proportion
+  function tbSize(l, v) { v = clamp(v, 4, 600); const r = v / (l.st.fs || 16); l.st.fs = R1(v); if (L.editing) L.editing.querySelectorAll('[style*="font-size"]').forEach(c => { c.style.fontSize = R2(px(c.style.fontSize) * r) + 'px'; }); paint(); }
+  function tbSync() {
+    const l = tbLayer(); if (!l || !TB) return; const k = (l.st.fs || 16) / (TB.base.fs || 16), w = tbW(l), lh = l.st.lh || 1.4;
+    const set = (r, v) => { const i = TB.querySelector(`[data-r="${r}"]`); if (i && !TB.drag) i.value = v; };
+    set('size', k); set('w', w); set('lh', lh);
+    TB.querySelector('[data-v="size"]').textContent = Math.round(k * 100) + '%'; TB.querySelector('[data-v="w"]').textContent = w.toFixed(2); TB.querySelector('[data-v="lh"]').textContent = (+lh).toFixed(2);
+    TB.querySelector('[data-t="bold"]').classList.toggle('on', +l.st.fw >= 600);
+  }
+  function tbPlace() {
+    if (!TB || !L.editing || TB.drag) return; const s = getSelection(); let r = null;
+    if (s.rangeCount && L.editing.contains(s.anchorNode)) { r = s.getRangeAt(0).getBoundingClientRect(); if (!r.width && !r.height) r = null; }
+    const box = L.editing.getBoundingClientRect(); if (!r) r = { left: box.left + box.width / 2, right: box.left + box.width / 2, top: box.top, bottom: box.top + 20 };
+    const w = TB.offsetWidth, h = TB.offsetHeight; let x = (r.left + r.right) / 2 - w / 2, y = r.top - h - 14; if (y < 64) y = Math.max(r.bottom, box.top + 10) + 14;
+    TB.style.left = Math.max(8, Math.min(innerWidth - w - 8, x)) + 'px'; TB.style.top = Math.max(8, Math.min(innerHeight - h - 8, y)) + 'px';
+  }
+  function tbShow(l) { if (!TB) tbBuild(); if (isPh()) return; TB.base = { fs: l.st.fs || 16, xs: l.st.xs || '', lh: l.st.lh }; TB.classList.add('on'); tbSync(); tbPlace(); }
+  function tbHide() { if (TB) TB.classList.remove('on'); }
 
   /* ======================================================================
      UI shell

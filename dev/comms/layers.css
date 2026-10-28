@@ -238,3 +238,15 @@ body.phone #fileMenu.lxMenu kbd{display:none}
 #lxProps .b.sticky{background:#FC5C17;border-color:#FC5C17;color:#fff}
 body.lx-painting #lxHost,body.lx-painting #lxHost .lxL{cursor:var(--lxBrush,copy)!important}
 @media (max-width:1640px){#lxTop #lxPaintB .lbl,#lxTop #lxGroupB .lbl,#lxTop #lxUngroupB .lbl,#lxTop #lxAiB .lbl{display:none}}
+/* floating text bar while typing */
+#lxTb{position:fixed;z-index:400;display:none;flex-direction:column;gap:6px;background:#002657;color:#fff;border-radius:12px;padding:6px 8px;box-shadow:0 10px 30px rgba(0,38,87,.35);direction:ltr}
+#lxTb.on{display:flex}
+#lxTb .tr{display:flex;align-items:center;gap:6px}
+#lxTb .tl{font-family:FSI;font-size:11.5px;opacity:.75;min-width:44px;text-align:center}
+#lxTb button{border:0;background:rgba(255,255,255,.1);color:#fff;border-radius:8px;height:30px;min-width:32px;padding:0 8px;cursor:pointer;font-family:FSI;font-size:13px;display:inline-flex;align-items:center;justify-content:center}
+#lxTb button:hover,#lxTb button.on{background:#2FC0C7;color:#002657}
+#lxTb button[data-t="bold"]{font-weight:700}
+#lxTb button svg{width:15px;height:15px;display:block}
+#lxTb input{width:120px;accent-color:#2FC0C7}
+#lxTb .tv{font-family:FSI;font-size:12px;min-width:40px;text-align:center;opacity:.9}
+#lxTb .tsep{width:1px;height:18px;background:rgba(255,255,255,.2)}

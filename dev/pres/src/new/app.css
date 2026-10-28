@@ -452,3 +452,15 @@ body.panning,body.panning *{cursor:grabbing!important;user-select:none}
 .tabs button{flex:1 1 0;min-width:0;flex-direction:column;gap:4px;padding:7px 2px 8px;font-size:11.5px}
 .tabs button svg.i{width:18px;height:18px}
 .ly-nm{text-align:right;unicode-bidi:isolate}
+/* floating text bar while typing (same as مصمم التواصل الداخلي) */
+#ftb{position:fixed;z-index:260;display:none;flex-direction:column;gap:6px;background:#002657;color:#fff;border-radius:12px;padding:6px 8px;box-shadow:0 10px 30px rgba(0,38,87,.35);direction:ltr;font-family:SanFSI,SanTaj,sans-serif}
+#ftb.on{display:flex}
+#ftb .tr{display:flex;align-items:center;gap:6px}
+#ftb .tl{font-size:11.5px;opacity:.75;min-width:44px;text-align:center}
+#ftb button{border:0;background:rgba(255,255,255,.1);color:#fff;border-radius:8px;height:30px;min-width:32px;padding:0 8px;cursor:pointer;font:13px SanFSI,sans-serif;display:inline-flex;align-items:center;justify-content:center}
+#ftb button:hover,#ftb button.on{background:#2FC0C7;color:#002657}
+#ftb button[data-t="bold"]{font-weight:700}
+#ftb button svg{width:15px;height:15px;display:block}
+#ftb input{width:120px;accent-color:#2FC0C7}
+#ftb .tv{font-size:12px;min-width:40px;text-align:center;opacity:.9}
+#ftb .tsep{width:1px;height:18px;background:rgba(255,255,255,.2)}

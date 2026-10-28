@@ -12,3 +12,4 @@ body.fmt-painting #page,body.fmt-painting #page *{cursor:var(--fmtBrush,copy)!im
 #fmtChip button:hover{background:#FC5C17}
 #fmtChip button svg{width:14px;height:14px}
 body.phone #fmtChip{bottom:84px}
+#tbar.whole [data-t="del"]{display:none}
