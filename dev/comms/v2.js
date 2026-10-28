@@ -95,7 +95,7 @@
     const title = (o.boards && o.boards[0] && o.boards[0].title) || 'Announcement';
     const blob = new Blob([JSON.stringify(o)], { type: 'application/json' });
     const body = `Hi,\n\nPlease find attached the design file "${name}".\n\nTo open and edit it: Internal Comms Designer > File > Open a file from your device.\n\nBest regards,`;
-    try { await JEDMAIL.draft({ subject: `Design file: ${title}`, body, fileName: fileBase(), files: [{ name, blob }] }); }
+    try { await JEDMAIL.draft({ kind: 'design', subject: `Design file: ${title}`, body, fileName: fileBase(), files: [{ name, blob }] }); }
     catch (e) { console.error(e); toast('تعذّر تجهيز الرسالة'); }
   }
   window.v2Share = share;

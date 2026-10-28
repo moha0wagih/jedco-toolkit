@@ -15994,7 +15994,7 @@ async function exportAs(kind) {
     const name = fileName(pdf ? 'pdf' : 'pptx');
     const title = (deck().name || (deck().slides[0] && PM.plain(deck().slides[0].spec.title)) || 'Presentation').trim();
     const body = `Hi,\n\nPlease find attached the presentation "${name}".\n\nBest regards,`;
-    try { await JEDMAIL.draft({ subject: `Presentation: ${title}`, body, fileName: name.replace(/\.[a-z]+$/i, ''), files: [{ name, blob: b }] }); }
+    try { await JEDMAIL.draft({ kind: 'presentation', subject: `Presentation: ${title}`, body, fileName: name.replace(/\.[a-z]+$/i, ''), files: [{ name, blob: b }] }); }
     catch (e) { console.error(e); UI.toast('تعذّر تجهيز رسالة Outlook', 4200); }
   }
 }

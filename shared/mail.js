@@ -14,7 +14,13 @@
   var CRLF = '\r\n';
 
   function b64Utf8(s) { return btoa(unescape(encodeURIComponent(s))); }
-  function hdrWord(s) { return /^[\x20-\x7e]*$/.test(s) ? s : '=?UTF-8?B?' + b64Utf8(s) + '?='; }
+  function hdrWord(s) {
+    if (/^[\x20-\x7e]*$/.test(s)) return s;
+    var out = [], cur = '';
+    Array.from(s).forEach(function (ch) { if (b64Utf8(cur + ch).length > 44) { out.push(cur); cur = ''; } cur += ch; });
+    if (cur) out.push(cur);
+    return out.map(function (x) { return '=?UTF-8?B?' + b64Utf8(x) + '?='; }).join(CRLF + ' ');
+  }
   function wrap76(s) { return s.replace(/(.{76})/g, '$1' + CRLF); }
   function blobB64(blob) {
     return new Promise(function (ok, no) {
@@ -51,12 +57,21 @@
     ];
     for (var i = 0; i < (o.files || []).length; i++) {
       var f = o.files[i];
-      var type = f.blob.type || 'application/octet-stream';
-      var enc = encodeURIComponent(f.name).replace(/['()*]/g, function (c) { return '%' + c.charCodeAt(0).toString(16).toUpperCase(); });
+      // Outlook keeps the attachment only when the headers are strictly standard:
+      // a plain ASCII name for every mail app, plus the real (Arabic) name as RFC 2231 parts
+      var ext = (f.name.match(/(\.[A-Za-z0-9]+)+$/) || [''])[0];
+      var ascii = f.name.slice(0, f.name.length - ext.length).replace(/[^A-Za-z0-9 _.-]+/g, ' ').replace(/\s+/g, ' ').trim();
+      if (/[^\x00-\x7f]/.test(f.name) || ascii.replace(/[^A-Za-z0-9]/g, '').length < 3) ascii = 'Jeddah Airports ' + (o.kind || 'file');
+      ascii = ascii.slice(0, 60) + ext;
+      var enc = encodeURIComponent(f.name).replace(/['()*!]/g, function (c) { return '%' + c.charCodeAt(0).toString(16).toUpperCase(); });
+      var parts = [], k = 0;
+      for (var j = 0; j < enc.length; k++) { var cut = Math.min(enc.length, j + 60); while (cut < enc.length && /%[0-9A-F]?$/.test(enc.slice(j, cut))) cut--; parts.push(' filename*' + k + '*=' + (k ? '' : "UTF-8''") + enc.slice(j, cut) + ';'); j = cut; }
+      parts[parts.length - 1] = parts[parts.length - 1].replace(/;$/, '');
       out.push('--' + bnd,
-        'Content-Type: ' + type + '; name="' + hdrWord(f.name) + '"',
+        'Content-Type: application/octet-stream; name="' + ascii + '"',
         'Content-Transfer-Encoding: base64',
-        'Content-Disposition: attachment; filename="' + hdrWord(f.name) + '"; filename*=UTF-8\'\'' + enc,
+        'Content-Disposition: attachment; filename="' + ascii + '";',
+        parts.join(CRLF),
         '',
         wrap76(await blobB64(f.blob)));
     }
@@ -118,7 +133,7 @@
       guide(files.map(function (f) { return f.name; }).join('، '), 'mailto');
       return 'mailto';
     }
-    var eml = await buildEml({ subject: o.subject, body: o.body, files: files });
+    var eml = await buildEml({ subject: o.subject, body: o.body, files: files, kind: o.kind });
     var nm = safeName(o.fileName || o.subject || (files[0] && files[0].name)) + '.eml';
     save(eml, nm);
     guide(nm, 'eml');

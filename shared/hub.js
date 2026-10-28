@@ -21,7 +21,7 @@
   window.JEDHUB = { os: os, device: dev, version: 'v2.0', framed: framed };
   /* shared helpers: «فتح في Outlook» everywhere; floating notes when a tool is opened on its own (the toolkit page has its own) */
   var BASE = (function () { var c = document.currentScript; return c && c.src ? c.src.replace(/[^\/]*$/, '') : '../../shared/'; })();
-  function need(f) { var sc = document.createElement('script'); sc.src = BASE + f + '?v=20261028'; (document.head || root).appendChild(sc); }
+  function need(f) { var sc = document.createElement('script'); sc.src = BASE + f + '?v=20261028d'; (document.head || root).appendChild(sc); }
   need('mail.js');
   if (!document.querySelector('link[rel~="icon"]')) { [['icon', 'icon/icon.svg', 'image/svg+xml'], ['apple-touch-icon', 'icon/apple-touch-icon.png', '']].forEach(function (x) { var l = document.createElement('link'); l.rel = x[0]; l.href = BASE + x[1]; if (x[2]) l.type = x[2]; (document.head || root).appendChild(l); }); }
   if (!framed) need('notes.js');
