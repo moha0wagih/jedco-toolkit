@@ -6325,7 +6325,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
       finally { a._h.remove(); b._h.remove(); }
       return strokeOK;
     }
-    const ring = (w, col) => { const r = w / 2; if (r < 0.01) return ''; const out = []; const n = r > 1.2 ? 24 : 16; for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; out.push(`${(Math.cos(a) * r).toFixed(3)}px ${(Math.sin(a) * r).toFixed(3)}px 0 ${col}`); } if (r > .5) for (let i = 0; i < 8; i++) { const a = (i + .5) / 8 * Math.PI * 2; out.push(`${(Math.cos(a) * r / 2).toFixed(3)}px ${(Math.sin(a) * r / 2).toFixed(3)}px 0 ${col}`); } return out.join(','); };
+    const ring = (w, col) => { const r = w * 0.45; if (r < 0.01) return ''; const out = []; const n = r > 1.2 ? 24 : 16; for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; out.push(`${(Math.cos(a) * r).toFixed(3)}px ${(Math.sin(a) * r).toFixed(3)}px 0 ${col}`); } if (r > .5) for (let i = 0; i < 8; i++) { const a = (i + .5) / 8 * Math.PI * 2; out.push(`${(Math.cos(a) * r / 2).toFixed(3)}px ${(Math.sin(a) * r / 2).toFixed(3)}px 0 ${col}`); } return out.join(','); };
     function bake(node) {
       const undo = [];
       const els = [node, ...node.querySelectorAll('*')];
@@ -6339,8 +6339,8 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     }
     Object.keys(orig).forEach(k => {
       H2I[k] = async function (node, o) {
-        let ok = true; try { ok = await probe(); } catch (e) { ok = false; }
-        if (ok || !node || !node.querySelectorAll) return orig[k](node, o);
+        // the weight is always drawn the safe way: some browsers (Safari, iPhone) drop -webkit-text-stroke inside the export
+        if (!node || !node.querySelectorAll) return orig[k](node, o);
         const un = bake(node); try { return await orig[k](node, o); } finally { un(); }
       };
     });
