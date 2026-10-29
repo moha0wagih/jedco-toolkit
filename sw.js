@@ -2,7 +2,7 @@
    First visit downloads each tool once; after that tools open from the device.
    · pages (html): fresh copy when online, saved copy when offline or slow
    · heavy files (js/wasm/images): saved copy right away, refreshed quietly in the background */
-const CACHE = 'jedco-toolkit-v2';
+const CACHE = 'jedco-toolkit-v3';
 self.addEventListener('install', e => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(
   caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('jedco-toolkit-') && k !== CACHE).map(k => caches.delete(k))))
@@ -16,9 +16,9 @@ self.addEventListener('fetch', e => {
     const hit = await c.match(req);
     const net = fetch(req).then(r => { if (r && r.ok) c.put(req, r.clone()); return r; });
     if (isPage(req)) {
-      // fresh page if it arrives within 4s, otherwise the saved one (the fresh one still gets saved)
+      // fresh page if it arrives within 15s, otherwise the saved one (the fresh one still gets saved)
       if (!hit) return net;
-      return Promise.race([net.catch(() => hit), new Promise(res => setTimeout(() => res(hit), 4000))]);
+      return Promise.race([net.catch(() => hit), new Promise(res => setTimeout(() => res(hit), 15000))]);
     }
     if (hit) { e.waitUntil(net.catch(() => {})); return hit; }
     return net;
