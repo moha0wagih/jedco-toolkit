@@ -104,14 +104,15 @@
   const st = q('stretch');
   let fb = null;
   if (st) {
-    fb = document.createElement('button'); fb.id = 'abFree'; fb.type = 'button';
-    fb.innerHTML = `${IC('lock-open', 2)}<span>حجم حر</span>`;
+    // two ways to size the page: «تمديد عادي» (as before: only longer, follows the content) or «حجم حر» (any height, cuts the content)
+    fb = document.createElement('div'); fb.id = 'abFree'; fb.setAttribute('role', 'group'); fb.setAttribute('aria-label', 'طريقة تغيير طول التصميم');
     st.after(fb);
     fb.addEventListener('pointerdown', e => e.stopPropagation());
     fb.addEventListener('click', e => {
-      e.stopPropagation(); const h = fixOf();
-      if (h) { setFix(0); try { afterLayout(); } catch (x) { } say('رجع طول التصميم تلقائي حسب المحتوى'); }
-      else { setFix(page.offsetHeight); say('الحجم الحر شغّال: اسحب الشريط تحت التصميم وطوّل أو قصّر بحرية — لو قصّرت أكثر من المحتوى ينقص من تحت'); }
+      e.stopPropagation(); const b = e.target.closest('[data-m]'); if (!b) return; const want = b.dataset.m, h = fixOf();
+      if (want === 'auto' && h) { const cur = page.offsetHeight; setFix(0); try { S.extra = 0; applyExtra(); const nat = page.offsetHeight; S.extra = Math.max(0, Math.round(cur - nat)); applyExtra(); afterLayout(); } catch (x) { } say('تمديد عادي: الطول يتبع المحتوى وتقدر تطوّله بالسحب'); }
+      else if (want === 'free' && !h) { setFix(page.offsetHeight); try { S.extra = 0; } catch (x) { } say('حجم حر: اسحب الشريط تحت التصميم لفوق أو لتحت بحرية — اللي ينقص يتقص من تحت'); }
+      else return;
       try { applyExtra(); snap(true); } catch (x) { }
     });
     // free drag (only while the switch is on); the normal drag stays as it was
@@ -124,7 +125,7 @@
     }, true);
   }
   function placeFree() { if (!fb || !st) return; fb.style.top = st.style.top; }
-  function updFree() { if (!fb) return; const on = !!fixOf(); fb.classList.toggle('on', on); fb.innerHTML = `${IC(on ? 'lock-open' : 'lock', 2)}<span>${on ? 'حجم حر: شغّال' : 'حجم حر'}</span>`; fb.title = on ? 'الطول ثابت وتتحكم فيه بحرية — اضغط عشان يرجع تلقائي حسب المحتوى' : 'شغّلها عشان تطوّل أو تقصّر التصميم بحرية كاملة، حتى لو قص المحتوى'; }
+  function updFree() { if (!fb) return; const on = !!fixOf(); fb.innerHTML = `<button type="button" data-m="auto" class="${on ? '' : 'on'}" title="مثل قبل: الطول يتبع المحتوى، والسحب يطوّل فقط">${IC('move-vertical', 2)}<span>تمديد عادي</span></button><button type="button" data-m="free" class="${on ? 'on' : ''}" title="طول ثابت تتحكم فيه بحرية — تطوّل أو تقصّر حتى لو قص المحتوى">${IC('crop', 2)}<span>حجم حر</span></button>`; }
   syncFix(); placeFree();
   new MutationObserver(() => syncFix()).observe(page, { childList: true });
 
