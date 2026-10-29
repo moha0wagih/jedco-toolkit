@@ -2,7 +2,7 @@
    First visit downloads each tool once; after that tools open from the device.
    · pages (html): fresh copy when online, saved copy when offline or slow
    · heavy files (js/wasm/images): saved copy right away, refreshed quietly in the background */
-const CACHE = 'jedco-toolkit-v3';
+const CACHE = 'jedco-toolkit-v4';
 self.addEventListener('install', e => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(
   caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('jedco-toolkit-') && k !== CACHE).map(k => caches.delete(k))))

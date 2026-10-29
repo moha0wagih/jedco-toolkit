@@ -22,40 +22,78 @@
      1) text weight survives the PNG export
      ===================================================================== */
   const H2I = window.htmlToImage;
-  if (H2I) {
-    const orig = {}; ['toPng', 'toJpeg', 'toBlob', 'toCanvas', 'toSvg'].forEach(k => { if (typeof H2I[k] === 'function') orig[k] = H2I[k].bind(H2I); });
-    let strokeOK = null;
-    const force = () => { try { return localStorage.getItem('jedStrokeFB') === '1'; } catch (e) { return false; } };
-    // does this browser draw -webkit-text-stroke inside the export? (checked once, on a tiny sample)
-    async function probe() {
-      if (force()) return false; if (strokeOK !== null) return strokeOK;
-      const mk = sw => { const h = document.createElement('div'); h.style.cssText = 'position:fixed;left:-9000px;top:0;pointer-events:none'; const d = document.createElement('div'); d.style.cssText = `position:relative;width:160px;height:70px;background:#fff;color:#000;font:700 48px Arial,sans-serif;line-height:70px;-webkit-text-stroke:${sw}px #000;white-space:nowrap;overflow:hidden`; d.textContent = 'IIII'; h.appendChild(d); document.body.appendChild(h); d._h = h; return d; };
-      const ink = async el => { const url = await orig.toPng(el, { pixelRatio: 1, width: 160, height: 70, cacheBust: false, skipFonts: true }); const im = new Image(); await new Promise((r, j) => { im.onload = r; im.onerror = j; im.src = url; }); const c = document.createElement('canvas'); c.width = 160; c.height = 70; const g = c.getContext('2d'); g.drawImage(im, 0, 0); const px = g.getImageData(0, 0, 160, 70).data; let n = 0; for (let i = 0; i < px.length; i += 4) if (px[i] < 128) n++; return n; };
-      const a = mk(0), b = mk(6);
-      try { await ink(a); const n0 = await ink(a), n1 = await ink(b); strokeOK = n0 > 50 ? n1 > n0 * 1.25 : false; window.__strokeInk = [n0, n1]; } catch (e) { strokeOK = false; }
-      finally { a._h.remove(); b._h.remove(); }
-      return strokeOK;
-    }
-    const ring = (w, col) => { const r = w * 0.45; if (r < 0.01) return ''; const out = []; const n = r > 1.2 ? 24 : 16; for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; out.push(`${(Math.cos(a) * r).toFixed(3)}px ${(Math.sin(a) * r).toFixed(3)}px 0 ${col}`); } if (r > .5) for (let i = 0; i < 8; i++) { const a = (i + .5) / 8 * Math.PI * 2; out.push(`${(Math.cos(a) * r / 2).toFixed(3)}px ${(Math.sin(a) * r / 2).toFixed(3)}px 0 ${col}`); } return out.join(','); };
-    function bake(node) {
-      const undo = [];
-      const els = [node, ...node.querySelectorAll('*')];
-      const plan = [];
-      els.forEach(el => { if (!(el instanceof Element)) return; const cs = getComputedStyle(el); const w = parseFloat(cs.webkitTextStrokeWidth) || 0; if (w <= 0) return; plan.push([el, w, cs.webkitTextStrokeColor || cs.color, cs.textShadow]); });
-      plan.forEach(([el, w, col, ts]) => {
-        const s = el.style; undo.push([el, s.getPropertyValue('-webkit-text-stroke-width'), s.getPropertyPriority('-webkit-text-stroke-width'), s.getPropertyValue('text-shadow'), s.getPropertyPriority('text-shadow')]);
-        const rg = ring(w, col); s.setProperty('-webkit-text-stroke-width', '0px', 'important'); s.setProperty('text-shadow', (ts && ts !== 'none' ? ts + ',' : '') + rg, 'important');
+  /* The browser's own export (SVG foreignObject) drops -webkit-text-stroke in Safari, and Safari also
+     ignores the text-shadow fallback. So the weight is no longer left to the browser at all:
+       pass 1 — the design exactly as is, with the stroke switched off
+       pass 2 — only the weighted text, in its own colour, on a transparent layer
+     then pass 2 is thickened on a plain canvas (the same way a stroke grows the letters) and laid
+     over pass 1. Plain canvas drawing works the same in every browser. */
+  if (H2I && typeof H2I.toCanvas === 'function') {
+    const orig = {}; ['toPng', 'toJpeg', 'toBlob', 'toCanvas'].forEach(k => { if (typeof H2I[k] === 'function') orig[k] = H2I[k].bind(H2I); });
+    const SAF = /^((?!chrome|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent);
+    let css = document.getElementById('v3InkCss');
+    if (!css) { css = document.createElement('style'); css.id = 'v3InkCss'; document.head.appendChild(css); }
+    css.textContent = `.v3ink,.v3ink *{color:transparent!important;-webkit-text-fill-color:transparent!important;background:none!important;background-color:transparent!important;border-color:transparent!important;box-shadow:none!important;text-shadow:none!important;outline:none!important;text-decoration-color:transparent!important;-webkit-text-stroke-width:0!important}
+.v3ink img,.v3ink svg,.v3ink video,.v3ink canvas,.v3ink picture{opacity:0!important}
+.v3ink *::before,.v3ink *::after{opacity:0!important;background:none!important;border-color:transparent!important;box-shadow:none!important}
+.v3ink [data-v3ink]{color:var(--v3c)!important;-webkit-text-fill-color:var(--v3c)!important}`;
+    function inked(node) {
+      const out = []; const nr = node.getBoundingClientRect(); const s = (nr.width / (node.offsetWidth || nr.width)) || 1;
+      [node, ...node.querySelectorAll('*')].forEach(el => {
+        if (!(el instanceof Element)) return; const cs = getComputedStyle(el); const w = parseFloat(cs.webkitTextStrokeWidth) || 0; if (w <= 0.001) return;
+        if (cs.display === 'none' || cs.visibility === 'hidden') return;
+        let own = false; for (const n of el.childNodes) if (n.nodeType === 3 && n.data.trim()) { own = true; break; } if (!own) return;
+        const r = el.getBoundingClientRect(); if (!r.width || !r.height) return;
+        out.push({ el, w, col: cs.webkitTextStrokeColor || cs.color, fill: cs.color, x: (r.left - nr.left) / s, y: (r.top - nr.top) / s, wd: r.width / s, ht: r.height / s });
       });
-      return () => undo.reverse().forEach(([el, w, wp, t, tp]) => { const s = el.style; if (w) s.setProperty('-webkit-text-stroke-width', w, wp); else s.removeProperty('-webkit-text-stroke-width'); if (t) s.setProperty('text-shadow', t, tp); else s.removeProperty('text-shadow'); });
+      return out;
     }
-    Object.keys(orig).forEach(k => {
-      H2I[k] = async function (node, o) {
-        // the weight is always drawn the safe way: some browsers (Safari, iPhone) drop -webkit-text-stroke inside the export
-        if (!node || !node.querySelectorAll) return orig[k](node, o);
-        const un = bake(node); try { return await orig[k](node, o); } finally { un(); }
-      };
-    });
-    window.__strokeProbe = probe;
+    async function render(node, o) {
+      o = Object.assign({}, o || {});
+      const list = inked(node);
+      if (!list.length) return orig.toCanvas(node, o);
+      const all = [node, ...node.querySelectorAll('*')].filter(el => { const w = parseFloat(getComputedStyle(el).webkitTextStrokeWidth) || 0; return w > 0.001; });
+      const keep = all.map(el => [el, el.style.getPropertyValue('-webkit-text-stroke-width'), el.style.getPropertyPriority('-webkit-text-stroke-width')]);
+      const restore = () => keep.forEach(([el, v, p]) => { if (v) el.style.setProperty('-webkit-text-stroke-width', v, p); else el.style.removeProperty('-webkit-text-stroke-width'); });
+      let base, ink;
+      try {
+        all.forEach(el => el.style.setProperty('-webkit-text-stroke-width', '0px', 'important'));
+        base = await orig.toCanvas(node, o);
+        // pass 2: only the weighted text
+        list.forEach(it => { it.el.setAttribute('data-v3ink', ''); it.el.style.setProperty('--v3c', it.col); });
+        node.classList.add('v3ink');
+        const o2 = Object.assign({}, o); delete o2.backgroundColor;
+        if (SAF) await orig.toCanvas(node, o2);   // Safari draws fonts on the second pass
+        ink = await orig.toCanvas(node, o2);
+      } finally {
+        node.classList.remove('v3ink'); list.forEach(it => { it.el.removeAttribute('data-v3ink'); it.el.style.removeProperty('--v3c'); }); restore();
+      }
+      // thicken: the stroke grows each letter by half its width on every side
+      const k = base.width / (o.width || node.offsetWidth || base.width);
+      const g = base.getContext('2d');
+      list.forEach(it => {
+        const r = it.w * 0.45 * k; if (r < 0.15) return; const pad = Math.ceil(r) + 2;
+        const sx = Math.max(0, Math.floor(it.x * k) - pad), sy = Math.max(0, Math.floor(it.y * k) - pad);
+        const sw = Math.min(ink.width - sx, Math.ceil(it.wd * k) + pad * 2), sh = Math.min(ink.height - sy, Math.ceil(it.ht * k) + pad * 2); if (sw <= 0 || sh <= 0) return;
+        const off = []; const rings = r > 1.5 ? [r, r * 0.66, r * 0.33] : [r, r * 0.5];
+        rings.forEach(rr => { const n = Math.max(12, Math.ceil(Math.PI * 2 * rr * 1.5)); for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; off.push([Math.cos(a) * rr, Math.sin(a) * rr]); } });
+        off.push([0, 0]);
+        // grow on a scratch canvas first (so overlapping copies don't darken the edges twice over the photo), then lay it down once
+        // keep only this text's own colour (anything else the browser still painted on this layer is dropped)
+        const rgb = (String(it.col).match(/[\d.]+/g) || []).slice(0, 3).map(Number);
+        const src = document.createElement('canvas'); src.width = sw; src.height = sh; const sg = src.getContext('2d'); sg.drawImage(ink, sx, sy, sw, sh, 0, 0, sw, sh);
+        if (rgb.length === 3) { const id = sg.getImageData(0, 0, sw, sh), d = id.data; for (let i = 0; i < d.length; i += 4) { if (!d[i + 3]) continue; if (Math.abs(d[i] - rgb[0]) + Math.abs(d[i + 1] - rgb[1]) + Math.abs(d[i + 2] - rgb[2]) > 90) d[i + 3] = 0; else { d[i] = rgb[0]; d[i + 1] = rgb[1]; d[i + 2] = rgb[2]; } } sg.putImageData(id, 0, 0); }
+        const t = document.createElement('canvas'); t.width = sw + pad * 2; t.height = sh + pad * 2; const tg = t.getContext('2d');
+        off.forEach(([dx, dy]) => tg.drawImage(src, pad + dx, pad + dy));
+        g.drawImage(t, sx - pad, sy - pad);
+      });
+      return base;
+    }
+    H2I.toCanvas = (node, o) => render(node, o);
+    H2I.toPng = async (node, o) => (await render(node, o)).toDataURL('image/png');
+    H2I.toJpeg = async (node, o) => { const c = await render(node, o); return c.toDataURL('image/jpeg', (o && o.quality) || 0.95); };
+    H2I.toBlob = async (node, o) => { const c = await render(node, o); return new Promise(r => c.toBlob(r, 'image/png')); };
+    window.__v3render = render;
   }
 
   /* =====================================================================
