@@ -1,0 +1,43 @@
+/* ---------- v2.1 · project tabs ---------- */
+#v3Tabs{position:fixed;top:56px;left:0;right:0;height:36px;z-index:98;display:flex;align-items:flex-end;gap:6px;padding:0 10px;background:#dfe5ee;border-bottom:1px solid var(--ui-line);direction:rtl;font-family:Tajawal,sans-serif}
+body.phone #v3Tabs{display:none}
+body.v3tabs:not(.phone) #iconPanel,body.v3tabs:not(.phone) #stage,body.v3tabs:not(.phone) #blockPanel{margin-top:36px}
+body.v3tabs:not(.phone) #lib,body.v3tabs:not(.phone) #qa{top:92px}
+body.v3tabs:not(.phone) #v2Start .v2b{padding-top:68px}
+#v3Tabs .v3tl{display:flex;align-items:flex-end;gap:2px;min-width:0;overflow:hidden}
+#v3Tabs .v3t{position:relative;display:flex;align-items:center;gap:7px;height:30px;max-width:210px;min-width:96px;padding:0 10px 0 6px;border-radius:9px 9px 0 0;background:transparent;color:var(--ui-sub);font-size:13px;font-weight:500;cursor:pointer;user-select:none;transition:background .15s,color .15s}
+#v3Tabs .v3t:hover{background:rgba(255,255,255,.55);color:var(--ui-text)}
+#v3Tabs .v3t.on{background:#fff;color:var(--navy);font-weight:700;box-shadow:inset 0 2px 0 var(--ui-acc)}
+#v3Tabs .v3t>svg{flex:none;width:15px;height:15px;color:var(--ui-acc)}
+#v3Tabs .v3n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#v3Tabs .v3d{flex:none;width:7px;height:7px;border-radius:50%;background:#FC5C17}
+#v3Tabs .v3x{flex:none;display:flex;align-items:center;justify-content:center;width:20px;height:20px;border:0;border-radius:6px;background:none;color:inherit;opacity:.55;cursor:pointer;padding:0}
+#v3Tabs .v3x svg{width:13px;height:13px}
+#v3Tabs .v3x:hover{opacity:1;background:#e4eaf3}
+#v3Tabs .v3add{flex:none;align-self:center;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border:0;border-radius:8px;background:none;color:var(--ui-acc);cursor:pointer}
+#v3Tabs .v3add svg{width:17px;height:17px}
+#v3Tabs .v3add:hover{background:#fff}
+#v3Tabs .v3add:disabled{color:#a3adbb;cursor:not-allowed;background:none}
+#v3Tabs .v3c{align-self:center;margin-inline-start:auto;font-family:Sequel,FSI,sans-serif;font-size:10.5px;color:#8b97a8;direction:ltr}
+/* ---------- free artboard size switch (beside the stretch handle) ---------- */
+#abFree{position:absolute;left:calc(50% + 103px);height:26px;display:flex;align-items:center;gap:5px;padding:0 10px;border:1px solid var(--ui-line);border-top:0;border-radius:0 0 10px 10px;background:#fff;color:var(--ui-sub);font:600 12px Tajawal,sans-serif;cursor:pointer;pointer-events:auto;white-space:nowrap;z-index:6}
+#abFree svg{width:13px;height:13px}
+#abFree:hover{color:var(--ui-acc);border-color:#c7d2e1}
+#abFree.on{background:#FC5C17;border-color:#FC5C17;color:#fff}
+body.exporting #abFree,body.lx-on #abFree,body.phone #abFree{display:none}
+/* ---------- presentation: the bar rests out of the way ---------- */
+#present.v3idle #pBar{opacity:0;pointer-events:none}
+#present.v3idle{cursor:none}
+#present #pBar{transition:opacity .35s}
+/* right-click menu: copy / paste entries */
+#selmenu button[data-v3]{display:flex}
+/* nothing floats over the design while presenting */
+body:has(#present.on) #hubHome,body:has(#present.on) #jnFab,body:has(#present.on) #v3Tabs,body:has(#present.on) #toast{display:none!important}
+/* layers panel bar: one row with the new «دمج» */
+#lxLayBar{flex-wrap:nowrap;gap:3px}
+#lxLayBar button{min-width:0;padding:0 6px;white-space:nowrap}
+#lxLayBar button[data-lb=group],#lxLayBar button[data-lb=ungroup],#lxLayBar button[data-lb=merge]{flex:1 1 auto}
+#lxLayBar button[data-lb=group] svg,#lxLayBar button[data-lb=ungroup] svg,#lxLayBar button[data-lb=merge] svg{display:none}
+#lxLayBar button[data-lb=dup],#lxLayBar button[data-lb=up],#lxLayBar button[data-lb=down],#lxLayBar button[data-lb=del]{flex:0 0 34px}
+/* a new tab has nothing to «continue» */
+body.v3fresh #v2Start [data-v=cont]{display:none}

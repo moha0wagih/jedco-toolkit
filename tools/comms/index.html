@@ -3210,7 +3210,7 @@ $('#bDev').onclick = () => setDevice(isPhone() ? 'desktop' : 'phone', true);
 
 /* ---------------- boot ---------------- */
 $('#brandLogo').innerHTML = ASSETS.logo;
-const APP_VER = 'v2.0', APP_BUILD = 'build 30';
+const APP_VER = 'v2.0', APP_BUILD = 'build 31';
 $('#sig').innerHTML = `<span>Designed by Mohammed Wagih · ${new Date().getFullYear()} · <b class="beta">${APP_VER}</b></span><button id="bReport" title="أرسل ملاحظة أو مشكلة لمحمد وجيه">الإبلاغ عن مشكلة</button>`;
 $('#bReport').onclick = () => {
   const ua = navigator.userAgent; const br = /Edg\//.test(ua) ? 'Edge' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : /Firefox\//.test(ua) ? 'Firefox' : 'Other';
@@ -4346,6 +4346,50 @@ body.fmt-painting #page,body.fmt-painting #page *{cursor:var(--fmtBrush,copy)!im
 body.phone #fmtChip{bottom:84px}
 #tbar.whole [data-t="del"]{display:none}
 
+/* ---------- v2.1 · project tabs ---------- */
+#v3Tabs{position:fixed;top:56px;left:0;right:0;height:36px;z-index:98;display:flex;align-items:flex-end;gap:6px;padding:0 10px;background:#dfe5ee;border-bottom:1px solid var(--ui-line);direction:rtl;font-family:Tajawal,sans-serif}
+body.phone #v3Tabs{display:none}
+body.v3tabs:not(.phone) #iconPanel,body.v3tabs:not(.phone) #stage,body.v3tabs:not(.phone) #blockPanel{margin-top:36px}
+body.v3tabs:not(.phone) #lib,body.v3tabs:not(.phone) #qa{top:92px}
+body.v3tabs:not(.phone) #v2Start .v2b{padding-top:68px}
+#v3Tabs .v3tl{display:flex;align-items:flex-end;gap:2px;min-width:0;overflow:hidden}
+#v3Tabs .v3t{position:relative;display:flex;align-items:center;gap:7px;height:30px;max-width:210px;min-width:96px;padding:0 10px 0 6px;border-radius:9px 9px 0 0;background:transparent;color:var(--ui-sub);font-size:13px;font-weight:500;cursor:pointer;user-select:none;transition:background .15s,color .15s}
+#v3Tabs .v3t:hover{background:rgba(255,255,255,.55);color:var(--ui-text)}
+#v3Tabs .v3t.on{background:#fff;color:var(--navy);font-weight:700;box-shadow:inset 0 2px 0 var(--ui-acc)}
+#v3Tabs .v3t>svg{flex:none;width:15px;height:15px;color:var(--ui-acc)}
+#v3Tabs .v3n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#v3Tabs .v3d{flex:none;width:7px;height:7px;border-radius:50%;background:#FC5C17}
+#v3Tabs .v3x{flex:none;display:flex;align-items:center;justify-content:center;width:20px;height:20px;border:0;border-radius:6px;background:none;color:inherit;opacity:.55;cursor:pointer;padding:0}
+#v3Tabs .v3x svg{width:13px;height:13px}
+#v3Tabs .v3x:hover{opacity:1;background:#e4eaf3}
+#v3Tabs .v3add{flex:none;align-self:center;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border:0;border-radius:8px;background:none;color:var(--ui-acc);cursor:pointer}
+#v3Tabs .v3add svg{width:17px;height:17px}
+#v3Tabs .v3add:hover{background:#fff}
+#v3Tabs .v3add:disabled{color:#a3adbb;cursor:not-allowed;background:none}
+#v3Tabs .v3c{align-self:center;margin-inline-start:auto;font-family:Sequel,FSI,sans-serif;font-size:10.5px;color:#8b97a8;direction:ltr}
+/* ---------- free artboard size switch (beside the stretch handle) ---------- */
+#abFree{position:absolute;left:calc(50% + 103px);height:26px;display:flex;align-items:center;gap:5px;padding:0 10px;border:1px solid var(--ui-line);border-top:0;border-radius:0 0 10px 10px;background:#fff;color:var(--ui-sub);font:600 12px Tajawal,sans-serif;cursor:pointer;pointer-events:auto;white-space:nowrap;z-index:6}
+#abFree svg{width:13px;height:13px}
+#abFree:hover{color:var(--ui-acc);border-color:#c7d2e1}
+#abFree.on{background:#FC5C17;border-color:#FC5C17;color:#fff}
+body.exporting #abFree,body.lx-on #abFree,body.phone #abFree{display:none}
+/* ---------- presentation: the bar rests out of the way ---------- */
+#present.v3idle #pBar{opacity:0;pointer-events:none}
+#present.v3idle{cursor:none}
+#present #pBar{transition:opacity .35s}
+/* right-click menu: copy / paste entries */
+#selmenu button[data-v3]{display:flex}
+/* nothing floats over the design while presenting */
+body:has(#present.on) #hubHome,body:has(#present.on) #jnFab,body:has(#present.on) #v3Tabs,body:has(#present.on) #toast{display:none!important}
+/* layers panel bar: one row with the new «دمج» */
+#lxLayBar{flex-wrap:nowrap;gap:3px}
+#lxLayBar button{min-width:0;padding:0 6px;white-space:nowrap}
+#lxLayBar button[data-lb=group],#lxLayBar button[data-lb=ungroup],#lxLayBar button[data-lb=merge]{flex:1 1 auto}
+#lxLayBar button[data-lb=group] svg,#lxLayBar button[data-lb=ungroup] svg,#lxLayBar button[data-lb=merge] svg{display:none}
+#lxLayBar button[data-lb=dup],#lxLayBar button[data-lb=up],#lxLayBar button[data-lb=down],#lxLayBar button[data-lb=del]{flex:0 0 34px}
+/* a new tab has nothing to «continue» */
+body.v3fresh #v2Start [data-v=cont]{display:none}
+
 </style>
 <script id="lxScript">
 /* =====================================================================
@@ -4934,6 +4978,22 @@ body.phone #fmtChip{bottom:84px}
   /* clipboard (inside the tool) */
   function copySel(cut) { const ts = topSel(); if (!ts.length) return; const fo = flatOrder(); L.clip = { items: ts.slice().sort((a, b) => fo.get(a.id) - fo.get(b.id)).map(CL), assets: {} }; const used = usedAssets(L.clip.items); used.forEach(k => { L.clip.assets[k] = L.A[k]; }); L.clip.n = 0; try { localStorage.setItem('jedLX_clip', JSON.stringify(L.clip)); } catch (x) { } if (cut) delSel(); else say(ts.length > 1 ? `تم نسخ ${ts.length} طبقات` : 'تم النسخ'); }
   function pasteClip() { let c = L.clip; if (!c) { try { c = JSON.parse(localStorage.getItem('jedLX_clip') || 'null'); } catch (x) { } } if (!c || !c.items || !c.items.length) return false; Object.entries(c.assets || {}).forEach(([k, v]) => { if (v && !L.A[k]) { L.A[k] = v; L.AI.set(v, k); } }); c.n = (c.n || 0) + 1; const items = c.items.map(it => { const x = reid(CL(it)); moveLayer(x, 14 * c.n, 14 * c.n); return x; }); const s = topSel(); let arr = L.doc.layers, i = arr.length; if (s.length) { arr = arrOf(s[s.length - 1].id); i = arr.indexOf(s[s.length - 1]) + 1; } arr.splice(i, 0, ...items); reindex(); setSel(items.map(l => l.id)); changed(); return true; }
+  /* elements copied from an announcement (⌘C there) land here as layers: the board is taken apart and only what was selected is kept */
+  async function pasteBoardBits(c) {
+    if (!L.on || !L.doc || !c || !c.html) return false;
+    busy(true, 'جاري اللصق…');
+    try {
+      const r = await decompose(c.html, PW, 0, { root: '#page' }); const lv = []; r.layers.forEach(l => leaves(l, lv));
+      const inside = l => { const b = aabb(l); if (!b || b.w < .5 || b.h < .5) return false; const cx = b.x + b.w / 2, cy = b.y + b.h / 2; return c.rects.some(R => cx >= R.x - 2 && cx <= R.x + R.w + 2 && cy >= R.y - 2 && cy <= R.y + R.h + 2 && b.w <= R.w + 12 && b.h <= R.h + 12); };
+      const items = lv.filter(inside).map(l => reid(CL(l)));
+      if (!items.length) { say('ما قدرت ألصق هذا العنصر هنا'); return true; }
+      const s = topSel(); let arr = L.doc.layers, i = arr.length; if (s.length) { arr = arrOf(s[s.length - 1].id); i = arr.indexOf(s[s.length - 1]) + 1; }
+      arr.splice(i, 0, ...items); reindex(); setSel(items.map(l => l.id)); changed();
+      say(items.length > 1 ? `تم اللصق: ${items.length} طبقات من الإعلان` : 'تم اللصق من الإعلان');
+    } catch (e) { console.error(e); say('تعذّر اللصق: ' + (e.message || e)); }
+    finally { busy(false); }
+    return true;
+  }
   function usedAssets(layers) { const s = new Set(); const w = arr => arr.forEach(l => { if (l.type === 'group') w(l.children); else if (l.type === 'image' && l.src) s.add(l.src); }); w(layers); return [...s]; }
 
   /* ---------------- layers panel ---------------- */
@@ -5030,7 +5090,7 @@ body.phone #fmtChip{bottom:84px}
     h += `<h4>ترتيب الطبقة</h4><div class="row"><div class="seg"><button data-a="front" title="للأمام تماماً (${K('⇧]')})">${IC('bring-to-front')}</button><button data-a="fwd" title="خطوة للأمام (${K(']')})">${IC('arrow-up')}</button><button data-a="bwd" title="خطوة للخلف (${K('[')})">${IC('arrow-down')}</button><button data-a="back" title="للخلف تماماً (${K('⇧[')})">${IC('send-to-back')}</button></div></div>`;
     h += `<div class="row">${ts.length > 1 ? `<button class="b" data-a="group" style="flex:1" title="${K('G')}">${IC('group')} تجميع</button>` : ''}${ts.length > 1 && ts.filter(l => l.type === 'group').length >= 1 ? `<button class="b" data-a="mergeG" style="flex:1">${IC('combine')} دمج المجموعات</button>` : ''}</div>`;
     h += `<div class="row"><button class="b" data-a="dup" style="flex:1" title="${K('D')}">${IC('copy')} نسخ</button><button class="b" data-a="lock" style="flex:1">${IC(ts.every(l => l.locked) ? 'lock-open' : 'lock')} ${ts.every(l => l.locked) ? 'فتح' : 'قفل'}</button><button class="b dn" data-a="del" style="flex:1">${IC('trash-2')} حذف</button></div>`;
-    h += `<div class="row"><button class="b" data-a="raster" style="flex:1" title="تدمج الطبقات المحددة في صورة وحدة (مثل Merge في الفوتوشوب)">${IC('images')} تحويل لصورة</button><button class="b" data-a="expSel" style="flex:1" title="تصدير المحدد فقط كصورة PNG">${IC('file-image')} تصدير المحدد</button></div>`;
+    h += `<div class="row"><button class="b" data-a="raster" style="flex:1" title="تدمج الطبقات المحددة في طبقة وحدة (مثل Merge في الفوتوشوب) · ${K('E')}">${IC('combine')} دمج الطبقات</button><button class="b" data-a="expSel" style="flex:1" title="تصدير المحدد فقط كصورة PNG">${IC('file-image')} تصدير المحدد</button></div>`;
     if (!L.aiMode) h += `<div class="row"><button class="b ai" data-a="aiOn" style="flex:1">${IC('sparkles')} تعديل ذكي على المحدد</button></div>`;
     p.innerHTML = h; afterProps(p, keepAi);
   }
@@ -5298,10 +5358,11 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     document.body.classList.add('lx-printing'); const t = document.title; document.title = fname('');
     await document.fonts.ready; await wait(80); window.print(); document.title = t; document.body.classList.remove('lx-printing'); box.innerHTML = ''; say('اختر «حفظ كـ PDF» من نافذة الطباعة');
   }
+  const canMerge = () => { const ts = topSel(); return ts.length >= 2 || (ts.length === 1 && ts[0].type === 'group'); };
   async function rasterSel() {
-    const ts = topSel(); if (!ts.length) return; const fo = flatOrder(); const b = selBox(); const sorted = ts.slice().sort((a, c) => fo.get(a.id) - fo.get(c.id));
+    finishEdit(true); const ts = topSel(); if (!ts.length) return say('حدد الطبقات اللي تبي تدمجها'); if (!canMerge()) return say('حدد طبقتين أو أكثر (أو مجموعة) عشان تندمج في طبقة وحدة'); if (ts.some(effLocked)) return say('فيه طبقة مقفلة في التحديد — افتح قفلها أولاً'); const fo = flatOrder(); const b = selBox(); const sorted = ts.slice().sort((a, c) => fo.get(a.id) - fo.get(c.id));
     busy(true, 'جاري الدمج…');
-    try { const { url } = await toImageData(offsetLayers(sorted, -b.x, -b.y), Math.ceil(b.w), Math.ceil(b.h), '', 3, false); const top = sorted[sorted.length - 1]; const arr = arrOf(top.id); const l = { id: uid(), type: 'image', name: 'صورة مدمجة', x: b.x, y: b.y, w: Math.ceil(b.w), h: Math.ceil(b.h), rot: 0, op: 1, src: putAsset(url), ix: 0, iy: 0, iw: Math.ceil(b.w), ih: Math.ceil(b.h), rad: [0, 0, 0, 0] }; arr.splice(arr.indexOf(top) + 1, 0, l); reindex(); sorted.forEach(x => { const a = arrOf(x.id); a.splice(a.indexOf(x), 1); reindex(); }); pruneGroups(); reindex(); setSel([l.id]); changed(); say('تم دمج الطبقات في صورة وحدة'); }
+    try { const { url } = await toImageData(offsetLayers(sorted, -b.x, -b.y), Math.ceil(b.w), Math.ceil(b.h), '', 4, false); const top = sorted[sorted.length - 1]; const arr = arrOf(top.id); const l = { id: uid(), type: 'image', name: 'طبقة مدمجة', x: b.x, y: b.y, w: Math.ceil(b.w), h: Math.ceil(b.h), rot: 0, op: 1, src: putAsset(url), ix: 0, iy: 0, iw: Math.ceil(b.w), ih: Math.ceil(b.h), rad: [0, 0, 0, 0] }; arr.splice(arr.indexOf(top) + 1, 0, l); reindex(); sorted.forEach(x => { const a = arrOf(x.id); a.splice(a.indexOf(x), 1); reindex(); }); pruneGroups(); reindex(); setSel([l.id]); changed(); say(`تم دمج ${sorted.length > 1 ? sorted.length + ' طبقات' : 'المجموعة'} في طبقة وحدة — للتراجع ${K('Z')}`); }
     catch (e) { console.error(e); say('تعذّر الدمج'); }
     busy(false);
   }
@@ -5370,7 +5431,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
   function sanitizeLayers(arr) { return (arr || []).filter(l => l && /^(text|image|shape|svg|group)$/.test(l.type)).map(l => { l.id = l.id || uid(); if (l.type === 'text') l.html = cleanHtml(String(l.html || '')); if (l.type === 'svg') { const t = document.createElement('template'); t.innerHTML = String(l.svg || ''); t.content.querySelectorAll('script,foreignObject').forEach(x => x.remove()); t.content.querySelectorAll('*').forEach(n => [...n.attributes].forEach(a => { if (/^on/i.test(a.name) || /javascript:/i.test(a.value)) n.removeAttribute(a.name); })); l.svg = t.innerHTML; } if (l.type === 'group') l.children = sanitizeLayers(l.children); return l; }); }
   function injectFonts(css) { let st = q('lxFonts'); if (!st) { st = document.createElement('style'); st.id = 'lxFonts'; document.head.appendChild(st); } st.textContent = css || ''; }
   function enter() { if (L.on) return; L.on = true; if (typeof closeSheets === 'function') closeSheets(); if (typeof qaClose === 'function') try { qaClose(); } catch (e) { } if (typeof libClose === 'function') try { libClose(); } catch (e) { } if (typeof deselect === 'function') try { deselect(); } catch (e) { } document.body.classList.add('lx-on', 'lx-tab-layers'); const sh = document.querySelector('#iconPanel .shead b'); if (sh) { sh._t = sh._t || sh.textContent; sh.textContent = 'الطبقات والأيقونات'; } const sh2 = document.querySelector('#blockPanel .shead b'); if (sh2) { sh2._t = sh2._t || sh2.textContent; sh2.textContent = 'الخصائص'; } if (document.body.classList.contains('free-on') && q('fmBack')) { document.body.classList.remove('free-on'); } setTimeout(() => { sizeStage(); fitZoom(); }, 30); }
-  async function exitLX() { endPaint(); tbHide(); finishEdit(true); if (L.doc) { await autosave(true); saveThumb(); } L.on = false; document.body.classList.remove('lx-on', 'lx-tab-layers', 'lx-tab-icons'); document.querySelectorAll('#iconPanel .shead b, #blockPanel .shead b').forEach(x => { if (x._t) x.textContent = x._t; }); L.cache.forEach(el => el.remove()); L.cache.clear(); q('lxOv').innerHTML = ''; if (typeof closeSheets === 'function') closeSheets(); try { localStorage.removeItem('jedLX_open'); } catch (e) { } setTimeout(() => { try { fit(); } catch (e) { } updLayersBtn(); }, 30); say(L.linkedBoard ? 'تعديلاتك محفوظة — اضغط «متابعة الطبقات» وترجع لها بنفس المكان' : 'تعديلاتك محفوظة في «تصاميمي»'); }
+  async function exitLX(opt) { endPaint(); tbHide(); finishEdit(true); if (L.doc) { await autosave(true); saveThumb(); } L.on = false; document.body.classList.remove('lx-on', 'lx-tab-layers', 'lx-tab-icons'); document.querySelectorAll('#iconPanel .shead b, #blockPanel .shead b').forEach(x => { if (x._t) x.textContent = x._t; }); L.cache.forEach(el => el.remove()); L.cache.clear(); q('lxOv').innerHTML = ''; if (typeof closeSheets === 'function') closeSheets(); try { localStorage.removeItem('jedLX_open'); } catch (e) { } setTimeout(() => { try { fit(); } catch (e) { } updLayersBtn(); }, 30); if (opt && opt.quiet === true) return; say(L.linkedBoard ? 'تعديلاتك محفوظة — اضغط «متابعة الطبقات» وترجع لها بنفس المكان' : 'تعديلاتك محفوظة في «تصاميمي»'); }
   function setTab(t) { document.body.classList.toggle('lx-tab-layers', t === 'layers'); document.body.classList.toggle('lx-tab-icons', t === 'icons'); q('lxTabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === t)); }
   const isPh = () => document.body.classList.contains('phone');
 
@@ -5614,7 +5675,10 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     try { if (typeof commitActive === 'function') commitActive(); } catch (e) { }
     busy(true, 'جاري تفكيك التصميم إلى طبقات…');
     try {
-      const pc = page.cloneNode(true); pc.querySelectorAll('[contenteditable]').forEach(x => x.removeAttribute('contenteditable')); pc.style.transform = ''; pc.style.boxShadow = 'none';
+      // free artboard size: what the shorter page hides under the footer is left out
+      const bl = page.querySelector(':scope > style.abFix') && page.querySelector('#blocks'); const cut = [];
+      if (bl) { const lim = bl.getBoundingClientRect().bottom - 1; bl.querySelectorAll('*').forEach(el => { const r = el.getBoundingClientRect(); if (r.height && r.top >= lim) { el.setAttribute('data-lxcut', ''); cut.push(el); } }); }
+      const pc = page.cloneNode(true); cut.forEach(el => el.removeAttribute('data-lxcut')); pc.querySelectorAll('[data-lxcut]').forEach(x => x.remove()); pc.querySelectorAll('[contenteditable]').forEach(x => x.removeAttribute('contenteditable')); pc.style.transform = ''; pc.style.boxShadow = 'none';
       const css = q('mainStyle') ? q('mainStyle').textContent : FONT_CSS;
       const html = `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><style>${css}</style><style>html,body{margin:0!important;height:auto!important;overflow:visible!important;background:#fff!important}#page{box-shadow:none!important}</style></head><body class="exporting">${pc.outerHTML}</body></html>`;
       const r = await decompose(html, PW, 0, { root: '#page' });
@@ -5660,13 +5724,14 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     TB.innerHTML = `<div class="tr rt"><button data-t="bold" title="عريض — على الكلمات المحددة أو النص كامل">B</button><span class="tsep"></span><button data-t="down" title="أصغر">A−</button><input type="range" data-r="size" min="0.5" max="3" step="0.01" value="1"><button data-t="up" title="أكبر">A+</button><span class="tv" data-v="size">100%</span><span class="tsep"></span><button data-t="reset" title="إرجاع الحجم والسماكة والتباعد">↺</button></div>
       <div class="tr rt"><span class="tl">Weight</span><button data-t="wdown">−</button><input type="range" data-r="w" min="0" max="2" step="0.05" value="0"><button data-t="wup">+</button><span class="tv" data-v="w">0.00</span></div>
       <div class="tr rt"><span class="tl">Leading</span><button data-t="ldown">−</button><input type="range" data-r="lh" min="0.8" max="2.6" step="0.05" value="1.4"><button data-t="lup">+</button><span class="tv" data-v="lh">1.40</span></div>
-      <div class="tr rg"><button class="lb" data-t="paint" title="ناسخ التنسيق — كليك: مرة وحدة · دبل كليك: يظل شغّال لين Esc · ${MAC ? '⌘⌥C / ⌘⌥V' : 'Ctrl+Alt+C / Ctrl+Alt+V'}">${IC('paintbrush', 2.2)}<span>ناسخ التنسيق</span></button><span class="tsep"></span><button class="lb" data-t="group" title="تجميع (${K('G')})">${IC('group', 2.2)}<span>تجميع</span></button><button class="lb" data-t="ungroup" title="فك التجميع (${K('⇧G')})">${IC('ungroup', 2.2)}<span>فك التجميع</span></button><button class="lb" data-t="flat" title="فك كل المجموعات: كل عنصر يصير طبقة مستقلة">${IC('layers-3', 2.2)}<span>فك الكل</span></button></div>`;
+      <div class="tr rg"><button class="lb" data-t="paint" title="ناسخ التنسيق — كليك: مرة وحدة · دبل كليك: يظل شغّال لين Esc · ${MAC ? '⌘⌥C / ⌘⌥V' : 'Ctrl+Alt+C / Ctrl+Alt+V'}">${IC('paintbrush', 2.2)}<span>ناسخ التنسيق</span></button><span class="tsep"></span><button class="lb" data-t="group" title="تجميع (${K('G')})">${IC('group', 2.2)}<span>تجميع</span></button><button class="lb" data-t="ungroup" title="فك التجميع (${K('⇧G')})">${IC('ungroup', 2.2)}<span>فك التجميع</span></button><button class="lb" data-t="flat" title="فك كل المجموعات: كل عنصر يصير طبقة مستقلة">${IC('layers-3', 2.2)}<span>فك الكل</span></button><span class="tsep"></span><button class="lb" data-t="merge" title="دمج الطبقات المحددة في طبقة وحدة (${K('E')})">${IC('combine', 2.2)}<span>دمج الطبقات</span></button></div>`;
     document.body.appendChild(TB);
     TB.addEventListener('mousedown', e => { if (!e.target.closest('input')) e.preventDefault(); });
     TB.addEventListener('pointerdown', e => { e.stopPropagation(); if (e.target.matches('input')) { TB.drag = true; const up = () => { TB.drag = false; removeEventListener('pointerup', up); tbPlace(); push(true); renderProps(); }; addEventListener('pointerup', up); } });
     TB.addEventListener('input', e => { const l = tbLayer(); if (!l) return; const k = e.target.dataset.r, v = +e.target.value; if (k === 'size') tbSize(l, TB.base.fs * v); if (k === 'w') tbWeight(l, v); if (k === 'lh') { l.st.lh = v; paint(); } tbSync(); });
     TB.addEventListener('click', e => {
       const b = e.target.closest('[data-t]'); if (!b || b.disabled) return; const a = b.dataset.t;
+      if (a === 'merge') { rasterSel(); return; }
       if (a === 'paint') { if (L.editing) { const id = L.editing.dataset.id; finishEdit(true); setSel([id]); } if (e.detail >= 2) startPaint(true); else if (L.paint) endPaint(); else startPaint(false); return; }
       if (a === 'group' || a === 'ungroup' || a === 'flat') {
         if (L.editing) { const id = L.editing.dataset.id; finishEdit(true); setSel([id]); }
@@ -5695,7 +5760,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     if (!TB) return; const l = tbLayer(); const ts = topSel();
     TB.querySelectorAll('.rt').forEach(r => r.style.display = l ? '' : 'none');
     const en = (a, on) => { const b = TB.querySelector(`[data-t="${a}"]`); b.disabled = !on; };
-    en('group', !L.editing && ts.length >= 2); en('ungroup', !L.editing && ts.some(x => x.type === 'group')); en('flat', all().some(x => x.type === 'group'));
+    en('group', !L.editing && ts.length >= 2); en('ungroup', !L.editing && ts.some(x => x.type === 'group')); en('flat', all().some(x => x.type === 'group')); en('merge', !L.editing && canMerge());
     const pb = TB.querySelector('[data-t="paint"]'); pb.classList.toggle('on', !!L.paint); pb.classList.toggle('sticky', !!(L.paint && L.paint.sticky));
     if (!l) return;
     if (!TB.base || TB.base.id !== l.id) TB.base = { id: l.id, fs: l.st.fs || 16, xs: l.st.xs || '', lh: l.st.lh };
@@ -5750,7 +5815,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     q('topbar').appendChild(top);
     const host = document.createElement('div'); host.id = 'lxHost'; host.tabIndex = -1; host.innerHTML = `<div id="lxPad"><div id="lxWrap"><div id="lxPage"></div><div id="lxOv"></div></div></div>`; q('stage').appendChild(host);
     const tabs = document.createElement('div'); tabs.id = 'lxTabs'; tabs.innerHTML = `<button data-t="layers" class="on">${'الطبقات'}</button><button data-t="icons">الأيقونات</button>`;
-    const lay = document.createElement('div'); lay.id = 'lxLay'; lay.innerHTML = `<div id="lxLayHead"><span id="lxCount"></span><span><button data-lb="expand">فتح الكل</button><button data-lb="collapse">إغلاق الكل</button></span></div><div id="lxList"></div><div id="lxLayBar"><button data-lb="group" title="تجميع (${K('G')})">${IC('group')}تجميع</button><button data-lb="ungroup" title="فك (${K('⇧G')})">${IC('ungroup')}فك</button><button data-lb="dup" title="نسخ (${K('D')})">${IC('copy')}</button><button data-lb="up" title="للأمام">${IC('arrow-up')}</button><button data-lb="down" title="للخلف">${IC('arrow-down')}</button><button data-lb="del" title="حذف">${IC('trash-2')}</button></div>`;
+    const lay = document.createElement('div'); lay.id = 'lxLay'; lay.innerHTML = `<div id="lxLayHead"><span id="lxCount"></span><span><button data-lb="expand">فتح الكل</button><button data-lb="collapse">إغلاق الكل</button></span></div><div id="lxList"></div><div id="lxLayBar"><button data-lb="group" title="تجميع (${K('G')})">${IC('group')}تجميع</button><button data-lb="ungroup" title="فك (${K('⇧G')})">${IC('ungroup')}فك</button><button data-lb="merge" title="دمج المحدد في طبقة وحدة (${K('E')})">${IC('combine')}دمج</button><button data-lb="dup" title="نسخ (${K('D')})">${IC('copy')}</button><button data-lb="up" title="للأمام">${IC('arrow-up')}</button><button data-lb="down" title="للخلف">${IC('arrow-down')}</button><button data-lb="del" title="حذف">${IC('trash-2')}</button></div>`;
     const ip = q('iconPanel'); const sh = ip.querySelector('.shead'); if (sh) sh.after(tabs, lay); else ip.prepend(tabs, lay); tabs.after(lay);
     const props = document.createElement('div'); props.id = 'lxProps'; q('blockPanel').appendChild(props);
     const extra = document.createElement('div'); extra.innerHTML = `<div id="lxCtx"></div><div id="lxModal"></div><div id="lxBusy"><i></i><span>لحظة…</span></div><div id="lxPrint"></div><input type="file" id="lxImgIn" accept="image/*" hidden><input type="file" id="lxFileIn" accept=".json,application/json" hidden><nav id="lxTab"></nav>`; [...extra.children].forEach(c => document.body.appendChild(c));
@@ -5763,7 +5828,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     host.addEventListener('scroll', () => closeCtx());
     props.addEventListener('mousedown', e => { if (L.editing && e.target.closest('button')) e.preventDefault(); }); props.addEventListener('click', onPropsClick); props.addEventListener('click', onLintClick);
     tabs.addEventListener('click', e => { const b = e.target.closest('[data-t]'); if (b) setTab(b.dataset.t); });
-    lay.addEventListener('click', e => { const b = e.target.closest('[data-lb]'); if (!b) return; const k = b.dataset.lb; if (k === 'expand') { all().forEach(l => { if (l.type === 'group') L.open[l.id] = true; }); renderPanel(); } if (k === 'collapse') { L.open = {}; renderPanel(); } if (k === 'group') groupSel(); if (k === 'ungroup') ungroupSel(); if (k === 'dup') dupSel(); if (k === 'up') order(1); if (k === 'down') order(-1); if (k === 'del') delSel(); });
+    lay.addEventListener('click', e => { const b = e.target.closest('[data-lb]'); if (!b) return; const k = b.dataset.lb; if (k === 'expand') { all().forEach(l => { if (l.type === 'group') L.open[l.id] = true; }); renderPanel(); } if (k === 'collapse') { L.open = {}; renderPanel(); } if (k === 'group') groupSel(); if (k === 'ungroup') ungroupSel(); if (k === 'merge') rasterSel(); if (k === 'dup') dupSel(); if (k === 'up') order(1); if (k === 'down') order(-1); if (k === 'del') delSel(); });
     wirePanel();
     q('lxPaintB').onclick = e => { if (e.detail >= 2) { startPaint(true); return; } if (L.paint) { endPaint(); return; } startPaint(false); };
     q('lxBack').onclick = exitLX; q('lxUndo').onclick = undo; q('lxRedo').onclick = redo; q('lxGroupB').onclick = groupSel; q('lxUngroupB').onclick = ungroupSel; q('lxAiB').onclick = () => { L.aiMode = !L.aiMode; renderProps(); if (isPh()) openSheet('blocks'); };
@@ -5788,7 +5853,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     window.addEventListener('keydown', onKeyAll, true); window.addEventListener('keyup', e => { if (e.code === 'Space' && L.on) { L.space = false; q('lxHost').classList.remove('pan'); } }, true);
     window.addEventListener('wheel', e => { if (!L.on || !(e.target.closest && e.target.closest('#lxHost'))) return; if (e.ctrlKey || e.metaKey) { e.preventDefault(); e.stopImmediatePropagation(); setZoom(L.z * Math.exp(-e.deltaY * (e.ctrlKey && Math.abs(e.deltaY) < 30 ? .012 : .0025)), e.clientX, e.clientY); } }, { passive: false, capture: true });
     ['gesturestart', 'gesturechange'].forEach(t => window.addEventListener(t, e => { if (!L.on) return; e.preventDefault(); e.stopImmediatePropagation(); if (t === 'gesturestart') L.gz = L.z; else setZoom(L.gz * e.scale, e.clientX, e.clientY); }, { passive: false, capture: true }));
-    window.addEventListener('paste', async e => { if (!L.on) return; if (e.target.closest && e.target.closest('input,textarea')) return; if (L.editing) { e.preventDefault(); const t = e.clipboardData.getData('text/plain'); document.execCommand('insertText', false, t); return; } const files = [...(e.clipboardData && e.clipboardData.files || [])].filter(f => /^image\//.test(f.type)); e.preventDefault(); e.stopImmediatePropagation(); if (files.length) { for (const f of files) await addImageData(await fileToData(f)); return; } if (pasteClip()) return; const t = e.clipboardData.getData('text/plain'); if (t && t.trim()) { addText(/[؀-ۿ]/.test(t) ? 'ar' : 'en'); setTimeout(() => { const el = L.editing; if (el) { el.textContent = t.trim(); finishEdit(true); } }, 60); } }, true);
+    window.addEventListener('paste', async e => { if (!L.on) return; if (e.target.closest && e.target.closest('input,textarea')) return; if (L.editing) { e.preventDefault(); const t = e.clipboardData.getData('text/plain'); document.execCommand('insertText', false, t); return; } const files = [...(e.clipboardData && e.clipboardData.files || [])].filter(f => /^image\//.test(f.type)); e.preventDefault(); e.stopImmediatePropagation(); if (files.length) { for (const f of files) await addImageData(await fileToData(f)); return; } { const ac = window.__annClip, tt = e.clipboardData.getData('text/plain'); if (ac && tt && tt === ac.marker) { await pasteBoardBits(ac.board); return; } } if (pasteClip()) return; const t = e.clipboardData.getData('text/plain'); if (t && t.trim()) { addText(/[؀-ۿ]/.test(t) ? 'ar' : 'en'); setTimeout(() => { const el = L.editing; if (el) { el.textContent = t.trim(); finishEdit(true); } }, 60); } }, true);
     window.addEventListener('dragover', e => { if (!L.on || !(e.target.closest && e.target.closest('#lxHost'))) return; const ty = [...e.dataTransfer.types]; if (ty.includes('text/x-icon') || ty.includes('Files')) { e.preventDefault(); e.stopImmediatePropagation(); } }, true);
     window.addEventListener('drop', async e => { if (!L.on || !(e.target.closest && e.target.closest('#lxHost'))) return; const ic = e.dataTransfer.getData('text/x-icon'); const [x, y] = toPg(e.clientX, e.clientY); if (ic) { e.preventDefault(); e.stopImmediatePropagation(); addIcon(ic, x, y); return; } const files = [...e.dataTransfer.files]; const img = files.filter(f => /^image\//.test(f.type)); if (img.length) { e.preventDefault(); e.stopImmediatePropagation(); for (const f of img) await addImageData(await fileToData(f), x, y); } }, true);
     const flush = () => { if (!L.doc || !(L.on || L.dirty)) return; syncTyping(); if (!L.libId) L.libId = 'x' + Date.now().toString(36); try { localStorage.setItem('jedLX_pend', JSON.stringify({ id: L.libId, t: Date.now(), name: L.doc.name, w: L.doc.w, h: L.doc.h, bg: L.doc.bg, fonts: L.doc.fonts, layers: L.doc.layers })); } catch (e) { } autosave(true); };
@@ -5803,7 +5868,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     if (!L.on) return; e.preventDefault(); e.stopPropagation(); const leaf = hitId(e.target); if (leaf) { const id = pickFrom(leaf, MOD(e)); if (!L.sel.includes(id) && !L.sel.some(s => isIn(id, s))) setSel([id]); }
     const ts = topSel(); const m = q('lxCtx'); const it = (a, t, k, dn) => `<button data-c="${a}"${dn ? ' class="dn"' : ''}><span>${t}</span>${k ? `<kbd>${k}</kbd>` : ''}</button>`;
     let h = '';
-    if (ts.length) { h += it('copy', 'نسخ', K('C')) + it('cut', 'قص', K('X')) + it('paste', 'لصق', K('V')) + it('dup', 'تكرار', K('D')) + '<hr>' + it('lookCopy', 'نسخ التنسيق', MAC ? '⌘⌥C' : 'Ctrl+Alt+C') + it('lookPaste', 'لصق التنسيق', MAC ? '⌘⌥V' : 'Ctrl+Alt+V') + it('paintT', 'ناسخ التنسيق (فرشاة)', '') + '<hr>' + it('front', 'للأمام تماماً', K('⇧]')) + it('fwd', 'خطوة للأمام', K(']')) + it('bwd', 'خطوة للخلف', K('[')) + it('back', 'للخلف تماماً', K('⇧[')) + '<hr>' + (ts.length > 1 ? it('group', 'تجميع', K('G')) : '') + (ts.some(l => l.type === 'group') ? it('ungroup', 'فك التجميع', K('⇧G')) : '') + (ts.length === 1 && parentOf(ts[0].id) ? it('outG', 'إخراج من المجموعة', '') : '') + it('lock', ts.every(l => l.locked) ? 'فتح القفل' : 'قفل', K('L')) + it('hide', 'إخفاء', K('⇧H')) + it('raster', 'تحويل لصورة', '') + it('expSel', 'تصدير المحدد PNG', '') + '<hr>' + it('del', 'حذف', 'Del', true); }
+    if (ts.length) { h += it('copy', 'نسخ', K('C')) + it('cut', 'قص', K('X')) + it('paste', 'لصق', K('V')) + it('dup', 'تكرار', K('D')) + '<hr>' + it('lookCopy', 'نسخ التنسيق', MAC ? '⌘⌥C' : 'Ctrl+Alt+C') + it('lookPaste', 'لصق التنسيق', MAC ? '⌘⌥V' : 'Ctrl+Alt+V') + it('paintT', 'ناسخ التنسيق (فرشاة)', '') + '<hr>' + it('front', 'للأمام تماماً', K('⇧]')) + it('fwd', 'خطوة للأمام', K(']')) + it('bwd', 'خطوة للخلف', K('[')) + it('back', 'للخلف تماماً', K('⇧[')) + '<hr>' + (ts.length > 1 ? it('group', 'تجميع', K('G')) : '') + (ts.some(l => l.type === 'group') ? it('ungroup', 'فك التجميع', K('⇧G')) : '') + (ts.length === 1 && parentOf(ts[0].id) ? it('outG', 'إخراج من المجموعة', '') : '') + it('lock', ts.every(l => l.locked) ? 'فتح القفل' : 'قفل', K('L')) + it('hide', 'إخفاء', K('⇧H')) + it('raster', 'دمج الطبقات', K('E')) + it('expSel', 'تصدير المحدد PNG', '') + '<hr>' + it('del', 'حذف', 'Del', true); }
     else h += it('paste', 'لصق', K('V')) + it('selAll', 'تحديد الكل', K('A')) + '<hr>' + it('addT', 'إضافة نص', '') + it('addI', 'إضافة صورة', '') + it('addR', 'إضافة مستطيل', '');
     m.innerHTML = h; m.classList.add('on'); const r = m.getBoundingClientRect(); m.style.left = Math.min(e.clientX, innerWidth - r.width - 8) + 'px'; m.style.top = Math.min(e.clientY, innerHeight - r.height - 8) + 'px';
     m.onclick = ev => { const b = ev.target.closest('[data-c]'); if (!b) return; closeCtx(); const a = b.dataset.c; const map = { lookCopy: copyLook, lookPaste: pasteLook, paintT: () => startPaint(false), copy: () => copySel(), cut: () => copySel(true), paste: () => { if (!pasteClip()) say('ما فيه شي منسوخ'); }, dup: dupSel, front: () => order(2), fwd: () => order(1), bwd: () => order(-1), back: () => order(-2), group: groupSel, ungroup: ungroupSel, outG: () => { const l = ts[0]; const g = parentOf(l.id); moveTo([l.id], g.id, 'above'); }, lock: () => { const v = !ts.every(l => l.locked); ts.forEach(l => l.locked = v); if (v) L.sel = []; changed(); }, hide: () => { ts.forEach(l => l.hidden = true); L.sel = []; changed(); }, raster: rasterSel, expSel: () => exportPNG(4, { sel: true }), del: delSel, selAll: () => setSel(L.doc.layers.filter(l => !l.locked && !l.hidden).map(l => l.id)), addT: () => addText('ar'), addI: () => pickImage(s => addImageData(s)), addR: () => addShape('rect') }; map[a] && map[a](); };
@@ -5835,6 +5900,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     if (!L.sel.length) return;
     if (mod && k === 'g') { stop(); e.shiftKey ? ungroupSel() : groupSel(); return; }
     if (mod && k === 'd') { stop(); dupSel(); return; }
+    if (mod && k === 'e' && !e.shiftKey) { stop(); rasterSel(); return; }
     if (mod && k === 'l') { stop(); const ts = topSel(); const v = !ts.every(l => l.locked); ts.forEach(l => l.locked = v); if (v) L.sel = []; changed(); return; }
     if (mod && e.shiftKey && k === 'h') { stop(); topSel().forEach(l => l.hidden = true); L.sel = []; changed(); return; }
     if (mod && (e.key === ']' || e.code === 'BracketRight')) { stop(); order(e.shiftKey ? 2 : 1); return; }
@@ -5880,7 +5946,9 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     if (typeof activate === 'function') { const _act = activate; activate = function () { const r = _act.apply(this, arguments); setTimeout(updLayersBtn, 300); return r; }; }
     let ubT = 0; const ub = () => { if (L.on) return; clearTimeout(ubT); ubT = setTimeout(updLayersBtn, 900); };
     document.addEventListener('pointerup', ub, true); document.addEventListener('keyup', ub, true);
-    window.__lxApi = { resumeLX, resumeInfo, fromBoard, fromFree, openObj, newModal, libModal, exitLX, get state() { return L; }, paint, setSel, groupSel, ungroupSel, flattenAll, exportPNG, get, all, aabb, topSel, undo, redo, alignSel, order, addText, addShape, addIcon, addLogo, decompose, fileObj, applyNum, renderProps, renderPanel };
+    async function openLib(id, o = {}) { if (L.on && L.doc) { syncTyping(); await autosave(true); saveThumb(); } const rec = await loadRec(id); if (!rec || !rec.data) return false; if (!openObj(rec.data, { libId: rec.id, thumb: rec.thumb })) return false; const k = getLinks().find(x => x.lx === rec.id); L.linkedBoard = k || null; if (o.hist && o.hist.length) { L.hist = o.hist; L.hi = Math.min(o.hi, o.hist.length - 1); updUndo(); } return true; }
+    async function saveNow() { if (!L.doc) return null; finishEdit(true); syncTyping(); await autosave(true); saveThumb(); return L.libId; }
+    window.__lxApi = { openLib, saveNow, pasteBoardBits, rasterSel, resumeLX, resumeInfo, fromBoard, fromFree, openObj, newModal, libModal, exitLX, get state() { return L; }, paint, setSel, groupSel, ungroupSel, flattenAll, exportPNG, get, all, aabb, topSel, undo, redo, alignSel, order, addText, addShape, addIcon, addLogo, decompose, fileObj, applyNum, renderProps, renderPanel };
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hook); else hook();
 })();
@@ -6212,6 +6280,327 @@ Only include layers you changed or added. Keep src values unchanged. No other te
   tbar.addEventListener('click', e => { const b = e.target.closest('[data-t="paint"]'); if (b) { e.stopPropagation(); toggle(e); } }, true);
   // leaving for the layers studio / another board: the brush goes away
   document.addEventListener('click', e => { if (F.on && e.target.closest && e.target.closest('#bLayers, .abHead, #fileMenu, #v2Start')) stop(); }, true);
+})();
+
+</script>
+<script id="v3Script">
+/* ==========================================================================
+   مصمم التواصل الداخلي · v2.1
+   1) PNG export keeps the text weight (stroke) on every browser — when a browser
+      drops -webkit-text-stroke inside the export, the same thickness is drawn
+      with an even ring of text-shadows instead
+   2) project tabs (up to 5 open at once, like Adobe) + copy / paste between them
+   3) free artboard size: a switch on the stretch handle lets the page get
+      shorter or longer than its content (the content is cut at the footer)
+   4) presentation: the control bar never sits on the design
+   ========================================================================== */
+(function () {
+  'use strict';
+  const q = id => document.getElementById(id);
+  const IC = (n, sw) => svgIcon(n, sw || 1.9);
+  const say = m => { try { toast(m); } catch (e) { } };
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const lx = () => window.__lxApi;
+  const lxOn = () => !!(lx() && lx().state.on);
+  const ESC = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  /* =====================================================================
+     1) text weight survives the PNG export
+     ===================================================================== */
+  const H2I = window.htmlToImage;
+  if (H2I) {
+    const orig = {}; ['toPng', 'toJpeg', 'toBlob', 'toCanvas', 'toSvg'].forEach(k => { if (typeof H2I[k] === 'function') orig[k] = H2I[k].bind(H2I); });
+    let strokeOK = null;
+    const force = () => { try { return localStorage.getItem('jedStrokeFB') === '1'; } catch (e) { return false; } };
+    // does this browser draw -webkit-text-stroke inside the export? (checked once, on a tiny sample)
+    async function probe() {
+      if (force()) return false; if (strokeOK !== null) return strokeOK;
+      const mk = sw => { const h = document.createElement('div'); h.style.cssText = 'position:fixed;left:-9000px;top:0;pointer-events:none'; const d = document.createElement('div'); d.style.cssText = `position:relative;width:160px;height:70px;background:#fff;color:#000;font:700 48px Arial,sans-serif;line-height:70px;-webkit-text-stroke:${sw}px #000;white-space:nowrap;overflow:hidden`; d.textContent = 'IIII'; h.appendChild(d); document.body.appendChild(h); d._h = h; return d; };
+      const ink = async el => { const url = await orig.toPng(el, { pixelRatio: 1, width: 160, height: 70, cacheBust: false, skipFonts: true }); const im = new Image(); await new Promise((r, j) => { im.onload = r; im.onerror = j; im.src = url; }); const c = document.createElement('canvas'); c.width = 160; c.height = 70; const g = c.getContext('2d'); g.drawImage(im, 0, 0); const px = g.getImageData(0, 0, 160, 70).data; let n = 0; for (let i = 0; i < px.length; i += 4) if (px[i] < 128) n++; return n; };
+      const a = mk(0), b = mk(6);
+      try { await ink(a); const n0 = await ink(a), n1 = await ink(b); strokeOK = n0 > 50 ? n1 > n0 * 1.25 : false; window.__strokeInk = [n0, n1]; } catch (e) { strokeOK = false; }
+      finally { a._h.remove(); b._h.remove(); }
+      return strokeOK;
+    }
+    const ring = (w, col) => { const r = w / 2; if (r < 0.01) return ''; const out = []; const n = r > 1.2 ? 24 : 16; for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; out.push(`${(Math.cos(a) * r).toFixed(3)}px ${(Math.sin(a) * r).toFixed(3)}px 0 ${col}`); } if (r > .5) for (let i = 0; i < 8; i++) { const a = (i + .5) / 8 * Math.PI * 2; out.push(`${(Math.cos(a) * r / 2).toFixed(3)}px ${(Math.sin(a) * r / 2).toFixed(3)}px 0 ${col}`); } return out.join(','); };
+    function bake(node) {
+      const undo = [];
+      const els = [node, ...node.querySelectorAll('*')];
+      const plan = [];
+      els.forEach(el => { if (!(el instanceof Element)) return; const cs = getComputedStyle(el); const w = parseFloat(cs.webkitTextStrokeWidth) || 0; if (w <= 0) return; plan.push([el, w, cs.webkitTextStrokeColor || cs.color, cs.textShadow]); });
+      plan.forEach(([el, w, col, ts]) => {
+        const s = el.style; undo.push([el, s.getPropertyValue('-webkit-text-stroke-width'), s.getPropertyPriority('-webkit-text-stroke-width'), s.getPropertyValue('text-shadow'), s.getPropertyPriority('text-shadow')]);
+        const rg = ring(w, col); s.setProperty('-webkit-text-stroke-width', '0px', 'important'); s.setProperty('text-shadow', (ts && ts !== 'none' ? ts + ',' : '') + rg, 'important');
+      });
+      return () => undo.reverse().forEach(([el, w, wp, t, tp]) => { const s = el.style; if (w) s.setProperty('-webkit-text-stroke-width', w, wp); else s.removeProperty('-webkit-text-stroke-width'); if (t) s.setProperty('text-shadow', t, tp); else s.removeProperty('text-shadow'); });
+    }
+    Object.keys(orig).forEach(k => {
+      H2I[k] = async function (node, o) {
+        let ok = true; try { ok = await probe(); } catch (e) { ok = false; }
+        if (ok || !node || !node.querySelectorAll) return orig[k](node, o);
+        const un = bake(node); try { return await orig[k](node, o); } finally { un(); }
+      };
+    });
+    window.__strokeProbe = probe;
+  }
+
+  /* =====================================================================
+     4) presentation: the bar keeps out of the design
+     ===================================================================== */
+  if (typeof layoutPresent === 'function') {
+    const BAR = 96; // room kept free under the design for the bar
+    layoutPresent = function () {
+      const pPage = q('pPage'), pWrap = q('pWrap'); const vw = innerWidth, vh = innerHeight;
+      const fixH = page.style.getPropertyValue('--abh'); pPage.style.height = fixH || '';
+      pPage.classList.toggle('abfix', !!fixH);
+      const H = pPage.offsetHeight;
+      const s = pMode === 'fit' ? Math.min((vw - 60) / PW, (vh - 30 - BAR) / H) : Math.min((vw - 80) / PW, 2.2);
+      pPage.style.transform = `scale(${s})`; pWrap.style.width = PW * s + 'px'; pWrap.style.height = H * s + 'px';
+      pWrap.style.marginTop = pMode === 'fit' ? Math.max(24, (vh - BAR - H * s) / 2) + 'px' : '40px'; pWrap.style.marginBottom = BAR + 24 + 'px';
+      document.querySelectorAll('#pBar [data-p]').forEach(b => b.classList.toggle('on', b.dataset.p === pMode));
+      barWake();
+    };
+    // the bar fades out while the mouse rests, and comes back on any move
+    let idle = 0; const pres = q('present');
+    function barWake() { if (!pres) return; pres.classList.remove('v3idle'); clearTimeout(idle); idle = setTimeout(() => { if (pres.classList.contains('on') && !pres.matches(':has(#pBar:hover)')) pres.classList.add('v3idle'); }, 2600); }
+    if (pres) { pres.addEventListener('pointermove', barWake); pres.addEventListener('wheel', barWake, { passive: true }); pres.addEventListener('touchstart', barWake, { passive: true }); }
+  }
+
+  /* =====================================================================
+     3) free artboard size (announcement)
+     the fixed height lives inside the page as a tiny <style> marker, so undo,
+     saving, files, «تصاميمي», previews and the layers screen all carry it
+     ===================================================================== */
+  const MK = 'style.abFix';
+  const fixOf = root => { const m = (root || page).querySelector(':scope > ' + MK); return m ? +m.dataset.h || 0 : 0; };
+  const fixCss = h => `:is(#page,#pPage,.abp-page,.libpg):has(> style.abFix[data-h="${h}"]){height:${h}px!important}:is(#page,#pPage,.abp-page,.libpg):has(> style.abFix[data-h="${h}"]) #blocks{flex:1 1 0!important;min-height:0!important;overflow:hidden!important;padding-bottom:0!important}`;
+  function setFix(h) {
+    let m = page.querySelector(':scope > ' + MK);
+    if (!h) { if (m) m.remove(); page.style.removeProperty('--abh'); return; }
+    h = Math.round(Math.max(300, Math.min(12000, h)));
+    if (!m) { m = document.createElement('style'); m.className = 'abFix'; page.appendChild(m); }
+    if (+m.dataset.h !== h) { m.dataset.h = h; m.textContent = fixCss(h); }
+    page.style.setProperty('--abh', h + 'px');
+  }
+  function syncFix() { const h = fixOf(); if (h) page.style.setProperty('--abh', h + 'px'); else page.style.removeProperty('--abh'); updFree(); }
+  if (typeof applyExtra === 'function') {
+    const _ae = applyExtra; applyExtra = function () { syncFix(); return _ae.apply(this, arguments); };
+    const _ps = posStretch; posStretch = function () { const r = _ps.apply(this, arguments); placeFree(); const h = fixOf(); if (h) { const l = q('hLbl'); if (l) l.textContent = `حجم حر · ${Math.round(page.offsetHeight)} × ${Math.round(PW)}`; } return r; };
+  }
+  const st = q('stretch');
+  let fb = null;
+  if (st) {
+    fb = document.createElement('button'); fb.id = 'abFree'; fb.type = 'button';
+    fb.innerHTML = `${IC('lock-open', 2)}<span>حجم حر</span>`;
+    st.after(fb);
+    fb.addEventListener('pointerdown', e => e.stopPropagation());
+    fb.addEventListener('click', e => {
+      e.stopPropagation(); const h = fixOf();
+      if (h) { setFix(0); try { afterLayout(); } catch (x) { } say('رجع طول التصميم تلقائي حسب المحتوى'); }
+      else { setFix(page.offsetHeight); say('الحجم الحر شغّال: اسحب الشريط تحت التصميم وطوّل أو قصّر بحرية — لو قصّرت أكثر من المحتوى ينقص من تحت'); }
+      try { applyExtra(); snap(true); } catch (x) { }
+    });
+    // free drag (only while the switch is on); the normal drag stays as it was
+    st.addEventListener('pointerdown', e => {
+      if (!fixOf()) return; e.preventDefault(); e.stopImmediatePropagation();
+      const y0 = e.clientY, h0 = page.offsetHeight;
+      const mv = ev => { setFix(h0 + (ev.clientY - y0) / S.scale); try { posStretch(); } catch (x) { } };
+      const up = () => { removeEventListener('pointermove', mv); removeEventListener('pointerup', up); try { applyExtra(); snap(true); } catch (x) { } };
+      addEventListener('pointermove', mv); addEventListener('pointerup', up);
+    }, true);
+  }
+  function placeFree() { if (!fb || !st) return; fb.style.top = st.style.top; }
+  function updFree() { if (!fb) return; const on = !!fixOf(); fb.classList.toggle('on', on); fb.innerHTML = `${IC(on ? 'lock-open' : 'lock', 2)}<span>${on ? 'حجم حر: شغّال' : 'حجم حر'}</span>`; fb.title = on ? 'الطول ثابت وتتحكم فيه بحرية — اضغط عشان يرجع تلقائي حسب المحتوى' : 'شغّلها عشان تطوّل أو تقصّر التصميم بحرية كاملة، حتى لو قص المحتوى'; }
+  syncFix(); placeFree();
+  new MutationObserver(() => syncFix()).observe(page, { childList: true });
+
+  /* =====================================================================
+     2a) copy / paste elements of an announcement (⌘C ⌘X ⌘V) — works across tabs
+     ===================================================================== */
+  const MARK = '⁣JEDCO-COPY:';
+  const isTyping = t => t && t.closest && (t.closest('input,textarea,select,[contenteditable="true"],.ed') || (t.isContentEditable));
+  const kindOf = el => {
+    if (el.matches('#blocks > .blk')) return { k: 'blk', c: '#blocks' };
+    if (el.matches('.htitles .ht')) return { k: 'ht', c: '.htitles' };
+    if (el.matches('#free > .fi')) return { k: 'fi', c: '#free' };
+    const p = el.parentElement; const cls = p && ['pillars', 'info', 'lst', 'steps', 'chipw'].find(c => p.classList.contains(c));
+    return cls ? { k: 'child', c: '.' + cls } : null;
+  };
+  function boardHtml() {
+    const pc = page.cloneNode(true); pc.querySelectorAll('[contenteditable]').forEach(x => x.removeAttribute('contenteditable')); pc.querySelectorAll('.selx,.hov,.tsel,.drop-hl').forEach(x => x.classList.remove('selx', 'hov', 'tsel', 'drop-hl')); pc.style.transform = ''; pc.style.boxShadow = 'none';
+    const css = q('mainStyle') ? q('mainStyle').textContent : FONT_CSS;
+    return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><style>${css}</style><style>html,body{margin:0!important;height:auto!important;overflow:visible!important;background:#fff!important}#page{box-shadow:none!important}</style></head><body class="exporting">${pc.outerHTML}</body></html>`;
+  }
+  function writeMarker(txt) {
+    const ae = document.activeElement; const ta = document.createElement('textarea'); ta.value = txt; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+    document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand('copy'); } catch (e) { } ta.remove(); try { ae && ae.focus && ae.focus({ preventScroll: true }); } catch (e) { }
+    if (!ok && navigator.clipboard) navigator.clipboard.writeText(txt).catch(() => { });
+  }
+  function annCopy(cut) {
+    const els = MS.sel.filter(el => page.contains(el) && el.id !== 'sender' && !el.classList.contains('wp'));
+    const items = []; els.forEach(el => { const k = kindOf(el); if (!k) return; const c = el.cloneNode(true); [c, ...c.querySelectorAll('*')].forEach(x => x.classList.remove('selx', 'hov', 'tsel', 'drop-hl')); items.push({ k: k.k, c: k.c, html: c.outerHTML, grp: el.dataset.grp || '' }); });
+    if (!items.length) { say('هذا العنصر ثابت في القالب وما ينسخ'); return; }
+    const pr = page.getBoundingClientRect(), sc = S.scale || 1;
+    const rects = els.map(el => { const r = el.getBoundingClientRect(); return { x: (r.left - pr.left) / sc, y: (r.top - pr.top) / sc, w: r.width / sc, h: r.height / sc }; });
+    const id = Date.now().toString(36);
+    window.__annClip = { marker: MARK + id, items, board: { html: boardHtml(), rects }, from: T.curId() + ':' + S.active, n: 0 };
+    writeMarker(window.__annClip.marker);
+    if (cut) { try { msDel(); } catch (e) { } say(items.length > 1 ? `تم قص ${items.length} عناصر` : 'تم القص'); }
+    else say(items.length > 1 ? `تم نسخ ${items.length} عناصر — الصقها في أي مشروع مفتوح ${KB('V')}` : `تم النسخ — الصقه في أي مشروع مفتوح ${KB('V')}`);
+  }
+  function annPaste() {
+    const c = window.__annClip; if (!c || !c.items.length) return false;
+    try { msBegin(); } catch (e) { }
+    const same = c.from === T.curId() + ':' + S.active; c.n = (c.n || 0) + 1; const off = same ? 16 * c.n : 0;
+    const selTop = MS.sel.length ? MS.sel.map(el => el.matches('#blocks > .blk') ? el : el.closest('#blocks > .blk')).filter(Boolean).pop() : null;
+    let afterBlk = selTop || null; const gm = {}; const out = []; let skipped = 0;
+    c.items.forEach(it => {
+      const t = document.createElement('template'); t.innerHTML = it.html; const el = t.content.firstElementChild; if (!el) return;
+      el.querySelectorAll('[data-grp]').forEach(x => x.removeAttribute('data-grp'));
+      if (it.grp) el.dataset.grp = gm[it.grp] || (gm[it.grp] = newGid()); else el.removeAttribute('data-grp');
+      if (it.k === 'blk') { const box = page.querySelector('#blocks'); if (!box) { skipped++; return; } if (afterBlk && box.contains(afterBlk)) afterBlk.after(el); else box.appendChild(el); afterBlk = el; }
+      else if (it.k === 'ht') { const box = page.querySelector('.htitles'); if (!box) { skipped++; return; } box.appendChild(el); if (off) moveBy(el, off, off); }
+      else if (it.k === 'fi') { const box = page.querySelector('#free'); if (!box) { skipped++; return; } box.appendChild(el); if (off) moveBy(el, off, off); }
+      else { const near = MS.sel.map(s => s.closest(it.c) || (s.matches(it.c) ? s : null) || s.querySelector(it.c)).filter(Boolean)[0]; const box = near || page.querySelector(it.c); if (!box) { skipped++; return; } box.appendChild(el); }
+      out.push(el);
+    });
+    if (!out.length) { say('ما فيه مكان مناسب لهذا العنصر في هذا الإعلان'); return true; }
+    try { cleanGroups(); MS.gIn = null; desel0(); MS.sel = msNorm(out); renderDynamic(); msCommitLayout(); } catch (e) { console.warn(e); }
+    say(skipped ? `تم اللصق (${out.length}) — ${skipped} ما لقى له مكان في هذا الإعلان` : (out.length > 1 ? `تم لصق ${out.length} عناصر` : 'تم اللصق'));
+    return true;
+  }
+  window.addEventListener('keydown', e => {
+    if (lxOn() || !(e.ctrlKey || e.metaKey) || e.altKey || document.body.classList.contains('phone')) return;
+    const k = e.code; if (k !== 'KeyC' && k !== 'KeyX') return;
+    if (isTyping(e.target) || (q('v2Start') && q('v2Start').classList.contains('on'))) return;
+    const sel = getSelection(); if (sel && !sel.isCollapsed && String(sel).trim()) return;   // real text selected: normal copy
+    if (!MS.sel.length) return;
+    e.preventDefault(); e.stopImmediatePropagation(); annCopy(k === 'KeyX');
+  }, true);
+  window.addEventListener('paste', e => {
+    if (lxOn() || document.body.classList.contains('phone')) return;
+    if (isTyping(e.target)) return;
+    const c = window.__annClip; if (!c) return; const t = e.clipboardData && e.clipboardData.getData('text/plain');
+    if (t !== c.marker) return; e.preventDefault(); e.stopImmediatePropagation(); annPaste();
+  }, true);
+  // right-click menu: copy / paste
+  const sm = q('selmenu');
+  if (typeof scaler !== 'undefined' && sm) {
+    scaler.addEventListener('contextmenu', () => { if (!sm.classList.contains('on')) return; const has = !!window.__annClip; const can = MS.sel.length > 0; sm.insertAdjacentHTML('afterbegin', `<button data-v3="copy"${can ? '' : ' disabled'}><span>نسخ</span><kbd>${KB('C')}</kbd></button><button data-v3="paste"${has ? '' : ' disabled'}><span>لصق</span><kbd>${KB('V')}</kbd></button><hr>`); sm.style.top = Math.max(8, Math.min(innerHeight - sm.offsetHeight - 8, parseFloat(sm.style.top) || 0)) + 'px'; });
+    sm.addEventListener('click', e => { const b = e.target.closest('[data-v3]'); if (!b || b.disabled) return; sm.classList.remove('on'); if (b.dataset.v3 === 'copy') annCopy(false); else annPaste(); });
+  }
+
+  /* =====================================================================
+     2b) project tabs — up to 5 projects open, switch freely like Adobe
+     every tab keeps its own announcement (all boards + undo) and its own
+     layers design; switching never loses work
+     ===================================================================== */
+  const MAX = 5;
+  const TDB = { open() { return this.p || (this.p = new Promise(r => { try { const o = indexedDB.open('jedIC2_tabs', 1); o.onupgradeneeded = () => o.result.createObjectStore('s'); o.onsuccess = () => r(o.result); o.onerror = () => r(null); } catch (e) { r(null); } })); },
+    async get() { const db = await this.open(); if (!db) return null; return new Promise(r => { const t = db.transaction('s').objectStore('s').get('tabs'); t.onsuccess = () => r(t.result || null); t.onerror = () => r(null); }); },
+    async put(v) { const db = await this.open(); if (!db) return; return new Promise(r => { const t = db.transaction('s', 'readwrite'); t.objectStore('s').put(v, 'tabs'); t.oncomplete = r; t.onerror = r; }); } };
+  const tid = () => 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+  const T = { tabs: [{ id: tid(), title: '', kind: 'ann', snap: null }], cur: 0, busy: false, curId() { return (this.tabs[this.cur] || {}).id || ''; } };
+  window.__tabs = T;
+  const startOn = () => !!(q('v2Start') && q('v2Start').classList.contains('on'));
+  function liveTitle() {
+    if (lxOn()) { const d = lx().state.doc; return (d && d.name) || 'تصميم بالطبقات'; }
+    if (startOn() && T.tabs[T.cur] && T.tabs[T.cur].fresh) return 'مشروع جديد';
+    const t = (page.querySelector('.htitles .t1') || {}).textContent || (page.querySelector('.htitles .t3') || {}).textContent || '';
+    let first = ''; try { first = (S.docs.map((d, i) => i === S.active ? '' : titleOf(d.html || '')).find(x => x && x.trim()) || '').trim(); } catch (e) { }
+    return t.trim() || first || (S.docs.length > 1 ? `${S.docs.length} إعلانات` : 'إعلان بدون عنوان');
+  }
+  async function snapLive() {
+    const tab = T.tabs[T.cur]; if (!tab) return;
+    let lxs = null;
+    if (lxOn()) { const id = await lx().saveNow(); const L = lx().state; lxs = { libId: id, hist: L.hist, hi: L.hi }; }
+    commitActive();
+    let dirty = false; try { dirty = libDirty() && !(tab.fresh); } catch (e) { }
+    tab.snap = { docs: S.docs.map(d => Object.assign({}, d)), active: S.active, libId: S.libId || null, savedSig: S.savedSig || '', scroll: stage.scrollTop, start: startOn(), lx: lxs };
+    tab.kind = lxs ? 'lx' : 'ann'; tab.title = liveTitle(); tab.dirty = dirty && !lxs;
+  }
+  async function loadSnap(sn) {
+    if (!sn) return;
+    if (!sn.lx && lxOn()) await lx().exitLX({ quiet: true });
+    S.docs = sn.docs.map(d => Object.assign({}, d)); S.active = -1; activate(Math.max(0, Math.min(sn.active || 0, S.docs.length - 1)), true);
+    S.libId = sn.libId || null; S.savedSig = sn.savedSig || ''; try { store('libId', S.libId || ''); store('savedSig', S.savedSig); } catch (e) { }
+    renderStack(); try { updDirtyDot(); } catch (e) { }
+    requestAnimationFrame(() => { stage.scrollTop = sn.scroll || 0; });
+    if (sn.lx && sn.lx.libId) { const ok = await lx().openLib(sn.lx.libId, { hist: sn.lx.hist, hi: sn.lx.hi }); if (!ok) say('ما لقيت تصميم الطبقات لهذا التبويب'); }
+    if (sn.start) window.v2Start.show(); else window.v2Start.hide();
+  }
+  const busyNow = () => T.busy || (q('busy') && q('busy').style.display === 'flex') || (q('lxBusy') && q('lxBusy').classList.contains('on'));
+  async function go(i) {
+    if (i === T.cur || !T.tabs[i] || busyNow()) return; T.busy = true; paint();
+    try { if (lxOn()) { try { lx().state.editing && document.activeElement && document.activeElement.blur(); } catch (e) { } } await snapLive(); const sn = T.tabs[i].snap; T.cur = i; await loadSnap(sn); T.tabs[i].snap = null; T.tabs[i].dirty = false; }
+    catch (e) { console.error(e); say('تعذّر التبديل بين المشاريع'); }
+    T.busy = false; paint(); persist();
+  }
+  async function blankLive() {
+    if (lxOn()) await lx().exitLX({ quiet: true });
+    const st = q('v2Start'); st._quiet = true;
+    try { S.photoSrc = ASSETS.header; loadWorkspace([{ html: docBlank(), photo: ASSETS.header, extra: 0 }], null); S.libId = null; try { libMark(); } catch (e) { } } finally { st._quiet = false; }
+  }
+  async function add() {
+    if (busyNow()) return;
+    if (T.tabs.length >= MAX) { say(`الحد الأقصى ${MAX} مشاريع مفتوحة — سكّر واحد عشان تفتح جديد`); return; }
+    T.busy = true;
+    try { await snapLive(); T.tabs.push({ id: tid(), title: 'مشروع جديد', kind: 'ann', snap: null, fresh: true }); T.cur = T.tabs.length - 1; await blankLive(); window.v2Start.show(); }
+    catch (e) { console.error(e); say('تعذّر فتح تبويب جديد'); }
+    T.busy = false; paint(); persist();
+  }
+  async function close(i) {
+    if (busyNow()) return;
+    if (i !== T.cur) await go(i); if (T.cur !== i) return;
+    const tab = T.tabs[i];
+    const drop = async () => {
+      T.busy = true;
+      try {
+        T.tabs.splice(i, 1);
+        if (!T.tabs.length) { T.tabs.push({ id: tid(), title: 'مشروع جديد', kind: 'ann', snap: null, fresh: true }); T.cur = 0; await blankLive(); window.v2Start.show(); }
+        else { T.cur = Math.min(i, T.tabs.length - 1); const sn = T.tabs[T.cur].snap; await loadSnap(sn); T.tabs[T.cur].snap = null; T.tabs[T.cur].dirty = false; }
+      } catch (e) { console.error(e); }
+      T.busy = false; paint(); persist();
+    };
+    if (lxOn()) { await lx().saveNow(); }
+    let pristine = false; try { const t = [docBlank(), docSample(), docWelcome()].map(h => String(h).replace(/\s+/g, '').replace(/contenteditable="[^"]*"/g, '')); commitActive(); pristine = S.docs.every(d => t.includes(String(d.html).replace(/\s+/g, '').replace(/contenteditable="[^"]*"/g, ''))); } catch (e) { }
+    if (tab.fresh || pristine || lxOn()) return drop();
+    askSave(drop);
+  }
+  /* ---- the strip ---- */
+  const bar = document.createElement('div'); bar.id = 'v3Tabs'; bar.setAttribute('role', 'tablist'); bar.setAttribute('aria-label', 'المشاريع المفتوحة');
+  document.body.appendChild(bar); document.body.classList.add('v3tabs');
+  function paint() {
+    const live = T.tabs[T.cur]; if (live) { live.title = liveTitle(); live.kind = lxOn() ? 'lx' : 'ann'; }
+    document.body.classList.toggle('v3fresh', !!(live && live.fresh));
+    bar.innerHTML = `<div class="v3tl">${T.tabs.map((t, i) => `<div class="v3t${i === T.cur ? ' on' : ''}" role="tab" aria-selected="${i === T.cur}" data-i="${i}" title="${ESC(t.title)}">${IC(t.kind === 'lx' ? 'layers' : 'megaphone', 1.9)}<span class="v3n">${ESC(t.title || 'مشروع')}</span>${t.dirty && i !== T.cur ? '<i class="v3d" title="فيه تعديلات ما انحفظت في «إعلاناتي»"></i>' : ''}<button class="v3x" data-x="${i}" title="إغلاق المشروع" aria-label="إغلاق">${IC('x', 2.2)}</button></div>`).join('')}</div>
+      <button class="v3add" data-add title="${T.tabs.length >= MAX ? `الحد الأقصى ${MAX} مشاريع` : 'فتح مشروع جديد في تبويب جديد'}"${T.tabs.length >= MAX ? ' disabled' : ''}>${IC('plus', 2.2)}</button><span class="v3c">${T.tabs.length} / ${MAX}</span>`;
+  }
+  bar.addEventListener('click', e => {
+    const x = e.target.closest('[data-x]'); if (x) { e.stopPropagation(); close(+x.dataset.x); return; }
+    if (e.target.closest('[data-add]')) { if (T.tabs.length >= MAX) say(`الحد الأقصى ${MAX} مشاريع مفتوحة — سكّر واحد عشان تفتح جديد`); else add(); return; }
+    const t = e.target.closest('.v3t'); if (t) go(+t.dataset.i);
+  });
+  bar.addEventListener('auxclick', e => { const t = e.target.closest('.v3t'); if (t && e.button === 1) { e.preventDefault(); close(+t.dataset.i); } });
+  // keep the live tab's name fresh
+  let rt = 0; const refresh = () => { clearTimeout(rt); rt = setTimeout(() => { if (!T.busy) { const t = T.tabs[T.cur]; if (t && t.fresh && !startOn()) t.fresh = false; paint(); } }, 500); };
+  document.addEventListener('keyup', refresh, true); document.addEventListener('pointerup', refresh, true);
+  new MutationObserver(refresh).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  const vs = q('v2Start'); if (vs) new MutationObserver(refresh).observe(vs, { attributes: true, attributeFilter: ['class'] });
+  /* ---- kept on this device: the tabs come back after a reload ---- */
+  let pt = 0;
+  function persist() { clearTimeout(pt); pt = setTimeout(() => { const v = { cur: T.cur, tabs: T.tabs.map((t, i) => ({ id: t.id, title: t.title, kind: t.kind, dirty: !!t.dirty, fresh: !!t.fresh, snap: i === T.cur || !t.snap ? null : Object.assign({}, t.snap, { docs: t.snap.docs.map(d => ({ html: d.html, photo: d.photo, extra: d.extra || 0 })), lx: t.snap.lx ? { libId: t.snap.lx.libId } : null }) })) }; TDB.put(v).catch(() => { }); }, 300); }
+  addEventListener('pagehide', () => { clearTimeout(pt); const t = T.tabs[T.cur]; if (t) t.title = liveTitle(); persist(); });
+  TDB.get().then(v => {
+    if (v && Array.isArray(v.tabs) && v.tabs.length > 1 && v.tabs.every(t => t.id)) {
+      T.tabs = v.tabs.slice(0, MAX).map(t => Object.assign({}, t)); T.cur = Math.max(0, Math.min(v.cur || 0, T.tabs.length - 1));
+      // a closed-down tab that has no stored state cannot be restored
+      T.tabs = T.tabs.filter((t, i) => i === T.cur || t.snap); T.cur = Math.max(0, T.tabs.findIndex(t => t.id === v.tabs[v.cur || 0].id)); T.tabs[T.cur].snap = null;
+    }
+    paint();
+  }).catch(() => paint());
+  paint();
+  window.v3Tabs = { go, add, close, paint, snapLive, T };
 })();
 
 </script>
