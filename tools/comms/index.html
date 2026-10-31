@@ -1041,17 +1041,36 @@ function serialize() {
 const H = { stack: [], i: -1, mute: false, t: 0 };
 function snap(now) {
   clearTimeout(H.t);
-  const go = () => { if (H.mute) return; const s = JSON.stringify({ h: serialize(), x: S.extra }); if (H.stack[H.i] === s) return; H.stack = H.stack.slice(0, H.i + 1); H.stack.push(s); if (H.stack.length > 60) H.stack.shift(); H.i = H.stack.length - 1; updUndo(); autosave(s); };
+  const go = () => { if (H.mute) return; const s = JSON.stringify({ h: serialize(), x: S.extra }); if (H.stack[H.i] === s) return; H.stack = H.stack.slice(0, H.i + 1); H.stack.push(s); if (H.stack.length > 60) H.stack.shift(); H.i = H.stack.length - 1; updUndo(); autosaveSoon(s); };
   now ? go() : (H.t = setTimeout(go, 450));
 }
 function restore(k) { const o = JSON.parse(H.stack[k]); H.mute = true; page.innerHTML = hyd(o.h.replace(/__PHOTO__/g, S.photoSrc)); migrate(); S.extra = o.x; applyExtra(); deselect(); afterLayout(); H.i = k; updUndo(); setTimeout(() => H.mute = false, 50); autosave(H.stack[k]); }
 function undo() { if (!H.mute) snap(true); if (H.i > 0) restore(H.i - 1) }
 function redo() { clearTimeout(H.t); if (H.i < H.stack.length - 1) restore(H.i + 1) }
 function updUndo() { $('#bUndo').disabled = H.i <= 0; $('#bRedo').disabled = H.i >= H.stack.length - 1 }
+/* uploaded header photos are big (several MB each): they live in IndexedDB and localStorage only keeps a short token.
+   Writing them into localStorage on every edit was what froze the page. */
+const PHID = new Map();
+function phTok(p) {
+  if (!p || p === ASSETS.header) return '@H';
+  if (typeof p !== 'string' || p.slice(0, 5) !== 'data:') return p;
+  let id = PHID.get(p); if (!id) { id = 'ph' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); PHID.set(p, id); S.imgs[id] = p; IDB.put(id, p); }
+  return '@I:' + id;
+}
+function phSrc(t) {
+  if (!t || t === '@H') return ASSETS.header;
+  if (typeof t === 'string' && t.slice(0, 3) === '@I:') { const id = t.slice(3), v = S.imgs && S.imgs[id]; if (v) { PHID.set(v, id); return v; } return ASSETS.header; }
+  return t;
+}
+let asT = 0, asS = null;
+function autosaveSoon(s) { asS = s; clearTimeout(asT); asT = setTimeout(flushAutosave, 1200); if (typeof updDirtyDot === 'function') updDirtyDot(); }
+function flushAutosave() { clearTimeout(asT); if (asS == null) return; const s = asS; asS = null; autosave(s); }
+addEventListener('pagehide', flushAutosave); addEventListener('beforeunload', flushAutosave);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushAutosave(); });
 function autosave(s) {
   if (!S.docs || !S.docs.length) { store('doc', s); return; }
   const o = JSON.parse(s); const docs = S.docs.map((d, i) => i === S.active ? { html: o.h, extra: o.x, photo: S.photoSrc } : d);
-  const tok = p => p === ASSETS.header ? '@H' : p;
+  const tok = phTok;
   const full = { active: S.active, docs: docs.map(d => ({ html: d.html, extra: d.extra || 0, photo: tok(d.photo) })) };
   if (!store('boards', JSON.stringify(full))) { full.docs.forEach(d => { if (d.photo !== '@H') d.photo = '@H'; }); store('boards', JSON.stringify(full)); }
   if (S.active === 0) store('doc', s);
@@ -2491,7 +2510,7 @@ $('#wordModal').addEventListener('click', e => {
     $('#wordModal').classList.remove('on'); toast(pick.length === 1 ? 'تمت إضافة الصورة' : `تمت إضافة ${pick.length} صور`); ref && ref.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 });
-IDB.all().then(m => { Object.assign(S.imgs, m); rehydrate(); if (S.docs && S.docs.length > 1) renderStack(); });
+S.imgsReady = IDB.all().then(m => { Object.assign(S.imgs, m); rehydrate(); if (S.docs && S.docs.length > 1) renderStack(); }).catch(() => { });
 
 /* ================= content check: spelling (AR/EN, offline) + match against the raw file ================= */
 const QA = { tab: 'spell', issues: [], ign: new Set(), ready: null, focusI: -1 };
@@ -3237,9 +3256,10 @@ try { S.locs = JSON.parse(load('locs') || '[]') } catch (e) { S.locs = [] }
 renderIconGrid(null);
 (async function boot() {
   await document.fonts.ready;
+  try { await Promise.race([S.imgsReady, new Promise(r => setTimeout(r, 4000))]); } catch (e) { }
   const saved = load('doc'); let ok = false;
   const bs = load('boards');
-  if (bs) { try { const o = JSON.parse(bs); S.docs = o.docs.map(d => ({ html: d.html, extra: d.extra, photo: d.photo === '@H' ? ASSETS.header : d.photo })); S.active = Math.min(o.active || 0, S.docs.length - 1); const d = S.docs[S.active]; setPage(d.html, d.photo, { extra: d.extra }); ok = true; } catch (e) { S.docs = []; } }
+  if (bs) { try { const o = JSON.parse(bs); S.docs = o.docs.map(d => ({ html: d.html, extra: d.extra, photo: phSrc(d.photo) })); S.active = Math.min(o.active || 0, S.docs.length - 1); const d = S.docs[S.active]; setPage(d.html, d.photo, { extra: d.extra }); ok = true; } catch (e) { S.docs = []; } }
   if (!ok && saved) { try { const o = JSON.parse(saved); setPage(o.h, load('photo') || ASSETS.header, { extra: o.x }); ok = true; } catch (e) { } }
   if (!ok) setPage(docBlank());
   if (!S.docs.length) { S.docs = [curDoc()]; S.active = 0; }
