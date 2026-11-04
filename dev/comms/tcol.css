@@ -1,0 +1,9 @@
+/* مصمم التواصل الداخلي · colour for the selected words */
+#tbar .tcRow{gap:5px}
+#tbar .tcSw{min-width:0;width:22px;height:22px;padding:0;border-radius:6px;background:var(--c)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);transition:transform .12s}
+#tbar .tcSw:hover{transform:scale(1.12)}
+#tbar .tcSw.on{outline:2px solid #2FC0C7;outline-offset:2px}
+#tbar .tcPick{position:relative;width:22px;height:22px;border-radius:6px;overflow:hidden;cursor:pointer;background:conic-gradient(#FC5C17,#F5C400,#2FC0C7,#004EAA,#FC5C17);display:inline-flex;align-items:center;justify-content:center;flex:none}
+#tbar .tcPick span{position:relative;font:700 14px/1 FSI;color:#fff;text-shadow:0 0 3px rgba(0,0,0,.5);pointer-events:none}
+#tbar .tcPick input{position:absolute;inset:-6px;width:auto!important;height:auto;opacity:0;cursor:pointer;border:0;padding:0}
+#tbar button.tcClr{min-width:30px;height:26px;padding:0 6px}

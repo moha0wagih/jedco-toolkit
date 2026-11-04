@@ -1325,16 +1325,25 @@ Only include layers you changed or added. Keep src values unchanged. No other te
      text: B · A− size A+ · reset / Weight / Leading (words selected while typing: size and bold go on those words only)
      always: ناسخ التنسيق · تجميع · فك التجميع · فك الكل */
   let TB = null;
+  // colour for the selected words (or the whole text when nothing is selected)
+  const TCOLS = [['#002657', 'كحلي'], ['#004EAA', 'أزرق'], ['#183990', 'أزرق داكن'], ['#62B6F3', 'سماوي'], ['#009CA5', 'تيل'], ['#2FC0C7', 'تيل فاتح'], ['#FC5C17', 'برتقالي'], ['#D6D9D4', 'رمادي'], ['#FFFFFF', 'أبيض']];
+  function tbColor(v) {
+    if (TB.rg && L.editing && L.editing.contains(TB.rg.commonAncestorContainer)) { const s = getSelection(); s.removeAllRanges(); s.addRange(TB.rg); }
+    TB.rg = null; applyColor('tcol', v); tbSync();
+  }
   function tbBuild() {
     TB = document.createElement('div'); TB.id = 'lxTb';
     TB.innerHTML = `<div class="tr rt"><button data-t="bold" title="عريض — على الكلمات المحددة أو النص كامل">B</button><span class="tsep"></span><button data-t="down" title="أصغر">A−</button><input type="range" data-r="size" min="0.5" max="3" step="0.01" value="1"><button data-t="up" title="أكبر">A+</button><span class="tv" data-v="size">100%</span><span class="tsep"></span><button data-t="reset" title="إرجاع الحجم والسماكة والتباعد">↺</button></div>
       <div class="tr rt"><span class="tl">Weight</span><button data-t="wdown">−</button><input type="range" data-r="w" min="0" max="2" step="0.05" value="0"><button data-t="wup">+</button><span class="tv" data-v="w">0.00</span></div>
       <div class="tr rt"><span class="tl">Leading</span><button data-t="ldown">−</button><input type="range" data-r="lh" min="0.8" max="2.6" step="0.05" value="1.4"><button data-t="lup">+</button><span class="tv" data-v="lh">1.40</span></div>
+      <div class="tr rt tcRow"><span class="tl">Color</span>${TCOLS.map(([c, n]) => `<button class="tcSw" data-t="tcol" data-c="${c}" title="${n}" style="--c:${c}"></button>`).join('')}<label class="tcPick" title="لون مخصص"><input type="color" data-cp="tb" value="#004eaa"><span>+</span></label></div>
       <div class="tr rg"><button class="lb" data-t="paint" title="ناسخ التنسيق — كليك: مرة وحدة · دبل كليك: يظل شغّال لين Esc · ${MAC ? '⌘⌥C / ⌘⌥V' : 'Ctrl+Alt+C / Ctrl+Alt+V'}">${IC('paintbrush', 2.2)}<span>ناسخ التنسيق</span></button><span class="tsep"></span><button class="lb" data-t="group" title="تجميع (${K('G')})">${IC('group', 2.2)}<span>تجميع</span></button><button class="lb" data-t="ungroup" title="فك التجميع (${K('⇧G')})">${IC('ungroup', 2.2)}<span>فك التجميع</span></button><button class="lb" data-t="flat" title="فك كل المجموعات: كل عنصر يصير طبقة مستقلة">${IC('layers-3', 2.2)}<span>فك الكل</span></button><span class="tsep"></span><button class="lb" data-t="merge" title="دمج الطبقات المحددة في طبقة وحدة (${K('E')})">${IC('combine', 2.2)}<span>دمج الطبقات</span></button></div>`;
     document.body.appendChild(TB);
     TB.addEventListener('mousedown', e => { if (!e.target.closest('input')) e.preventDefault(); });
+    TB.addEventListener('pointerdown', e => { if (e.target.closest('.tcPick')) { e.stopPropagation(); const r = rangeInEdit(); TB.rg = r ? r.cloneRange() : null; return; } }, true);
+    TB.addEventListener('change', e => { if (e.target.dataset.cp === 'tb') tbColor(e.target.value); });
     TB.addEventListener('pointerdown', e => { e.stopPropagation(); if (e.target.matches('input')) { TB.drag = true; const up = () => { TB.drag = false; removeEventListener('pointerup', up); tbPlace(); push(true); renderProps(); }; addEventListener('pointerup', up); } });
-    TB.addEventListener('input', e => { const l = tbLayer(); if (!l) return; const k = e.target.dataset.r, v = +e.target.value; if (k === 'size') tbSize(l, TB.base.fs * v); if (k === 'w') tbWeight(l, v); if (k === 'lh') { l.st.lh = v; paint(); } tbSync(); });
+    TB.addEventListener('input', e => { if (e.target.dataset.cp) return; const l = tbLayer(); if (!l) return; const k = e.target.dataset.r, v = +e.target.value; if (k === 'size') tbSize(l, TB.base.fs * v); if (k === 'w') tbWeight(l, v); if (k === 'lh') { l.st.lh = v; paint(); } tbSync(); });
     TB.addEventListener('click', e => {
       const b = e.target.closest('[data-t]'); if (!b || b.disabled) return; const a = b.dataset.t;
       if (a === 'merge') { rasterSel(); return; }
@@ -1346,6 +1355,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
         return;
       }
       const l = tbLayer(); if (!l) return;
+      if (a === 'tcol') { tbColor(b.dataset.c); return; }
       if (a === 'bold') { const r = rangeInEdit(); if (r) { const n = r.startContainer.nodeType === 3 ? r.startContainer.parentElement : r.startContainer; styleRange('fontWeight', +getComputedStyle(n).fontWeight >= 600 ? '400' : '700'); } else { l.st.fw = +l.st.fw >= 600 ? 400 : 700; if (L.editing) L.editing.querySelectorAll('[style]').forEach(c => c.style.fontWeight = ''); else l.html = stripProp(l.html, 'font-weight'); paint(); } }
       if (a === 'up' || a === 'down') { const r = rangeInEdit(); const f = a === 'up' ? 1.1 : 1 / 1.1; if (r) { const n = r.startContainer.nodeType === 3 ? r.startContainer.parentElement : r.startContainer; styleRange('fontSize', R1(px(getComputedStyle(n).fontSize) * f) + 'px'); } else tbSize(l, l.st.fs * f); }
       if (a === 'wup' || a === 'wdown') tbWeight(l, clamp(tbW(l) + (a === 'wup' ? .15 : -.15), 0, 2));
@@ -1375,6 +1385,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     set('size', k); set('w', w); set('lh', lh);
     TB.querySelector('[data-v="size"]').textContent = Math.round(k * 100) + '%'; TB.querySelector('[data-v="w"]').textContent = w.toFixed(2); TB.querySelector('[data-v="lh"]').textContent = (+lh).toFixed(2);
     TB.querySelector('[data-t="bold"]').classList.toggle('on', +l.st.fw >= 600);
+    { let c = l.st.col; const r = rangeInEdit(); if (r) { const n = r.startContainer.nodeType === 3 ? r.startContainer.parentElement : r.startContainer; c = getComputedStyle(n).color; } const hx = (toHex(c) || '').toUpperCase(); TB.querySelectorAll('.tcSw').forEach(x => x.classList.toggle('on', x.dataset.c === hx)); const ip = TB.querySelector('[data-cp="tb"]'); if (ip && /^#[0-9A-F]{6}$/.test(hx)) ip.value = hx.toLowerCase(); }
   }
   function tbPlace() {
     if (!TB || TB.drag || !TB.classList.contains('on')) return; let r = null, box;

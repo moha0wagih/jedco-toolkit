@@ -256,3 +256,11 @@ body.lx-painting #lxHost,body.lx-painting #lxHost .lxL{cursor:var(--lxBrush,copy
 #lxTb button.lb span{white-space:nowrap}
 #lxTb button[disabled]{opacity:.35;cursor:default;background:rgba(255,255,255,.06)!important;color:#fff!important}
 #lxTb button.sticky{background:#FC5C17;color:#fff}
+/* text colour row of the floating bar */
+#lxTb .tcRow{gap:5px}
+#lxTb .tcSw{min-width:0;width:22px;height:22px;padding:0;border-radius:6px;background:var(--c)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);transition:transform .12s}
+#lxTb .tcSw:hover{transform:scale(1.12)}
+#lxTb .tcSw.on{outline:2px solid #2FC0C7;outline-offset:2px}
+#lxTb .tcPick{position:relative;width:22px;height:22px;border-radius:6px;overflow:hidden;cursor:pointer;background:conic-gradient(#FC5C17,#F5C400,#2FC0C7,#004EAA,#FC5C17);display:inline-flex;align-items:center;justify-content:center}
+#lxTb .tcPick span{position:relative;font:700 14px/1 FSI;color:#fff;text-shadow:0 0 3px rgba(0,0,0,.5);pointer-events:none}
+#lxTb .tcPick input{position:absolute;inset:-6px;width:auto!important;height:auto;opacity:0;cursor:pointer;border:0;padding:0}

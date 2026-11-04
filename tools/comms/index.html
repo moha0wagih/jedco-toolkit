@@ -3229,7 +3229,7 @@ $('#bDev').onclick = () => setDevice(isPhone() ? 'desktop' : 'phone', true);
 
 /* ---------------- boot ---------------- */
 $('#brandLogo').innerHTML = ASSETS.logo;
-const APP_VER = 'v2.0', APP_BUILD = 'build 31';
+const APP_VER = 'v2.0', APP_BUILD = 'build 32';
 $('#sig').innerHTML = `<span>Designed by Mohammed Wagih · ${new Date().getFullYear()} · <b class="beta">${APP_VER}</b></span><button id="bReport" title="أرسل ملاحظة أو مشكلة لمحمد وجيه">الإبلاغ عن مشكلة</button>`;
 $('#bReport').onclick = () => {
   const ua = navigator.userAgent; const br = /Edg\//.test(ua) ? 'Edge' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : /Firefox\//.test(ua) ? 'Firefox' : 'Other';
@@ -4294,6 +4294,14 @@ body.lx-painting #lxHost,body.lx-painting #lxHost .lxL{cursor:var(--lxBrush,copy
 #lxTb button.lb span{white-space:nowrap}
 #lxTb button[disabled]{opacity:.35;cursor:default;background:rgba(255,255,255,.06)!important;color:#fff!important}
 #lxTb button.sticky{background:#FC5C17;color:#fff}
+/* text colour row of the floating bar */
+#lxTb .tcRow{gap:5px}
+#lxTb .tcSw{min-width:0;width:22px;height:22px;padding:0;border-radius:6px;background:var(--c)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);transition:transform .12s}
+#lxTb .tcSw:hover{transform:scale(1.12)}
+#lxTb .tcSw.on{outline:2px solid #2FC0C7;outline-offset:2px}
+#lxTb .tcPick{position:relative;width:22px;height:22px;border-radius:6px;overflow:hidden;cursor:pointer;background:conic-gradient(#FC5C17,#F5C400,#2FC0C7,#004EAA,#FC5C17);display:inline-flex;align-items:center;justify-content:center}
+#lxTb .tcPick span{position:relative;font:700 14px/1 FSI;color:#fff;text-shadow:0 0 3px rgba(0,0,0,.5);pointer-events:none}
+#lxTb .tcPick input{position:absolute;inset:-6px;width:auto!important;height:auto;opacity:0;cursor:pointer;border:0;padding:0}
 
 /* ---------- v2.0 · start page: nothing open, one + to begin ---------- */
 #v2Start{position:fixed;inset:0;z-index:97;display:none;flex-direction:column;background:var(--ui-bg);direction:rtl}
@@ -4412,6 +4420,16 @@ body:has(#present.on) #hubHome,body:has(#present.on) #jnFab,body:has(#present.on
 #lxLayBar button[data-lb=dup],#lxLayBar button[data-lb=up],#lxLayBar button[data-lb=down],#lxLayBar button[data-lb=del]{flex:0 0 34px}
 /* a new tab has nothing to «continue» */
 body.v3fresh #v2Start [data-v=cont]{display:none}
+
+/* مصمم التواصل الداخلي · colour for the selected words */
+#tbar .tcRow{gap:5px}
+#tbar .tcSw{min-width:0;width:22px;height:22px;padding:0;border-radius:6px;background:var(--c)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);transition:transform .12s}
+#tbar .tcSw:hover{transform:scale(1.12)}
+#tbar .tcSw.on{outline:2px solid #2FC0C7;outline-offset:2px}
+#tbar .tcPick{position:relative;width:22px;height:22px;border-radius:6px;overflow:hidden;cursor:pointer;background:conic-gradient(#FC5C17,#F5C400,#2FC0C7,#004EAA,#FC5C17);display:inline-flex;align-items:center;justify-content:center;flex:none}
+#tbar .tcPick span{position:relative;font:700 14px/1 FSI;color:#fff;text-shadow:0 0 3px rgba(0,0,0,.5);pointer-events:none}
+#tbar .tcPick input{position:absolute;inset:-6px;width:auto!important;height:auto;opacity:0;cursor:pointer;border:0;padding:0}
+#tbar button.tcClr{min-width:30px;height:26px;padding:0 6px}
 
 </style>
 <script id="lxScript">
@@ -5742,16 +5760,25 @@ Only include layers you changed or added. Keep src values unchanged. No other te
      text: B · A− size A+ · reset / Weight / Leading (words selected while typing: size and bold go on those words only)
      always: ناسخ التنسيق · تجميع · فك التجميع · فك الكل */
   let TB = null;
+  // colour for the selected words (or the whole text when nothing is selected)
+  const TCOLS = [['#002657', 'كحلي'], ['#004EAA', 'أزرق'], ['#183990', 'أزرق داكن'], ['#62B6F3', 'سماوي'], ['#009CA5', 'تيل'], ['#2FC0C7', 'تيل فاتح'], ['#FC5C17', 'برتقالي'], ['#D6D9D4', 'رمادي'], ['#FFFFFF', 'أبيض']];
+  function tbColor(v) {
+    if (TB.rg && L.editing && L.editing.contains(TB.rg.commonAncestorContainer)) { const s = getSelection(); s.removeAllRanges(); s.addRange(TB.rg); }
+    TB.rg = null; applyColor('tcol', v); tbSync();
+  }
   function tbBuild() {
     TB = document.createElement('div'); TB.id = 'lxTb';
     TB.innerHTML = `<div class="tr rt"><button data-t="bold" title="عريض — على الكلمات المحددة أو النص كامل">B</button><span class="tsep"></span><button data-t="down" title="أصغر">A−</button><input type="range" data-r="size" min="0.5" max="3" step="0.01" value="1"><button data-t="up" title="أكبر">A+</button><span class="tv" data-v="size">100%</span><span class="tsep"></span><button data-t="reset" title="إرجاع الحجم والسماكة والتباعد">↺</button></div>
       <div class="tr rt"><span class="tl">Weight</span><button data-t="wdown">−</button><input type="range" data-r="w" min="0" max="2" step="0.05" value="0"><button data-t="wup">+</button><span class="tv" data-v="w">0.00</span></div>
       <div class="tr rt"><span class="tl">Leading</span><button data-t="ldown">−</button><input type="range" data-r="lh" min="0.8" max="2.6" step="0.05" value="1.4"><button data-t="lup">+</button><span class="tv" data-v="lh">1.40</span></div>
+      <div class="tr rt tcRow"><span class="tl">Color</span>${TCOLS.map(([c, n]) => `<button class="tcSw" data-t="tcol" data-c="${c}" title="${n}" style="--c:${c}"></button>`).join('')}<label class="tcPick" title="لون مخصص"><input type="color" data-cp="tb" value="#004eaa"><span>+</span></label></div>
       <div class="tr rg"><button class="lb" data-t="paint" title="ناسخ التنسيق — كليك: مرة وحدة · دبل كليك: يظل شغّال لين Esc · ${MAC ? '⌘⌥C / ⌘⌥V' : 'Ctrl+Alt+C / Ctrl+Alt+V'}">${IC('paintbrush', 2.2)}<span>ناسخ التنسيق</span></button><span class="tsep"></span><button class="lb" data-t="group" title="تجميع (${K('G')})">${IC('group', 2.2)}<span>تجميع</span></button><button class="lb" data-t="ungroup" title="فك التجميع (${K('⇧G')})">${IC('ungroup', 2.2)}<span>فك التجميع</span></button><button class="lb" data-t="flat" title="فك كل المجموعات: كل عنصر يصير طبقة مستقلة">${IC('layers-3', 2.2)}<span>فك الكل</span></button><span class="tsep"></span><button class="lb" data-t="merge" title="دمج الطبقات المحددة في طبقة وحدة (${K('E')})">${IC('combine', 2.2)}<span>دمج الطبقات</span></button></div>`;
     document.body.appendChild(TB);
     TB.addEventListener('mousedown', e => { if (!e.target.closest('input')) e.preventDefault(); });
+    TB.addEventListener('pointerdown', e => { if (e.target.closest('.tcPick')) { e.stopPropagation(); const r = rangeInEdit(); TB.rg = r ? r.cloneRange() : null; return; } }, true);
+    TB.addEventListener('change', e => { if (e.target.dataset.cp === 'tb') tbColor(e.target.value); });
     TB.addEventListener('pointerdown', e => { e.stopPropagation(); if (e.target.matches('input')) { TB.drag = true; const up = () => { TB.drag = false; removeEventListener('pointerup', up); tbPlace(); push(true); renderProps(); }; addEventListener('pointerup', up); } });
-    TB.addEventListener('input', e => { const l = tbLayer(); if (!l) return; const k = e.target.dataset.r, v = +e.target.value; if (k === 'size') tbSize(l, TB.base.fs * v); if (k === 'w') tbWeight(l, v); if (k === 'lh') { l.st.lh = v; paint(); } tbSync(); });
+    TB.addEventListener('input', e => { if (e.target.dataset.cp) return; const l = tbLayer(); if (!l) return; const k = e.target.dataset.r, v = +e.target.value; if (k === 'size') tbSize(l, TB.base.fs * v); if (k === 'w') tbWeight(l, v); if (k === 'lh') { l.st.lh = v; paint(); } tbSync(); });
     TB.addEventListener('click', e => {
       const b = e.target.closest('[data-t]'); if (!b || b.disabled) return; const a = b.dataset.t;
       if (a === 'merge') { rasterSel(); return; }
@@ -5763,6 +5790,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
         return;
       }
       const l = tbLayer(); if (!l) return;
+      if (a === 'tcol') { tbColor(b.dataset.c); return; }
       if (a === 'bold') { const r = rangeInEdit(); if (r) { const n = r.startContainer.nodeType === 3 ? r.startContainer.parentElement : r.startContainer; styleRange('fontWeight', +getComputedStyle(n).fontWeight >= 600 ? '400' : '700'); } else { l.st.fw = +l.st.fw >= 600 ? 400 : 700; if (L.editing) L.editing.querySelectorAll('[style]').forEach(c => c.style.fontWeight = ''); else l.html = stripProp(l.html, 'font-weight'); paint(); } }
       if (a === 'up' || a === 'down') { const r = rangeInEdit(); const f = a === 'up' ? 1.1 : 1 / 1.1; if (r) { const n = r.startContainer.nodeType === 3 ? r.startContainer.parentElement : r.startContainer; styleRange('fontSize', R1(px(getComputedStyle(n).fontSize) * f) + 'px'); } else tbSize(l, l.st.fs * f); }
       if (a === 'wup' || a === 'wdown') tbWeight(l, clamp(tbW(l) + (a === 'wup' ? .15 : -.15), 0, 2));
@@ -5792,6 +5820,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     set('size', k); set('w', w); set('lh', lh);
     TB.querySelector('[data-v="size"]').textContent = Math.round(k * 100) + '%'; TB.querySelector('[data-v="w"]').textContent = w.toFixed(2); TB.querySelector('[data-v="lh"]').textContent = (+lh).toFixed(2);
     TB.querySelector('[data-t="bold"]').classList.toggle('on', +l.st.fw >= 600);
+    { let c = l.st.col; const r = rangeInEdit(); if (r) { const n = r.startContainer.nodeType === 3 ? r.startContainer.parentElement : r.startContainer; c = getComputedStyle(n).color; } const hx = (toHex(c) || '').toUpperCase(); TB.querySelectorAll('.tcSw').forEach(x => x.classList.toggle('on', x.dataset.c === hx)); const ip = TB.querySelector('[data-cp="tb"]'); if (ip && /^#[0-9A-F]{6}$/.test(hx)) ip.value = hx.toLowerCase(); }
   }
   function tbPlace() {
     if (!TB || TB.drag || !TB.classList.contains('on')) return; let r = null, box;
@@ -6663,6 +6692,51 @@ Only include layers you changed or added. Keep src values unchanged. No other te
   }).catch(() => paint());
   paint();
   window.v3Tabs = { go, add, close, paint, snapLive, T };
+})();
+
+</script>
+<script id="tcolScript">
+/* ==========================================================================
+   مصمم التواصل الداخلي · تلوين النص المحدد
+   select words → pick a colour on the floating bar → only those words change colour
+   (no selection, cursor in a text → the whole text). ↺ in the row brings back the original colour.
+   ========================================================================== */
+(function () {
+  'use strict';
+  if (typeof tbar === 'undefined' || typeof TS === 'undefined' || typeof ensureSpans !== 'function') return;
+  const COLS = (typeof PALETTE !== 'undefined' && PALETTE.length) ? PALETTE : [['#002657', 'كحلي'], ['#004EAA', 'أزرق'], ['#FC5C17', 'برتقالي'], ['#FFFFFF', 'أبيض']];
+  const row = document.createElement('div'); row.className = 'tr tcRow';
+  row.innerHTML = `<span class="tl">Color</span>${COLS.map(([c, n]) => `<button class="tcSw" data-tc="${c}" title="${n}" style="--c:${c}"></button>`).join('')}<label class="tcPick" title="لون مخصص"><input type="color" id="tbCol" value="#004eaa"><span>+</span></label><button data-tc="" class="tcClr" title="إرجاع لون الكلمات الأصلي">↺</button>`;
+  tbar.appendChild(row);
+  const pick = row.querySelector('#tbCol');
+
+  const hex = c => { const m = String(c || '').match(/rgba?\(([^)]+)\)/); if (!m) return String(c || '').toUpperCase(); return '#' + m[1].split(/[\s,\/]+/).slice(0, 3).map(v => (+v).toString(16).padStart(2, '0')).join('').toUpperCase(); };
+  function curColor() { const n = TS.range && TS.ed && selectedTextNodesPeek(TS.range, TS.ed)[0]; return n ? hex(getComputedStyle(n.parentElement).color) : ''; }
+  function mark() { const c = curColor(); row.querySelectorAll('.tcSw').forEach(b => b.classList.toggle('on', b.dataset.tc.toUpperCase() === c)); if (/^#[0-9A-F]{6}$/.test(c)) pick.value = c.toLowerCase(); }
+
+  function applyColor(c) {
+    if (!TS.range || !TS.ed || !page.contains(TS.ed)) return;
+    const spans = ensureSpans();
+    spans.forEach(sp => {
+      if (c) sp.style.color = c; else sp.style.removeProperty('color');
+      // colours set earlier on words inside go, so the new one shows everywhere in the selection
+      sp.querySelectorAll('[style]').forEach(x => { if (!x.closest('.ii')) x.style.removeProperty('color'); });
+      if (!sp.getAttribute('style')) sp.removeAttribute('style');
+    });
+    mark(); afterLayout();
+  }
+
+  // the bar stays up while the native colour window is open
+  TS.picking = false;
+  const _hide = hideTbar; hideTbar = function () { if (TS.picking) return; return _hide.apply(this, arguments); };
+  pick.addEventListener('pointerdown', () => { TS.picking = true; });
+  pick.addEventListener('input', () => applyColor(pick.value));
+  pick.addEventListener('change', () => { applyColor(pick.value); TS.picking = false; });
+  pick.addEventListener('blur', () => { setTimeout(() => { TS.picking = false; }, 300); });
+
+  tbar.addEventListener('click', e => { const b = e.target.closest('[data-tc]'); if (!b) return; e.stopPropagation(); applyColor(b.dataset.tc); }, true);
+
+  const _sync = syncTbar; syncTbar = function () { const r = _sync.apply(this, arguments); try { mark(); } catch (x) { } return r; };
 })();
 
 </script>
