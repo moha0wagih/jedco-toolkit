@@ -1,0 +1,112 @@
+/* ==========================================================================
+   مصمم التواصل الداخلي · build 33 — interface tidy-up (desktop only)
+   one calm top bar in three zones, nothing overflows the screen,
+   a quieter side panel. Every button and feature is still there.
+   ========================================================================== */
+
+/* never wider than the screen (the bar was pushing the whole page sideways) */
+body:not(.phone) #app{grid-template-columns:268px minmax(0,1fr) 300px}
+body:not(.phone) #topbar{min-width:0;gap:4px;padding:0 12px}
+
+/* ---------- top bar: right = file · centre = history + zoom · left = check + export ---------- */
+body:not(.phone) #topbar>.brand{order:-2;margin-inline-end:6px}
+body:not(.phone) #topbar>.rel:has(#fileMenu){order:2}
+body:not(.phone) #topbar>#bLib{order:3}
+body:not(.phone) #topbar>#bWord,body:not(.phone) #topbar>#bPaste{display:none}
+body:not(.phone) #topbar>.sp{order:5}
+body:not(.phone) #topbar>#bUndo{order:6}
+body:not(.phone) #topbar>#bRedo{order:7}
+body:not(.phone) #topbar>#bZoomOut{order:8}
+body:not(.phone) #topbar>#zoomLbl{order:9}
+body:not(.phone) #topbar>#bZoomIn{order:10}
+body:not(.phone) #topbar>#bFit{order:11}
+body:not(.phone) #topbar>.sp~.sp{order:12}
+body:not(.phone) #topbar>#bLayers{order:13}
+body:not(.phone) #topbar>#bQA{order:14}
+body:not(.phone) #topbar>#bPresent{order:15}
+body:not(.phone) #topbar>#bBalance{order:16}
+body:not(.phone) #topbar>#bDev{order:17}
+body:not(.phone) #topbar>.rel:has(#expMenu){order:18;margin-inline-start:6px}
+
+/* quiet buttons: no outline until hovered, one size */
+body:not(.phone) #topbar>.tb,body:not(.phone) #topbar>.rel>.tb{height:34px;padding:0 10px;border-color:transparent;background:transparent;border-radius:9px;font-size:13px}
+body:not(.phone) #topbar>.tb:hover:not([disabled]),body:not(.phone) #topbar>.rel>.tb:hover{background:rgba(255,255,255,.12)}
+body:not(.phone) #topbar>.rel>.tb.pri{background:#2FC0C7;border-color:#2FC0C7;padding:0 14px}
+body:not(.phone) #topbar>.rel>.tb.pri:hover{background:#4fd3d9}
+body:not(.phone) #topbar .rel:has(#fileMenu) .tb,body:not(.phone) #topbar #bLib{background:rgba(255,255,255,.07)}
+/* icon-only buttons (the name shows on hover) */
+body:not(.phone) #topbar #bPresent .lbl,body:not(.phone) #topbar #bBalance .lbl{display:none}
+body:not(.phone) #topbar #bPresent,body:not(.phone) #topbar #bBalance,body:not(.phone) #topbar #bDev,
+body:not(.phone) #topbar #bUndo,body:not(.phone) #topbar #bRedo{width:34px;padding:0;justify-content:center}
+
+/* history + zoom read as one small group in the middle */
+body:not(.phone) #topbar #bRedo{margin-inline-end:10px}
+body:not(.phone) #topbar #bZoomOut,body:not(.phone) #topbar #bZoomIn{width:30px;padding:0;justify-content:center;font-size:17px;background:rgba(255,255,255,.07)}
+body:not(.phone) #topbar #zoomLbl{min-width:48px;font:400 11.5px Sequel,'Segoe UI',sans-serif;opacity:.9}
+body:not(.phone) #topbar #bFit{font-size:12.5px;opacity:.9}
+/* the left group sits behind a thin separator */
+body:not(.phone) #topbar #bLayers{position:relative;margin-inline-start:10px}
+body:not(.phone) #topbar #bLayers::before{content:'';position:absolute;inset-inline-start:-8px;top:8px;bottom:8px;width:1px;background:rgba(255,255,255,.18)}
+
+/* home + notes now live beside the title instead of floating over the design */
+#u4Brand{display:inline-flex;align-items:center;gap:2px;margin-inline-start:8px}
+#u4Brand button{position:relative;width:32px;height:32px;border:0;border-radius:9px;background:transparent;color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+#u4Brand button:hover{background:rgba(255,255,255,.12)}
+#u4Brand button.on{background:rgba(255,255,255,.2)}
+#u4Brand svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#u4Brand i{position:absolute;top:1px;left:1px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;background:#FC5C17;color:#fff;font:400 9px/15px Sequel,'Segoe UI',sans-serif;font-style:normal;text-align:center}
+#u4Brand i:empty{display:none}
+#u4Brand .u4sep{width:1px;height:20px;background:rgba(255,255,255,.2);margin:0 6px 0 4px}
+body:not(.phone).u4 #hubHome,body:not(.phone).u4 #jnFab{display:none!important}
+body.phone #u4Brand{display:none}
+
+/* narrower laptops: names off the secondary buttons, everything still fits */
+@media (max-width:1400px){
+  body:not(.phone) #topbar #bQA .lbl,body:not(.phone) #topbar #bLayers .lbl{display:none}
+  body:not(.phone) #topbar #bQA,body:not(.phone) #topbar #bLayers{width:34px;padding:0;justify-content:center}
+  body:not(.phone) #topbar>.brand{font-size:14.5px}
+}
+@media (max-width:1180px){
+  body:not(.phone) #topbar #bLib .lbl,body:not(.phone) #topbar #bFit{display:none}
+  body:not(.phone) #topbar>.brand{font-size:0}
+  body:not(.phone) #topbar>.brand #brandLogo{font-size:14px}
+}
+
+/* ---------- side panel: one calm style for every element ---------- */
+body:not(.phone) #blockPanel{padding:16px 14px 40px}
+body:not(.phone) #blockPanel h3{font-size:13px;color:var(--ui-sub);font-weight:700;margin:0 0 10px}
+/* start from content: word + paste side by side */
+#u4Start{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 10px}
+#u4Start button{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:11px 12px;border-radius:12px;border:0;cursor:pointer;text-align:right;font:700 13px Tajawal,sans-serif;color:#fff;background:#004EAA}
+#u4Start button+button{background:#fff;color:var(--ui-text);border:1px solid var(--ui-line)}
+#u4Start button:hover{filter:brightness(1.07)}
+#u4Start button+button:hover{border-color:var(--ui-acc);color:var(--ui-acc);filter:none}
+#u4Start svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+#u4Start button+button svg{color:var(--ui-acc)}
+#u4Start small{display:block;font:400 10.5px Tajawal,sans-serif;opacity:.8;margin-top:1px}
+body:not(.phone).u4 #blockPanel>#bWord2{display:none}
+body:not(.phone) .qaCards{margin:0 0 18px}
+body:not(.phone) .qaCards button{padding:9px 10px;border-radius:12px}
+
+/* elements: two neat columns, line icon + name, the description shows on hover */
+body:not(.phone) #blockBtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+body:not(.phone) #blockBtns .bp{flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:8px;margin:0;padding:11px 11px 10px;min-height:74px;border-radius:12px;background:#fff;border:1px solid var(--ui-line);font-size:12.5px;line-height:1.35;font-weight:600}
+body:not(.phone) #blockBtns .bp:hover{border-color:var(--ui-acc);background:#F4F8FD}
+body:not(.phone) #blockBtns .bp svg{width:20px;height:20px;color:var(--ui-acc)!important}
+body:not(.phone) #blockBtns .bp small{display:none}
+body:not(.phone) #blockBtns .bp:active{transform:scale(.98)}
+body:not(.phone) #blockPanel .sec .hint{font-size:11.5px;line-height:1.7}
+
+/* menus from the top bar open above the project tabs (the first item used to hide behind them) */
+body:not(.phone) #topbar .menu{z-index:130;max-height:calc(100vh - 70px);overflow:auto}
+
+/* layers studio bar on laptop screens: title shrinks to the logo, button names show on hover */
+@media (max-width:1500px){
+  body.lx-on:not(.phone) #topbar>.brand,body.free-on:not(.phone) #topbar>.brand{font-size:0}
+  body.lx-on:not(.phone) #topbar>.brand #brandLogo,body.free-on:not(.phone) #topbar>.brand #brandLogo{font-size:14px}
+}
+@media (max-width:1366px){
+  body.lx-on:not(.phone) #lxTop .tb:not(.pri):not(#lxBack):not(#lxFileB) .lbl{display:none}
+}
+/* unsaved dot sits on the corner, clear of the name */
+body:not(.phone) #topbar #bLib .dot{top:3px;left:3px;width:7px;height:7px;box-shadow:0 0 0 2px var(--navy)}

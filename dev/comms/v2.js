@@ -103,10 +103,12 @@
   /* any open menu stays fully on screen (the export menus sit at the far edge of the bar) */
   function keepIn(m) {
     if (!m || !m.offsetParent) return;
-    m.style.transform = '';
-    const r = m.getBoundingClientRect(), pad = 8; let dx = 0;
-    if (r.left < pad) dx = pad - r.left; else if (r.right > innerWidth - pad) dx = innerWidth - pad - r.right;
-    if (dx) m.style.transform = `translateX(${Math.round(dx)}px)`;
+    /* measure without touching the style (writing it re-triggered this observer forever and froze the page) */
+    const cur = parseFloat((m.style.transform.match(/translateX\((-?[\d.]+)px\)/) || [])[1]) || 0;
+    const r = m.getBoundingClientRect(), pad = 8, L = r.left - cur, R = r.right - cur; let dx = 0;
+    if (L < pad) dx = pad - L; else if (R > innerWidth - pad) dx = innerWidth - pad - R;
+    const want = dx ? `translateX(${Math.round(dx)}px)` : '';
+    if (m.style.transform !== want) m.style.transform = want;
   }
   const watch = () => document.querySelectorAll('#expMenu,#fileMenu,#lxExpM,#lxFileM').forEach(m => { if (m._kp) return; m._kp = true; new MutationObserver(() => keepIn(m)).observe(m, { attributes: true, attributeFilter: ['style', 'class'] }); });
   watch(); new MutationObserver(watch).observe(document.body, { childList: true, subtree: true });
