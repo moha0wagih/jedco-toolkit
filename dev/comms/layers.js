@@ -503,7 +503,7 @@
   function removeIds(ids) { ids.forEach(id => { const a = arrOf(id); if (!a) return; const i = a.findIndex(x => x.id === id); if (i >= 0) a.splice(i, 1); reindex(); }); pruneGroups(); L.sel = L.sel.filter(get); if (L.ctx && !get(L.ctx)) L.ctx = null; changed(); renderPanel(); renderProps(); }
   function pruneGroups() { let again = true; while (again) { again = false; all().forEach(l => { if (l.type === 'group' && !l.children.length) { const a = arrOf(l.id); a.splice(a.indexOf(l), 1); reindex(); again = true; } }); } }
   function delSel() { const ts = topSel(); if (!ts.length) return; if (ts.some(effLocked)) { say('فيه طبقة مقفولة ضمن المحدد — افتح القفل أولاً'); return; } const n = ts.length; removeIds(ts.map(l => l.id)); say(n > 1 ? `تم حذف ${n} طبقات` : 'تم الحذف'); }
-  function reid(l) { l.id = uid(); delete l.src; delete l.o; if (l.type === 'group') l.children.forEach(reid); return l; }   // a copy is a new layer, not linked to the announcement
+  function reid(l) { l.id = uid(); delete l.lxs; delete l.o; if (l.type === 'group') l.children.forEach(reid); return l; }   // a copy is a new layer, not linked to the announcement
   function duplicateItems(items, off) { const fo = flatOrder(); const out = []; items.slice().sort((a, b) => fo.get(a.id) - fo.get(b.id)).forEach(l => { const c = reid(CL(l)); if (off) moveLayer(c, off, off); const a = arrOf(l.id); a.splice(a.indexOf(l) + 1, 0, c); out.push(c); reindex(); }); reindex(); return out; }
   function dupSel() { const ts = topSel(); if (!ts.length) return; const c = duplicateItems(ts, 14); setSel(c.map(l => l.id), true); changed(); }
   function groupSel() {
@@ -1062,7 +1062,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
       const R = root.getBoundingClientRect(); const W = Math.round(opt.w || R.width), H = Math.round(opt.h || h || R.height);
       const ctx = { d, win, ox: R.left, oy: R.top, root, fonts: '' };
       const rcs = win.getComputedStyle(root); let bg = toHex(rcs.backgroundColor); if (alphaOf(bg) < .05) bg = '#ffffff';
-      const own = await visuals(root, rcs, ctx, 1, null, true); own.forEach(l => { l.src = '-'; });
+      const own = await visuals(root, rcs, ctx, 1, null, true); own.forEach(l => { l.lxs = '-'; });
       let layers = own.concat(await walkKids(root, ctx, 1, null, 0));
       layers = tidy(layers);
       // fonts that are not part of the tool
@@ -1243,7 +1243,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
   async function walk(el, cs, ctx, op, clip, depth) {
     const r = await walk0(el, cs, ctx, op, clip, depth);
     const s = el.getAttribute && el.getAttribute('data-lxs');
-    const tag = l => { if (!l.src) { l.src = s || '-'; } if (l.type === 'group') l.children.forEach(tag); };   // this element's own shapes sit inside its group
+    const tag = l => { if (!l.lxs) { l.lxs = s || '-'; } if (l.type === 'group') l.children.forEach(tag); };   // this element's own shapes sit inside its group
     r.forEach(tag);
     return r;
   }
@@ -1302,10 +1302,10 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     // remember how every layer looked when it was made, and which kinds each element produced
     const kinds = {};
     all().forEach(l => {
-      if (!l.src || l.src === '-') return; (kinds[l.src] = kinds[l.src] || new Set()).add(kindOf(l));
-      const h = hid && hid[l.src]; if (h && (h === 'all' || h === kindOf(l))) l.hidden = true;
+      if (!l.lxs || l.lxs === '-') return; (kinds[l.lxs] = kinds[l.lxs] || new Set()).add(kindOf(l));
+      const h = hid && hid[l.lxs]; if (h && (h === 'all' || h === kindOf(l))) l.hidden = true;
     });
-    all().forEach(l => { if (!l.src || l.src === '-') return; const b = aabb(l, true); l.o = { x: b ? b.x : 0, ax: anchorX(l, b), y: b ? b.y : 0, html: l.html, op: l.op ?? 1, hid: !!l.hidden, col: l.st && l.st.col, fs: l.st && l.st.fs, ff: l.st && l.st.ff, fw: l.st && l.st.fw, fill: l.fill }; });
+    all().forEach(l => { if (!l.lxs || l.lxs === '-') return; const b = aabb(l, true); l.o = { x: b ? b.x : 0, ax: anchorX(l, b), y: b ? b.y : 0, html: l.html, op: l.op ?? 1, hid: !!l.hidden, col: l.st && l.st.col, fs: l.st && l.st.fs, ff: l.st && l.st.ff, fw: l.st && l.st.fw, fill: l.fill }; });
     page.querySelectorAll('[data-lxk]').forEach(el => el.removeAttribute('data-lxk'));
     Object.entries(kinds).forEach(([src, set]) => { const el = page.querySelector(`[data-lxs="${src}"]`); if (el) el.setAttribute('data-lxk', [...set].join(',')); });
   }
@@ -1314,7 +1314,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     if (!L.doc || !page) return null; const hdr = page.querySelector('.hdr'); if (!hdr || hdr.getAttribute('data-lxdoc') !== L.libId) return null;
     const els = new Map(); page.querySelectorAll('[data-lxs]').forEach(e => els.set(e.getAttribute('data-lxs'), e));
     const bySrc = new Map(); let fresh = 0;
-    all().forEach(l => { if (!l.src || l.src === '-') { if (l.type !== 'group' && !l.src) fresh++; return; } (bySrc.get(l.src) || bySrc.set(l.src, []).get(l.src)).push(l); });
+    all().forEach(l => { if (!l.lxs || l.lxs === '-') { if (l.type !== 'group' && !l.lxs) fresh++; return; } (bySrc.get(l.lxs) || bySrc.set(l.lxs, []).get(l.lxs)).push(l); });
     let n = 0; try { snap(true); } catch (e) { }
     // 1) hidden / deleted
     page.querySelectorAll('[data-lxk]').forEach(el => {
@@ -1370,7 +1370,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     // build 39: the announcement changed since the layers were made → rebuild them from it (your own added layers come along)
     const hd0 = page.querySelector('.hdr'), ln0 = findLink(key);
     if (ln0 && ln0.hash !== key.hash && hd0 && hd0.getAttribute('data-lxdoc') === ln0.lx) fresh = true;
-    if (fresh !== true) { const ln = findLink(key); const rec = ln && await loadRec(ln.lx); const linked = rec && rec.data && JSON.stringify(rec.data.layers || []).includes('"src":"'); if (rec && rec.data && !linked) say('نسخة الطبقات القديمة ما كانت مربوطة بالإعلان — بنيتها من جديد وصارت مربوطة (القديمة محفوظة في «تصاميمي»)'); if (rec && rec.data && linked) { openObj(rec.data, { libId: rec.id, thumb: rec.thumb }); L.linkedBoard = key; addLink(key, rec.id); say('فتحت نسخة الطبقات اللي عدّلت عليها — للتفكيك من جديد من الإعلان الأصلي: ملف ▸ تفكيك من جديد'); return; } }
+    if (fresh !== true) { const ln = findLink(key); const rec = ln && await loadRec(ln.lx); const linked = rec && rec.data && JSON.stringify(rec.data.layers || []).includes('"lxs":"'); if (rec && rec.data && !linked) say('نسخة الطبقات القديمة ما كانت مربوطة بالإعلان — بنيتها من جديد وصارت مربوطة (القديمة محفوظة في «تصاميمي»)'); if (rec && rec.data && linked) { openObj(rec.data, { libId: rec.id, thumb: rec.thumb }); L.linkedBoard = key; addLink(key, rec.id); say('فتحت نسخة الطبقات اللي عدّلت عليها — للتفكيك من جديد من الإعلان الأصلي: ملف ▸ تفكيك من جديد'); return; } }
     setAssets({});
     try { if (typeof commitActive === 'function') commitActive(); } catch (e) { }
     busy(true, 'جاري تفكيك التصميم إلى طبقات…');
@@ -1387,7 +1387,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
       openDoc({ name: title + ' (طبقات)', w: r.w, h: r.h, bg: r.bg, layers: r.layers, fonts: r.fonts }, { keepAssets: true });
       snapshotLayers(hidMap);
       // layers you added yourself in the layers view stay on top after a rebuild
-      if (prevDoc && prevDoc !== L.libId) { try { const old = await loadRec(prevDoc); const mine = (old && old.data && old.data.layers || []).filter(l => !l.src); if (mine.length) { L.doc.layers.push(...sanitizeLayers(JSON.parse(JSON.stringify(mine)))); reindex(); paint(true); renderPanel(); } } catch (e) { } }
+      if (prevDoc && prevDoc !== L.libId) { try { const old = await loadRec(prevDoc); const mine = (old && old.data && old.data.layers || []).filter(l => !l.lxs); if (mine.length) { L.doc.layers.push(...sanitizeLayers(JSON.parse(JSON.stringify(mine)))); reindex(); paint(true); renderPanel(); } } catch (e) { } }
       { const hd = page.querySelector('.hdr'); if (hd) hd.setAttribute('data-lxdoc', L.libId); }
       await autosave(true);
       const key2 = boardKey(); L.linkedBoard = key2; addLink(key2, L.libId);
