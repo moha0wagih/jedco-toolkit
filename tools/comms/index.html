@@ -3262,7 +3262,7 @@ $('#bDev').onclick = () => setDevice(isPhone() ? 'desktop' : 'phone', true);
 
 /* ---------------- boot ---------------- */
 $('#brandLogo').innerHTML = ASSETS.logo;
-const APP_VER = 'v2.0', APP_BUILD = 'build 39';
+const APP_VER = 'v2.0', APP_BUILD = 'build 40';
 $('#sig').innerHTML = `<span>Designed by Mohammed Wagih · ${new Date().getFullYear()} · <b class="beta">${APP_VER}</b></span><button id="bReport" title="أرسل ملاحظة أو مشكلة لمحمد وجيه">الإبلاغ عن مشكلة</button>`;
 $('#bReport').onclick = () => {
   const ua = navigator.userAgent; const br = /Edg\//.test(ua) ? 'Edge' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : /Firefox\//.test(ua) ? 'Firefox' : 'Other';
@@ -5693,7 +5693,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
   const hashStr = t => { let h = 0; for (let i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0; return t.length + ':' + h; };
   function getLinks() { try { return JSON.parse(localStorage.getItem('jedLX_links') || '[]'); } catch (e) { return []; } }
   function setLinks(a) { try { localStorage.setItem('jedLX_links', JSON.stringify(a.slice(-60))); } catch (e) { } }
-  function boardKey() { let html = ''; try { if (typeof commitActive === 'function') commitActive(); html = (S.docs && S.docs[S.active] && S.docs[S.active].html) || page.innerHTML; } catch (e) { html = page ? page.innerHTML : ''; } const t1 = page && page.querySelector('.t1') ? page.querySelector('.t1').textContent.trim() : ''; return { hash: hashStr(html), lib: (typeof S !== 'undefined' && S.libId) || null, act: (typeof S !== 'undefined' && S.active) || 0, t1 }; }
+  function boardKey() { let html = ''; try { if (typeof commitActive === 'function') commitActive(); html = (S.docs && S.docs[S.active] && S.docs[S.active].html) || page.innerHTML; } catch (e) { html = page ? page.innerHTML : ''; } const t1 = page && page.querySelector('.t1') ? page.querySelector('.t1').textContent.trim() : ''; html = html.replace(/ style="\s*"/g, ''); return { hash: hashStr(html), lib: (typeof S !== 'undefined' && S.libId) || null, act: (typeof S !== 'undefined' && S.active) || 0, t1 }; }
   function findLink(k) { const ls = getLinks(); return ls.slice().reverse().find(x => x.hash === k.hash) || (k.lib ? ls.slice().reverse().find(x => x.lib === k.lib && x.act === k.act) : null) || (k.t1 ? ls.slice().reverse().find(x => !x.lib && x.t1 === k.t1) : null) || null; }
   function addLink(k, lx) { const ls = getLinks().filter(x => x.lx !== lx && x.hash !== k.hash); ls.push(Object.assign({}, k, { lx, t: Date.now() })); setLinks(ls); }
   function updLayersBtn() { const b = q('bLayers'); if (!b) return; let has = false; try { has = !!(page && page.querySelector('.hdr') && findLink(boardKey())); } catch (e) { } b.classList.toggle('lxHas', has); const l = b.querySelector('.lbl'); if (l) l.textContent = has ? 'متابعة الطبقات' : 'طبقات'; b.title = has ? 'عندك نسخة طبقات معدّلة من هذا الإعلان — اضغط لفتحها وتكمل عليها' : 'تفكيك التصميم الحالي إلى طبقات منفصلة (مثل الفوتوشوب): كل نص وصورة وشكل وأيقونة تتحكم فيه لحاله'; }
@@ -5736,7 +5736,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
   function sanitizeLayers(arr) { return (arr || []).filter(l => l && /^(text|image|shape|svg|group)$/.test(l.type)).map(l => { l.id = l.id || uid(); if (l.type === 'text') l.html = cleanHtml(String(l.html || '')); if (l.type === 'svg') { const t = document.createElement('template'); t.innerHTML = String(l.svg || ''); t.content.querySelectorAll('script,foreignObject').forEach(x => x.remove()); t.content.querySelectorAll('*').forEach(n => [...n.attributes].forEach(a => { if (/^on/i.test(a.name) || /javascript:/i.test(a.value)) n.removeAttribute(a.name); })); l.svg = t.innerHTML; } if (l.type === 'group') l.children = sanitizeLayers(l.children); return l; }); }
   function injectFonts(css) { let st = q('lxFonts'); if (!st) { st = document.createElement('style'); st.id = 'lxFonts'; document.head.appendChild(st); } st.textContent = css || ''; }
   function enter() { if (L.on) return; L.on = true; if (typeof closeSheets === 'function') closeSheets(); if (typeof qaClose === 'function') try { qaClose(); } catch (e) { } if (typeof libClose === 'function') try { libClose(); } catch (e) { } if (typeof deselect === 'function') try { deselect(); } catch (e) { } document.body.classList.add('lx-on', 'lx-tab-layers'); const sh = document.querySelector('#iconPanel .shead b'); if (sh) { sh._t = sh._t || sh.textContent; sh.textContent = 'الطبقات والأيقونات'; } const sh2 = document.querySelector('#blockPanel .shead b'); if (sh2) { sh2._t = sh2._t || sh2.textContent; sh2.textContent = 'الخصائص'; } if (document.body.classList.contains('free-on') && q('fmBack')) { document.body.classList.remove('free-on'); } setTimeout(() => { sizeStage(); fitZoom(); }, 30); }
-  async function exitLX(opt) { endPaint(); tbHide(); finishEdit(true); let synced = null; try { synced = syncToBoard(); } catch (e) { console.warn('lx sync', e); } if (L.doc) { await autosave(true); saveThumb(); } L.on = false; document.body.classList.remove('lx-on', 'lx-tab-layers', 'lx-tab-icons'); document.querySelectorAll('#iconPanel .shead b, #blockPanel .shead b').forEach(x => { if (x._t) x.textContent = x._t; }); L.cache.forEach(el => el.remove()); L.cache.clear(); q('lxOv').innerHTML = ''; if (typeof closeSheets === 'function') closeSheets(); try { localStorage.removeItem('jedLX_open'); } catch (e) { } setTimeout(() => { try { fit(); } catch (e) { } updLayersBtn(); }, 30); if (opt && opt.quiet === true) return; if (synced) { say(synced.n ? `نقلت تعديلات الطبقات للإعلان${synced.fresh ? ` — ${synced.fresh} عنصر جديد أضفته في الطبقات يظهر في واجهة الطبقات والتصدير منها` : ''}` : (synced.fresh ? `العناصر الجديدة اللي أضفتها في الطبقات (${synced.fresh}) تظهر في واجهة الطبقات والتصدير منها` : 'رجعت للإعلان')); return; } say(L.linkedBoard ? 'تعديلاتك محفوظة — ارجع للطبقات من مفتاح «الطبقات» فوق' : 'تعديلاتك محفوظة في «تصاميمي»'); }
+  async function exitLX(opt) { endPaint(); tbHide(); finishEdit(true); let synced = null; try { synced = syncToBoard(); } catch (e) { console.warn('lx sync', e); } if (synced) { const lid = L.libId; setTimeout(() => { try { if (!L.on && lid) addLink(boardKey(), lid); } catch (e) { } }, 900); } if (L.doc) { await autosave(true); saveThumb(); } L.on = false; document.body.classList.remove('lx-on', 'lx-tab-layers', 'lx-tab-icons'); document.querySelectorAll('#iconPanel .shead b, #blockPanel .shead b').forEach(x => { if (x._t) x.textContent = x._t; }); L.cache.forEach(el => el.remove()); L.cache.clear(); q('lxOv').innerHTML = ''; if (typeof closeSheets === 'function') closeSheets(); try { localStorage.removeItem('jedLX_open'); } catch (e) { } setTimeout(() => { try { fit(); } catch (e) { } updLayersBtn(); }, 30); if (opt && opt.quiet === true) return; if (synced) { say(synced.n ? `نقلت تعديلات الطبقات للإعلان${synced.fresh ? ` — ${synced.fresh} عنصر جديد أضفته في الطبقات يظهر في واجهة الطبقات والتصدير منها` : ''}` : (synced.fresh ? `العناصر الجديدة اللي أضفتها في الطبقات (${synced.fresh}) تظهر في واجهة الطبقات والتصدير منها` : 'رجعت للإعلان')); return; } say(L.linkedBoard ? 'تعديلاتك محفوظة — ارجع للطبقات من مفتاح «الطبقات» فوق' : 'تعديلاتك محفوظة في «تصاميمي»'); }
   function setTab(t) { document.body.classList.toggle('lx-tab-layers', t === 'layers'); document.body.classList.toggle('lx-tab-icons', t === 'icons'); q('lxTabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === t)); }
   const isPh = () => document.body.classList.contains('phone');
 
@@ -6067,7 +6067,7 @@ Only include layers you changed or added. Keep src values unchanged. No other te
     // build 39: the announcement changed since the layers were made → rebuild them from it (your own added layers come along)
     const hd0 = page.querySelector('.hdr'), ln0 = findLink(key);
     if (ln0 && ln0.hash !== key.hash && hd0 && hd0.getAttribute('data-lxdoc') === ln0.lx) fresh = true;
-    if (fresh !== true) { const ln = findLink(key); const rec = ln && await loadRec(ln.lx); if (rec && rec.data) { openObj(rec.data, { libId: rec.id, thumb: rec.thumb }); L.linkedBoard = key; addLink(key, rec.id); say('فتحت نسخة الطبقات اللي عدّلت عليها — للتفكيك من جديد من الإعلان الأصلي: ملف ▸ تفكيك من جديد'); return; } }
+    if (fresh !== true) { const ln = findLink(key); const rec = ln && await loadRec(ln.lx); const linked = rec && rec.data && JSON.stringify(rec.data.layers || []).includes('"src":"'); if (rec && rec.data && !linked) say('نسخة الطبقات القديمة ما كانت مربوطة بالإعلان — بنيتها من جديد وصارت مربوطة (القديمة محفوظة في «تصاميمي»)'); if (rec && rec.data && linked) { openObj(rec.data, { libId: rec.id, thumb: rec.thumb }); L.linkedBoard = key; addLink(key, rec.id); say('فتحت نسخة الطبقات اللي عدّلت عليها — للتفكيك من جديد من الإعلان الأصلي: ملف ▸ تفكيك من جديد'); return; } }
     setAssets({});
     try { if (typeof commitActive === 'function') commitActive(); } catch (e) { }
     busy(true, 'جاري تفكيك التصميم إلى طبقات…');
@@ -7705,7 +7705,7 @@ window.CERT_ASSETS = {bg:"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wB
       const list = titles().map(el => {
         const auto = !el.style.top || el.style.top === el.dataset.autoTop;
         let base;
-        if (auto) { const keep = el.style.top; el.style.top = ''; base = parseFloat(getComputedStyle(el).top) || 0; el.style.top = keep; }
+        if (auto) { const keep = el.style.top; el.style.top = ''; base = parseFloat(getComputedStyle(el).top) || 0; el.style.top = keep; if (!el.getAttribute('style')) el.removeAttribute('style'); }
         return { el, auto, base };
       }).filter(x => x.auto).sort((a, b) => a.base - b.base);
       // stack: each line starts under the one above it
@@ -7727,7 +7727,7 @@ window.CERT_ASSETS = {bg:"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wB
       }
       for (const p of plan) {
         const el = p.x.el, want = Math.round(p.top * 100) / 100;
-        if (Math.abs(want - p.x.base) < 0.01) { if (el.style.top) el.style.removeProperty('top'); delete el.dataset.autoTop; }
+        if (Math.abs(want - p.x.base) < 0.01) { if (el.style.top) el.style.removeProperty('top'); delete el.dataset.autoTop; if (!el.getAttribute('style')) el.removeAttribute('style'); }
         else { const v = want + 'px'; if (el.style.top !== v) el.style.top = v; el.dataset.autoTop = v; }
       }
     } catch (e) { }

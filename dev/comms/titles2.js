@@ -17,7 +17,7 @@
       const list = titles().map(el => {
         const auto = !el.style.top || el.style.top === el.dataset.autoTop;
         let base;
-        if (auto) { const keep = el.style.top; el.style.top = ''; base = parseFloat(getComputedStyle(el).top) || 0; el.style.top = keep; }
+        if (auto) { const keep = el.style.top; el.style.top = ''; base = parseFloat(getComputedStyle(el).top) || 0; el.style.top = keep; if (!el.getAttribute('style')) el.removeAttribute('style'); }
         return { el, auto, base };
       }).filter(x => x.auto).sort((a, b) => a.base - b.base);
       // stack: each line starts under the one above it
@@ -39,7 +39,7 @@
       }
       for (const p of plan) {
         const el = p.x.el, want = Math.round(p.top * 100) / 100;
-        if (Math.abs(want - p.x.base) < 0.01) { if (el.style.top) el.style.removeProperty('top'); delete el.dataset.autoTop; }
+        if (Math.abs(want - p.x.base) < 0.01) { if (el.style.top) el.style.removeProperty('top'); delete el.dataset.autoTop; if (!el.getAttribute('style')) el.removeAttribute('style'); }
         else { const v = want + 'px'; if (el.style.top !== v) el.style.top = v; el.dataset.autoTop = v; }
       }
     } catch (e) { }
