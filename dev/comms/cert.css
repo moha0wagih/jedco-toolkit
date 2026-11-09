@@ -90,3 +90,8 @@ body.crt-on #hubHome,body.crt-on #jnFab,body.crt-on #v3Tabs,body.crt-on #cvPop{d
 #ctx .cvChips button:hover{border-color:var(--ui-acc);background:#f4f8fe}
 #ctx .cvChips button.on{border-color:var(--ui-acc);background:#eef4fb;color:var(--ui-acc);cursor:default}
 body.phone #blockbar{z-index:86}
+/* ---------- build 35 · title on two lines ---------- */
+#ctx .tlRow{margin-top:10px}
+#ctx .tlSeg{display:flex;background:#eef1f6;border-radius:10px;padding:3px;gap:3px}
+#ctx .tlSeg button{flex:1;height:32px;border:0;border-radius:8px;background:none;font:600 13px Tajawal,sans-serif;color:var(--ui-sub);cursor:pointer}
+#ctx .tlSeg button.on{background:#fff;color:var(--ui-acc);box-shadow:0 1px 3px rgba(0,30,70,.12)}
