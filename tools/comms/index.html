@@ -3262,7 +3262,7 @@ $('#bDev').onclick = () => setDevice(isPhone() ? 'desktop' : 'phone', true);
 
 /* ---------------- boot ---------------- */
 $('#brandLogo').innerHTML = ASSETS.logo;
-const APP_VER = 'v2.0', APP_BUILD = 'build 35';
+const APP_VER = 'v2.0', APP_BUILD = 'build 36';
 $('#sig').innerHTML = `<span>Designed by Mohammed Wagih · ${new Date().getFullYear()} · <b class="beta">${APP_VER}</b></span><button id="bReport" title="أرسل ملاحظة أو مشكلة لمحمد وجيه">الإبلاغ عن مشكلة</button>`;
 $('#bReport').onclick = () => {
   const ua = navigator.userAgent; const br = /Edg\//.test(ua) ? 'Edge' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : /Firefox\//.test(ua) ? 'Firefox' : 'Other';
@@ -7569,7 +7569,7 @@ window.CERT_ASSETS = {bg:"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wB
 </script>
 <script id="titlesScript">
 /* ==========================================================================
-   مصمم التواصل الداخلي · build 35 — عنوان على سطرين
+   مصمم التواصل الداخلي · build 36 — العنوان على أكثر من سطر
    Each header line (Arabic title, subtitle, English title …) can be one line or
    two, on its own. Lines below a two-line title move down by themselves, unless
    the user has dragged them somewhere else.
@@ -7590,13 +7590,27 @@ window.CERT_ASSETS = {bg:"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wB
         if (auto) { const keep = el.style.top; el.style.top = ''; base = parseFloat(getComputedStyle(el).top) || 0; el.style.top = keep; }
         return { el, auto, base };
       }).filter(x => x.auto).sort((a, b) => a.base - b.base);
-      let acc = 0;
+      // stack: each line starts under the one above it
+      let acc = 0; const plan = [];
       for (const x of list) {
-        const want = Math.round((x.base + acc) * 100) / 100;
-        if (acc === 0) { if (x.el.style.top) x.el.style.removeProperty('top'); delete x.el.dataset.autoTop; }
-        else { const v = want + 'px'; if (x.el.style.top !== v) x.el.style.top = v; x.el.dataset.autoTop = v; }
-        const lh = parseFloat(getComputedStyle(x.el).lineHeight) || 0;
-        acc += Math.max(0, x.el.offsetHeight - lh - 1) > 0 ? x.el.offsetHeight - lh : 0;
+        const lh = parseFloat(getComputedStyle(x.el).lineHeight) || 0, h = x.el.offsetHeight;
+        plan.push({ x, top: x.base + acc, h }); acc += Math.max(0, h - lh);
+      }
+      // a tall stack slides up (never above the top margin) so it stays on the photo
+      const welcome = !!q('.hdr.welcome', page), limit = welcome ? 322 : 258, minTop = 26;
+      if (plan.length) {
+        const bottom = Math.max(...plan.map(p => p.top + p.h)), over = bottom - limit;
+        const room = plan[0].top - minTop;
+        const up = over > 0 ? Math.min(over, Math.max(0, room)) : 0;
+        plan.forEach(p => p.top -= up);
+        const still = over - up > 2;   // even at the top it does not fit: say so once
+        if (still && !restack.warned) { restack.warned = true; setTimeout(() => { try { toast('العناوين صارت أطول من صورة الترويسة — صغّر حجم أحد الأسطر من «حجم هذا السطر»'); } catch (e) { } }, 50); }
+        if (!still) restack.warned = false;
+      }
+      for (const p of plan) {
+        const el = p.x.el, want = Math.round(p.top * 100) / 100;
+        if (Math.abs(want - p.x.base) < 0.01) { if (el.style.top) el.style.removeProperty('top'); delete el.dataset.autoTop; }
+        else { const v = want + 'px'; if (el.style.top !== v) el.style.top = v; el.dataset.autoTop = v; }
       }
     } catch (e) { }
     busy = false;
@@ -7613,7 +7627,6 @@ window.CERT_ASSETS = {bg:"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wB
   page.addEventListener('keydown', e => {
     if (e.key !== 'Enter' || e.isComposing) return; const t = e.target.closest && e.target.closest('.htitles .ht'); if (!t) return;
     e.preventDefault(); e.stopImmediatePropagation();
-    if (lines(t) >= 2) { toast('العنوان صار سطرين — للسطر الثالث استخدم سطر جديد'); return; }
     document.execCommand('insertLineBreak');
     // no stray space at the start of the new line or the end of the first one
     qa('br', t).forEach(br => { const n = br.nextSibling, pv = br.previousSibling; if (n && n.nodeType === 3) n.textContent = n.textContent.replace(/^[\s\u00a0]+/, ''); if (pv && pv.nodeType === 3) pv.textContent = pv.textContent.replace(/[\s\u00a0]+$/, ''); });
@@ -7660,7 +7673,7 @@ window.CERT_ASSETS = {bg:"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wB
   function addRow() {
     if (!ctxEl || ctxEl.querySelector('.tlRow') || !S.sel || S.sel.type !== 'title') return;
     const row = document.createElement('div'); row.className = 'tlRow';
-    row.innerHTML = `<label class="f">عدد أسطر هذا العنوان</label><div class="tlSeg"><button type="button" data-tl="1">سطر واحد</button><button type="button" data-tl="2">سطرين</button></div><div class="hint">كل عنوان لحاله: تقدر تخلي العربي سطرين والإنجليزي سطر. «سطرين» يقسم من النص، أو اضغط Enter داخل العنوان عند الكلمة اللي تبي يبدأ منها السطر الثاني.</div>`;
+    row.innerHTML = `<label class="f">أسطر هذا العنوان</label><div class="tlSeg"><button type="button" data-tl="1">سطر واحد</button><button type="button" data-tl="2">سطرين</button></div><div class="hint">كل عنوان لحاله: تقدر تخلي العربي سطرين والإنجليزي سطر. اضغط Enter داخل العنوان في أي مكان ينزل سطر جديد (بدون حد). «سطرين» يقسمه من النص، و«سطر واحد» يرجّعه سطر.</div>`;
     row.addEventListener('mousedown', e => e.preventDefault());
     row.addEventListener('click', e => { const b = e.target.closest('[data-tl]'); if (b && S.sel && S.sel.type === 'title') setLines(S.sel.el, +b.dataset.tl); });
     const size = ctxEl.querySelector('#tsz'); const anchor = size && size.closest('.rowc');
