@@ -3262,7 +3262,7 @@ $('#bDev').onclick = () => setDevice(isPhone() ? 'desktop' : 'phone', true);
 
 /* ---------------- boot ---------------- */
 $('#brandLogo').innerHTML = ASSETS.logo;
-const APP_VER = 'v2.0', APP_BUILD = 'build 37';
+const APP_VER = 'v2.0', APP_BUILD = 'build 38';
 $('#sig').innerHTML = `<span>Designed by Mohammed Wagih · ${new Date().getFullYear()} · <b class="beta">${APP_VER}</b></span><button id="bReport" title="أرسل ملاحظة أو مشكلة لمحمد وجيه">الإبلاغ عن مشكلة</button>`;
 $('#bReport').onclick = () => {
   const ua = navigator.userAgent; const br = /Edg\//.test(ua) ? 'Edge' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : /Firefox\//.test(ua) ? 'Firefox' : 'Other';
@@ -4681,6 +4681,17 @@ body.phone #blockbar{z-index:86}
 #updBar button{border:0;border-radius:8px;height:32px;padding:0 12px;font:700 13px Tajawal,sans-serif;cursor:pointer}
 #updBar [data-u=go]{background:#fff;color:#0E1D40}
 #updBar [data-u=x]{background:none;color:#fff;font-size:20px;padding:0 6px}
+/* ---------- build 38 · view switch + fonts ---------- */
+.msw{display:inline-flex;align-items:center;gap:2px;padding:3px;border-radius:11px;background:rgba(255,255,255,.12);flex:none}
+.msw button{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border:0;border-radius:8px;background:none;color:rgba(255,255,255,.78);font:600 13.5px Tajawal,sans-serif;cursor:pointer;white-space:nowrap}
+.msw button svg{width:16px;height:16px}
+.msw button:hover{color:#fff;background:rgba(255,255,255,.1)}
+.msw button.on{background:#fff;color:#0E1D40;cursor:default}
+.mswHid{display:none!important}
+body.phone .msw button span{display:none}
+#tbar .ffRow{gap:4px}
+#tbar .ffRow button{min-width:0;height:26px;padding:0 8px;font-size:12px;white-space:nowrap}
+#tbar .ffRow button.on{outline:2px solid #2FC0C7;outline-offset:1px}
 
 </style>
 <script id="lxScript">
@@ -4768,6 +4779,8 @@ body.phone #blockbar{z-index:86}
   const topSel = () => { const s = L.sel.map(get).filter(Boolean); return s.filter(l => !s.some(o => o !== l && o.type === 'group' && isIn(l.id, o.id))); };
   const selBox = () => union(topSel().map(l => aabb(l)));
   const textOf = l => { if (!l) return ''; if (l.type === 'text') { const t = document.createElement('div'); t.innerHTML = l.html; return t.textContent.replace(/\s+/g, ' ').trim(); } if (l.type === 'group') { const ts = l.children.map(textOf).filter(Boolean); return ts.find(t => /[\p{L}\d]{2}/u.test(t)) || ts[0] || ''; } return ''; };
+  // build 38: English text → FS Industrie, Arabic → Tajawal, unless the font was picked by hand
+  const autoFF = (l, cur, force) => { const t = textOf(l); const lat = (t.match(/[A-Za-z]/g) || []).length, ar = (t.match(/[\u0600-\u06FF]/g) || []).length; const f = String(cur || '').split(',')[0].replace(/['"]/g, '').trim(); if (force && lat > ar) return 'FSI'; if (force && ar >= lat && ar > 0) return 'Tajawal'; if (lat >= 2 && lat > ar * 1.5 && /^tajawal$/i.test(f)) return 'FSI'; if (ar >= 2 && ar > lat * 1.5 && !/^tajawal$/i.test(f)) return 'Tajawal'; return cur; };
   function nameOf(l) { if (l.name) return l.name; if (l.type === 'text') return textOf(l).slice(0, 40) || 'نص'; if (l.type === 'group') { const t = textOf(l); if (t) return 'مجموعة · ' + t.slice(0, 26); const f = leaves(l).find(c => c.type === 'image' || c.type === 'svg'); return f ? 'مجموعة · ' + (f.name || TYPE_AR[f.type]) : 'مجموعة'; } return TYPE_AR[l.type] || 'طبقة'; }
 
   /* ---------------- render ---------------- */
@@ -5092,7 +5105,7 @@ body.phone #blockbar{z-index:86}
   function cleanHtml(h) { const t = document.createElement('template'); t.innerHTML = h; t.content.querySelectorAll('script,style,iframe,object,embed,link,meta').forEach(x => x.remove()); t.content.querySelectorAll('*').forEach(n => [...n.attributes].forEach(a => { if (/^on/i.test(a.name) || /javascript:/i.test(a.value) || a.name === 'contenteditable' || a.name === 'class') n.removeAttribute(a.name); })); return t.innerHTML; }
   function finishEdit(save) {
     tbHide(); const el = L.editing; if (!el) return; L.editing = null; el.removeAttribute('contenteditable'); const l = get(el.dataset.id);
-    if (l && save) { const h = cleanHtml(el.innerHTML); const empty = !el.textContent.trim() && !el.querySelector('img,svg'); if (empty) { removeIds([l.id]); return; } if (h !== l.html) { l.html = h; el._h = h; changed(); } }
+    if (l && save) { const h = cleanHtml(el.innerHTML); const empty = !el.textContent.trim() && !el.querySelector('img,svg'); if (empty) { removeIds([l.id]); return; } if (h !== l.html) { l.html = h; el._h = h; if (!l.st.ffMan) { const nf = autoFF(l, l.st.ff); if (nf !== l.st.ff) { l.st.ff = nf; say(nf === 'FSI' ? 'النص إنجليزي — صار بخط FS Industrie تلقائياً (تقدر تغيّره من «الخط»)' : 'النص عربي — صار بخط Tajawal تلقائياً'); } } changed(); } }
     try { getSelection().removeAllRanges(); } catch (x) { }
     paint(); renderProps();
   }
@@ -5391,7 +5404,7 @@ body.phone #blockbar{z-index:86}
     const lh = t.lh ? R2(t.lh) : 1.2;
     return `<h4>النص ${ed ? '<small style="font-weight:400;color:#FC5C17">· وضع الكتابة: الألوان والحجم والعريض تنطبق على الكلام المظلل</small>' : ''}</h4>
     <div class="row"><button class="b pri" data-a="${ed ? 'endEdit' : 'edit'}" style="flex:1">${IC(ed ? 'badge-check' : 'pen-line')} ${ed ? 'إنهاء الكتابة (Esc)' : 'تعديل الكلام (دبل كليك)'}</button></div>
-    <div class="row"><select data-s="ff">${FONTS.map(([v, n]) => `<option value="${v}"${fam === v ? ' selected' : ''}>${n}</option>`).join('')}${FONTS.some(f => f[0] === fam) ? '' : `<option value="${ESC(fam)}" selected>${ESC(fam)} (خارج الهوية)</option>`}</select></div>
+    <div class="row"><label>الخط</label></div><div class="row"><select data-s="ff"><option value="__auto"${!t.ffMan ? ' selected' : ''}>تلقائي حسب اللغة${!t.ffMan && fam ? ' · ' + ESC(fam === 'FSI' ? 'FS Industrie' : fam) : ''}</option>${FONTS.map(([v, n]) => `<option value="${v}"${t.ffMan && fam === v ? ' selected' : ''}>${n}</option>`).join('')}${FONTS.some(f => f[0] === fam) ? '' : `<option value="${ESC(fam)}"${t.ffMan ? ' selected' : ''}>${ESC(fam)} (خارج الهوية)</option>`}</select></div>
     <div class="row"><div class="seg" style="flex:none;width:120px"><button data-a="fw4" class="${+t.fw < 600 ? 'on' : ''}">عادي</button><button data-a="fw7" class="${+t.fw >= 600 ? 'on' : ''}"><b>عريض</b></button></div>${num('fs', 'px', R1(t.fs))}<button class="b ic" data-a="fs-" title="أصغر">A−</button><button class="b ic" data-a="fs+" title="أكبر">A+</button></div>
     <div class="row"><div class="seg">${[['right', 'align-right', 'يمين'], ['center', 'align-center', 'وسط'], ['left', 'align-left', 'يسار'], ['justify', 'align-justify', 'ضبط']].map(([k, i, n]) => `<button data-ta="${k}" class="${(t.ta || 'right') === k ? 'on' : ''}" title="${n}">${IC(i)}</button>`).join('')}</div><div class="seg" style="flex:none;width:86px"><button data-dir="rtl" class="${t.dir !== 'ltr' ? 'on' : ''}" title="عربي (من اليمين)">ع</button><button data-dir="ltr" class="${t.dir === 'ltr' ? 'on' : ''}" title="English (from the left)">En</button></div></div>
     <div class="row"><label>لون النص</label></div>${swatches('tcol', t.col)}
@@ -5401,7 +5414,7 @@ body.phone #blockbar{z-index:86}
     <div class="row"><label>الارتفاع</label><div class="seg"><button data-a="ahOn" class="${l.ah !== false ? 'on' : ''}">تلقائي</button><button data-a="ahOff" class="${l.ah === false ? 'on' : ''}">ثابت</button></div></div>
     <div class="row"><label>خلفية النص</label></div>${swatches('tbg', t.bg, true)}`;
   }
-  function multiTextProps(ts) { return `<h4>النص (لكل المحدد)</h4><div class="row"><select data-s="ffAll"><option value="">— الخط —</option>${FONTS.map(([v, n]) => `<option value="${v}">${n}</option>`).join('')}</select></div><div class="row"><button class="b ic" data-a="fsAll-">A−</button><button class="b ic" data-a="fsAll+">A+</button><div class="seg"><button data-a="fwAll4">عادي</button><button data-a="fwAll7"><b>عريض</b></button></div></div><div class="row"><label>لون النص</label></div>${swatches('tcolAll', null)}`; }
+  function multiTextProps(ts) { return `<h4>النص (لكل المحدد)</h4><div class="row"><select data-s="ffAll"><option value="">— الخط —</option><option value="__auto">تلقائي حسب اللغة</option>${FONTS.map(([v, n]) => `<option value="${v}">${n}</option>`).join('')}</select></div><div class="row"><button class="b ic" data-a="fsAll-">A−</button><button class="b ic" data-a="fsAll+">A+</button><div class="seg"><button data-a="fwAll4">عادي</button><button data-a="fwAll7"><b>عريض</b></button></div></div><div class="row"><label>لون النص</label></div>${swatches('tcolAll', null)}`; }
   function shapeProps(l) {
     const r = (l.rad || [0])[0]; const rn = typeof r === 'number' ? r : px(r); const b = (l.bd || []).find(x => x && x.w > 0); const mixed = l.bd && l.bd.some(x => x && x.w > 0) && !l.bd.every(x => x && x.w > 0);
     return `${l._img ? `<div class="row"><button class="b" data-a="backImg" style="flex:1">${IC('image')} رجوع للصورة</button></div>` : ''}<h4>الشكل</h4><div class="row"><div class="seg"><button data-sh="rect" class="${l.shape !== 'ellipse' ? 'on' : ''}">${IC('square')} مستطيل</button><button data-sh="ellipse" class="${l.shape === 'ellipse' ? 'on' : ''}">${IC('circle')} دائرة</button></div></div>
@@ -5496,7 +5509,7 @@ body.phone #blockbar{z-index:86}
   }
   function syncEditing() { const el = L.editing; if (!el) return; const l = get(el.dataset.id); if (l) { l.html = cleanHtml(el.innerHTML); el._h = l.html; push(true); } }
   function stripProp(html, prop) { return html.replace(new RegExp(`(^|[;"\\s])${prop}\\s*:[^;"]*;?`, 'g'), '$1'); }
-  function applySelect(k, v) { const ts = topSel(); if (k === 'ff') { const l = ts[0]; l.st.ff = v; l.html = stripProp(l.html, 'font-family'); } if (k === 'ffAll' && v) ts.forEach(l => { if (l.type === 'text') { l.st.ff = v; l.html = stripProp(l.html, 'font-family'); } }); changed(); renderProps(); }
+  function applySelect(k, v) { const ts = topSel(); if (k === 'ff') { const l = ts[0]; if (v === '__auto') { l.st.ffMan = false; l.st.ff = autoFF(l, l.st.ff, true); } else { l.st.ff = v; l.st.ffMan = true; } l.html = stripProp(l.html, 'font-family'); } if (k === 'ffAll' && v) ts.forEach(l => { if (l.type === 'text') { if (v === '__auto') { l.st.ffMan = false; l.st.ff = autoFF(l, l.st.ff, true); } else { l.st.ff = v; l.st.ffMan = true; } l.html = stripProp(l.html, 'font-family'); } }); changed(); renderProps(); }
   function onPropsClick(e) {
     const b = e.target.closest('button'); if (!b || !L.on) return;
     if (b.dataset.c) { applyColor(b.dataset.c, b.dataset.v); return; }
@@ -7729,6 +7742,123 @@ window.CERT_ASSETS = {bg:"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wB
   });
   setTimeout(check, 2500); setInterval(check, 10 * 60 * 1000);
   addEventListener('online', check);
+})();
+
+</script>
+<script id="fontsScript">
+/* ==========================================================================
+   مصمم التواصل الداخلي · build 38 — الخطوط
+   1) Automatic: a text written in English inside an Arabic-styled line switches
+      to FS Industrie by itself, and Arabic typed into an English-styled line
+      switches to Tajawal. Lines that are Sequel on purpose (English title,
+      numbers) keep Sequel.
+   2) Manual: a «Font» row on the text bar — تلقائي / Tajawal / Sequel /
+      FS Industrie — for the selected words (or the whole text if nothing is
+      selected). A manual choice always wins over the automatic one.
+   ========================================================================== */
+(function () {
+  'use strict';
+  const qa = (s, r) => [...(r || document).querySelectorAll(s)];
+  const isTaj = f => /tajawal/i.test(f || '');
+  function langScore(t) { t = t || ''; return { lat: (t.match(/[A-Za-z]/g) || []).length, ar: (t.match(/[؀-ۿ]/g) || []).length }; }
+  function wants(baseFam, text) {
+    const { lat, ar } = langScore(text);
+    if (lat >= 2 && lat > ar * 1.5 && isTaj(baseFam.split(',')[0])) return "FSI, Tajawal, sans-serif";
+    if (ar >= 2 && ar > lat * 1.5 && !isTaj(baseFam.split(',')[0])) return "Tajawal, sans-serif";
+    return '';
+  }
+  // the units that get one font each: a paragraph of a body, or the text element itself
+  const UNITS = '.htitles .ht, #blocks .ed, #blocks .chip .ct, #blocks .iitem .itx span';
+  function units(root) {
+    const out = [];
+    qa(UNITS, root || page).forEach(el => { if (el.closest('.phx')) return; const ps = qa(':scope > p, :scope > div', el); if (ps.length) out.push(...ps); else out.push(el); });
+    return out;
+  }
+  function autoOne(el) {
+    if (!el || !el.isConnected || el.hasAttribute('data-ff')) return;
+    const had = el.dataset.autoff != null;
+    if (had) { el.style.removeProperty('font-family'); delete el.dataset.autoff; }
+    const base = getComputedStyle(el).fontFamily;
+    const w = wants(base, el.textContent);
+    if (w) { el.style.fontFamily = w; el.dataset.autoff = '1'; }
+    if (!el.getAttribute('style')) el.removeAttribute('style');
+  }
+  function autoAll(root) { try { units(root).forEach(autoOne); } catch (e) { } }
+
+  // typing: re-check the edited unit a moment after the last key
+  let t = 0;
+  page.addEventListener('input', e => {
+    const ed = e.target.closest && e.target.closest(UNITS); if (!ed) return;
+    clearTimeout(t); t = setTimeout(() => { const ps = qa(':scope > p, :scope > div', ed); (ps.length ? ps : [ed]).forEach(autoOne); }, 350);
+  });
+  // opening a design / switching tabs / adding elements
+  try { new MutationObserver(muts => { if (muts.some(m => [...m.addedNodes].some(n => n.nodeType === 1 && (n.matches('.blk,.hdr,#blocks,.htitles') || n.querySelector?.('.ed,.ht'))))) setTimeout(() => autoAll(), 60); }).observe(page, { childList: true, subtree: true }); } catch (e) { }
+  setTimeout(() => autoAll(), 900);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => autoAll());
+
+  /* ---------- manual choice on the text bar ---------- */
+  if (typeof tbar === 'undefined' || typeof TS === 'undefined' || typeof ensureSpans !== 'function') { window.__fontsApi = { autoAll, autoOne, wants }; return; }
+  const FF = [['', 'تلقائي', 'حسب لغة النص'], ['Tajawal', 'Tajawal', 'للعربي'], ['Sequel', 'Sequel', 'الأرقام والعناوين الإنجليزية'], ['FSI', 'FS Industrie', 'النص الإنجليزي']];
+  const row = document.createElement('div'); row.className = 'tr ffRow';
+  row.innerHTML = `<span class="tl">Font</span>${FF.map(([v, n, d]) => `<button type="button" data-ffv="${v}" title="${d}" style="${v ? `font-family:${v},Tajawal` : ''}">${n}</button>`).join('')}`;
+  tbar.appendChild(row);
+  function curFF() {
+    const n = TS.range && TS.ed && typeof selectedTextNodesPeek === 'function' ? selectedTextNodesPeek(TS.range, TS.ed)[0] : null;
+    let el = n ? n.parentElement : TS.ed; if (!el) return null;
+    const man = el.closest('[data-ff]'); return man && TS.ed && (TS.ed.contains(man) || man === TS.ed) ? man.getAttribute('data-ff') : '';
+  }
+  function mark() { const c = curFF(); row.querySelectorAll('[data-ffv]').forEach(b => b.classList.toggle('on', c != null && b.dataset.ffv === c)); }
+  function applyFF(v) {
+    if (!TS.range || !TS.ed || !page.contains(TS.ed)) return;
+    const spans = ensureSpans();
+    spans.forEach(sp => {
+      sp.querySelectorAll('[data-ff]').forEach(x => { x.removeAttribute('data-ff'); x.style.removeProperty('font-family'); if (!x.getAttribute('style')) x.removeAttribute('style'); });
+      if (v) { sp.setAttribute('data-ff', v); sp.style.fontFamily = v + ', Tajawal, sans-serif'; }
+      else { sp.removeAttribute('data-ff'); sp.style.removeProperty('font-family'); if (!sp.getAttribute('style')) sp.removeAttribute('style'); }
+    });
+    // whole text picked → the unit itself remembers the manual font too
+    const ed = TS.ed; try { if (!v) autoAll(ed.parentElement); } catch (e) { }
+    mark(); try { afterLayout(); } catch (e) { }
+  }
+  tbar.addEventListener('click', e => { const b = e.target.closest('[data-ffv]'); if (!b) return; e.stopPropagation(); applyFF(b.dataset.ffv); }, true);
+  const _sync = syncTbar; syncTbar = function () { const r = _sync.apply(this, arguments); try { mark(); } catch (x) { } return r; };
+  window.__fontsApi = { autoAll, autoOne, wants, applyFF };
+})();
+
+</script>
+<script id="mswScript">
+/* ==========================================================================
+   مصمم التواصل الداخلي · build 38 — التنقل بين «الإعلان» و«الطبقات»
+   One switch, in the same spot in both views: الإعلان | الطبقات.
+   · الإعلان: the editor with element types, cards, «تغيير النوع»…
+   · الطبقات: the Photoshop-style view of the same design.
+   Going back and forth keeps both: the layers copy is saved and reopened, and
+   if the announcement changed meanwhile the layers are rebuilt from it.
+   ========================================================================== */
+(function () {
+  'use strict';
+  const IC = n => (typeof svgIcon === 'function' ? svgIcon(n, 2) : '');
+  function mk(active) {
+    const w = document.createElement('div'); w.className = 'msw'; w.setAttribute('role', 'tablist'); w.setAttribute('aria-label', 'طريقة العرض');
+    w.innerHTML = `<button type="button" data-m="ann" role="tab" class="${active === 'ann' ? 'on' : ''}" title="واجهة الإعلان: البطاقات، أنواع العناصر، تغيير النوع…">${IC('layout-template')}<span>الإعلان</span></button><button type="button" data-m="lx" role="tab" class="${active === 'lx' ? 'on' : ''}" title="واجهة الطبقات: كل نص وصورة وشكل لحاله">${IC('layers')}<span>الطبقات</span></button>`;
+    return w;
+  }
+  function hook() {
+    // announcement bar
+    const bl = document.getElementById('bLayers');
+    if (bl && !bl.dataset.msw) { bl.dataset.msw = '1';
+      const w = mk('ann'); bl.before(w); w.querySelector('[data-m=lx]').addEventListener('click', e => { e.stopPropagation(); bl.click(); });
+      bl.classList.add('mswHid');
+    }
+    // layers bar
+    const back = document.getElementById('lxBack');
+    if (back && !back.dataset.msw) { back.dataset.msw = '1';
+      const w = mk('lx'); back.before(w); w.querySelector('[data-m=ann]').addEventListener('click', e => { e.stopPropagation(); back.click(); });
+      back.classList.add('mswHid');
+    }
+  }
+  hook(); [300, 1200, 3000, 6000].forEach(t => setTimeout(hook, t));
+  try { new MutationObserver(() => { const a = document.getElementById('bLayers'), c = document.getElementById('lxBack'); if ((a && !a.dataset.msw) || (c && !c.dataset.msw)) hook(); }).observe(document.body, { childList: true, subtree: true }); } catch (e) { }
 })();
 
 </script>

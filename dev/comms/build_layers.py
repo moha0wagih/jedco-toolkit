@@ -9,7 +9,7 @@ import pathlib, re
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 TARGET = ROOT / 'tools' / 'comms' / 'index.html'
-BUILD = 'build 37'
+BUILD = 'build 38'
 
 css = (HERE / 'layers.css').read_text(encoding='utf-8')
 js = (HERE / 'layers.js').read_text(encoding='utf-8')
@@ -28,12 +28,15 @@ js7 = (HERE / 'conv.js').read_text(encoding='utf-8')
 js8 = (HERE / 'cert.js').read_text(encoding='utf-8')
 js9 = (HERE / 'titles2.js').read_text(encoding='utf-8')
 js10 = (HERE / 'update.js').read_text(encoding='utf-8')
+js11 = (HERE / 'fonts2.js').read_text(encoding='utf-8')
+js12 = (HERE / 'modesw.js').read_text(encoding='utf-8')
 import base64
 def b64(name, mime):
     return f'data:{mime};base64,' + base64.b64encode((HERE / 'cert' / name).read_bytes()).decode()
 cert_assets = ('window.CERT_ASSETS = {' + f'bg:"{b64("bg.jpg", "image/jpeg")}",titleAr:"{b64("title_ar.png", "image/png")}",sig:"{b64("sig_default.png", "image/png")}"' + '};')
 assert '</script>' not in js and '</script>' not in js2 and '</script>' not in js3 and '</script>' not in js4 and '</script>' not in js5 and '</script>' not in js6 and '</script>' not in js7 and '</script>' not in js8 and '</script>' not in js9, 'scripts must not contain a closing script tag'
 # v2.0: start page + share by Outlook run after the layers studio
+# build 38: fonts2.js (auto English/Arabic font + Font row) · modesw.js (الإعلان | الطبقات switch)
 # build 37: update.js — online copy shows a one-tap «new version» bar
 # build 35: titles2.js — each header title can be one or two lines on its own, lines below move down
 # build 34: conv.js — change an element's type (text ↔ cards ↔ list …); cert.js — certificate template (AR/EN, logo choice, signature upload, PNG/PDF, many names)
@@ -42,7 +45,7 @@ assert '</script>' not in js and '</script>' not in js2 and '</script>' not in j
 # build 31: v3.js — export weight fix, project tabs + copy/paste, free artboard, presentation bar
 # build 30: format painter for the announcement editor (fmt.js) runs last
 block = (f'<!-- LAYERS-STUDIO -->\n<style id="lxStyle">\n{css}\n{css2}\n{css3}\n{css4}\n{css5}\n{css6}\n{css7}\n</style>\n<script id="lxScript">\n{js}\n</script>\n'
-         f'<script id="v2Script">\n{js2}\n</script>\n<script id="fmtScript">\n{js3}\n</script>\n<script id="v3Script">\n{js4}\n</script>\n<script id="tcolScript">\n{js5}\n</script>\n<script id="ui4Script">\n{js6}\n</script>\n<script id="convScript">\n{js7}\n</script>\n<script id="certAssets">\n{cert_assets}\n</script>\n<script id="certScript">\n{js8}\n</script>\n<script id="titlesScript">\n{js9}\n</script>\n<script id="updScript">\n{js10}\n</script>\n<!-- /LAYERS-STUDIO -->\n')
+         f'<script id="v2Script">\n{js2}\n</script>\n<script id="fmtScript">\n{js3}\n</script>\n<script id="v3Script">\n{js4}\n</script>\n<script id="tcolScript">\n{js5}\n</script>\n<script id="ui4Script">\n{js6}\n</script>\n<script id="convScript">\n{js7}\n</script>\n<script id="certAssets">\n{cert_assets}\n</script>\n<script id="certScript">\n{js8}\n</script>\n<script id="titlesScript">\n{js9}\n</script>\n<script id="updScript">\n{js10}\n</script>\n<script id="fontsScript">\n{js11}\n</script>\n<script id="mswScript">\n{js12}\n</script>\n<!-- /LAYERS-STUDIO -->\n')
 
 html = TARGET.read_text(encoding='utf-8')
 html = re.sub(r'<!-- LAYERS-STUDIO -->.*?<!-- /LAYERS-STUDIO -->\n?', '', html, flags=re.S)

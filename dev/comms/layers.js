@@ -82,6 +82,8 @@
   const topSel = () => { const s = L.sel.map(get).filter(Boolean); return s.filter(l => !s.some(o => o !== l && o.type === 'group' && isIn(l.id, o.id))); };
   const selBox = () => union(topSel().map(l => aabb(l)));
   const textOf = l => { if (!l) return ''; if (l.type === 'text') { const t = document.createElement('div'); t.innerHTML = l.html; return t.textContent.replace(/\s+/g, ' ').trim(); } if (l.type === 'group') { const ts = l.children.map(textOf).filter(Boolean); return ts.find(t => /[\p{L}\d]{2}/u.test(t)) || ts[0] || ''; } return ''; };
+  // build 38: English text → FS Industrie, Arabic → Tajawal, unless the font was picked by hand
+  const autoFF = (l, cur, force) => { const t = textOf(l); const lat = (t.match(/[A-Za-z]/g) || []).length, ar = (t.match(/[\u0600-\u06FF]/g) || []).length; const f = String(cur || '').split(',')[0].replace(/['"]/g, '').trim(); if (force && lat > ar) return 'FSI'; if (force && ar >= lat && ar > 0) return 'Tajawal'; if (lat >= 2 && lat > ar * 1.5 && /^tajawal$/i.test(f)) return 'FSI'; if (ar >= 2 && ar > lat * 1.5 && !/^tajawal$/i.test(f)) return 'Tajawal'; return cur; };
   function nameOf(l) { if (l.name) return l.name; if (l.type === 'text') return textOf(l).slice(0, 40) || 'نص'; if (l.type === 'group') { const t = textOf(l); if (t) return 'مجموعة · ' + t.slice(0, 26); const f = leaves(l).find(c => c.type === 'image' || c.type === 'svg'); return f ? 'مجموعة · ' + (f.name || TYPE_AR[f.type]) : 'مجموعة'; } return TYPE_AR[l.type] || 'طبقة'; }
 
   /* ---------------- render ---------------- */
@@ -406,7 +408,7 @@
   function cleanHtml(h) { const t = document.createElement('template'); t.innerHTML = h; t.content.querySelectorAll('script,style,iframe,object,embed,link,meta').forEach(x => x.remove()); t.content.querySelectorAll('*').forEach(n => [...n.attributes].forEach(a => { if (/^on/i.test(a.name) || /javascript:/i.test(a.value) || a.name === 'contenteditable' || a.name === 'class') n.removeAttribute(a.name); })); return t.innerHTML; }
   function finishEdit(save) {
     tbHide(); const el = L.editing; if (!el) return; L.editing = null; el.removeAttribute('contenteditable'); const l = get(el.dataset.id);
-    if (l && save) { const h = cleanHtml(el.innerHTML); const empty = !el.textContent.trim() && !el.querySelector('img,svg'); if (empty) { removeIds([l.id]); return; } if (h !== l.html) { l.html = h; el._h = h; changed(); } }
+    if (l && save) { const h = cleanHtml(el.innerHTML); const empty = !el.textContent.trim() && !el.querySelector('img,svg'); if (empty) { removeIds([l.id]); return; } if (h !== l.html) { l.html = h; el._h = h; if (!l.st.ffMan) { const nf = autoFF(l, l.st.ff); if (nf !== l.st.ff) { l.st.ff = nf; say(nf === 'FSI' ? 'النص إنجليزي — صار بخط FS Industrie تلقائياً (تقدر تغيّره من «الخط»)' : 'النص عربي — صار بخط Tajawal تلقائياً'); } } changed(); } }
     try { getSelection().removeAllRanges(); } catch (x) { }
     paint(); renderProps();
   }
@@ -705,7 +707,7 @@
     const lh = t.lh ? R2(t.lh) : 1.2;
     return `<h4>النص ${ed ? '<small style="font-weight:400;color:#FC5C17">· وضع الكتابة: الألوان والحجم والعريض تنطبق على الكلام المظلل</small>' : ''}</h4>
     <div class="row"><button class="b pri" data-a="${ed ? 'endEdit' : 'edit'}" style="flex:1">${IC(ed ? 'badge-check' : 'pen-line')} ${ed ? 'إنهاء الكتابة (Esc)' : 'تعديل الكلام (دبل كليك)'}</button></div>
-    <div class="row"><select data-s="ff">${FONTS.map(([v, n]) => `<option value="${v}"${fam === v ? ' selected' : ''}>${n}</option>`).join('')}${FONTS.some(f => f[0] === fam) ? '' : `<option value="${ESC(fam)}" selected>${ESC(fam)} (خارج الهوية)</option>`}</select></div>
+    <div class="row"><label>الخط</label></div><div class="row"><select data-s="ff"><option value="__auto"${!t.ffMan ? ' selected' : ''}>تلقائي حسب اللغة${!t.ffMan && fam ? ' · ' + ESC(fam === 'FSI' ? 'FS Industrie' : fam) : ''}</option>${FONTS.map(([v, n]) => `<option value="${v}"${t.ffMan && fam === v ? ' selected' : ''}>${n}</option>`).join('')}${FONTS.some(f => f[0] === fam) ? '' : `<option value="${ESC(fam)}"${t.ffMan ? ' selected' : ''}>${ESC(fam)} (خارج الهوية)</option>`}</select></div>
     <div class="row"><div class="seg" style="flex:none;width:120px"><button data-a="fw4" class="${+t.fw < 600 ? 'on' : ''}">عادي</button><button data-a="fw7" class="${+t.fw >= 600 ? 'on' : ''}"><b>عريض</b></button></div>${num('fs', 'px', R1(t.fs))}<button class="b ic" data-a="fs-" title="أصغر">A−</button><button class="b ic" data-a="fs+" title="أكبر">A+</button></div>
     <div class="row"><div class="seg">${[['right', 'align-right', 'يمين'], ['center', 'align-center', 'وسط'], ['left', 'align-left', 'يسار'], ['justify', 'align-justify', 'ضبط']].map(([k, i, n]) => `<button data-ta="${k}" class="${(t.ta || 'right') === k ? 'on' : ''}" title="${n}">${IC(i)}</button>`).join('')}</div><div class="seg" style="flex:none;width:86px"><button data-dir="rtl" class="${t.dir !== 'ltr' ? 'on' : ''}" title="عربي (من اليمين)">ع</button><button data-dir="ltr" class="${t.dir === 'ltr' ? 'on' : ''}" title="English (from the left)">En</button></div></div>
     <div class="row"><label>لون النص</label></div>${swatches('tcol', t.col)}
@@ -715,7 +717,7 @@
     <div class="row"><label>الارتفاع</label><div class="seg"><button data-a="ahOn" class="${l.ah !== false ? 'on' : ''}">تلقائي</button><button data-a="ahOff" class="${l.ah === false ? 'on' : ''}">ثابت</button></div></div>
     <div class="row"><label>خلفية النص</label></div>${swatches('tbg', t.bg, true)}`;
   }
-  function multiTextProps(ts) { return `<h4>النص (لكل المحدد)</h4><div class="row"><select data-s="ffAll"><option value="">— الخط —</option>${FONTS.map(([v, n]) => `<option value="${v}">${n}</option>`).join('')}</select></div><div class="row"><button class="b ic" data-a="fsAll-">A−</button><button class="b ic" data-a="fsAll+">A+</button><div class="seg"><button data-a="fwAll4">عادي</button><button data-a="fwAll7"><b>عريض</b></button></div></div><div class="row"><label>لون النص</label></div>${swatches('tcolAll', null)}`; }
+  function multiTextProps(ts) { return `<h4>النص (لكل المحدد)</h4><div class="row"><select data-s="ffAll"><option value="">— الخط —</option><option value="__auto">تلقائي حسب اللغة</option>${FONTS.map(([v, n]) => `<option value="${v}">${n}</option>`).join('')}</select></div><div class="row"><button class="b ic" data-a="fsAll-">A−</button><button class="b ic" data-a="fsAll+">A+</button><div class="seg"><button data-a="fwAll4">عادي</button><button data-a="fwAll7"><b>عريض</b></button></div></div><div class="row"><label>لون النص</label></div>${swatches('tcolAll', null)}`; }
   function shapeProps(l) {
     const r = (l.rad || [0])[0]; const rn = typeof r === 'number' ? r : px(r); const b = (l.bd || []).find(x => x && x.w > 0); const mixed = l.bd && l.bd.some(x => x && x.w > 0) && !l.bd.every(x => x && x.w > 0);
     return `${l._img ? `<div class="row"><button class="b" data-a="backImg" style="flex:1">${IC('image')} رجوع للصورة</button></div>` : ''}<h4>الشكل</h4><div class="row"><div class="seg"><button data-sh="rect" class="${l.shape !== 'ellipse' ? 'on' : ''}">${IC('square')} مستطيل</button><button data-sh="ellipse" class="${l.shape === 'ellipse' ? 'on' : ''}">${IC('circle')} دائرة</button></div></div>
@@ -810,7 +812,7 @@
   }
   function syncEditing() { const el = L.editing; if (!el) return; const l = get(el.dataset.id); if (l) { l.html = cleanHtml(el.innerHTML); el._h = l.html; push(true); } }
   function stripProp(html, prop) { return html.replace(new RegExp(`(^|[;"\\s])${prop}\\s*:[^;"]*;?`, 'g'), '$1'); }
-  function applySelect(k, v) { const ts = topSel(); if (k === 'ff') { const l = ts[0]; l.st.ff = v; l.html = stripProp(l.html, 'font-family'); } if (k === 'ffAll' && v) ts.forEach(l => { if (l.type === 'text') { l.st.ff = v; l.html = stripProp(l.html, 'font-family'); } }); changed(); renderProps(); }
+  function applySelect(k, v) { const ts = topSel(); if (k === 'ff') { const l = ts[0]; if (v === '__auto') { l.st.ffMan = false; l.st.ff = autoFF(l, l.st.ff, true); } else { l.st.ff = v; l.st.ffMan = true; } l.html = stripProp(l.html, 'font-family'); } if (k === 'ffAll' && v) ts.forEach(l => { if (l.type === 'text') { if (v === '__auto') { l.st.ffMan = false; l.st.ff = autoFF(l, l.st.ff, true); } else { l.st.ff = v; l.st.ffMan = true; } l.html = stripProp(l.html, 'font-family'); } }); changed(); renderProps(); }
   function onPropsClick(e) {
     const b = e.target.closest('button'); if (!b || !L.on) return;
     if (b.dataset.c) { applyColor(b.dataset.c, b.dataset.v); return; }

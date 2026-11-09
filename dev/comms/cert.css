@@ -102,3 +102,14 @@ body.phone #blockbar{z-index:86}
 #updBar button{border:0;border-radius:8px;height:32px;padding:0 12px;font:700 13px Tajawal,sans-serif;cursor:pointer}
 #updBar [data-u=go]{background:#fff;color:#0E1D40}
 #updBar [data-u=x]{background:none;color:#fff;font-size:20px;padding:0 6px}
+/* ---------- build 38 · view switch + fonts ---------- */
+.msw{display:inline-flex;align-items:center;gap:2px;padding:3px;border-radius:11px;background:rgba(255,255,255,.12);flex:none}
+.msw button{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border:0;border-radius:8px;background:none;color:rgba(255,255,255,.78);font:600 13.5px Tajawal,sans-serif;cursor:pointer;white-space:nowrap}
+.msw button svg{width:16px;height:16px}
+.msw button:hover{color:#fff;background:rgba(255,255,255,.1)}
+.msw button.on{background:#fff;color:#0E1D40;cursor:default}
+.mswHid{display:none!important}
+body.phone .msw button span{display:none}
+#tbar .ffRow{gap:4px}
+#tbar .ffRow button{min-width:0;height:26px;padding:0 8px;font-size:12px;white-space:nowrap}
+#tbar .ffRow button.on{outline:2px solid #2FC0C7;outline-offset:1px}
