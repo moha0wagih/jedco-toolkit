@@ -148,6 +148,28 @@ PM.addSlide = function (deck, spec, at, o = {}) {
 };
 PM.buildDeck = function (deck) {
   deck.slides.forEach((s, i) => { if (!s.layout) PM.autoSlide(deck, i); else PM.relayout(deck, i); });
+  PM.spreadPhotos(deck);
+};
+/* no picture of the uploaded file is ever dropped: the ones a slide's design could not hold get a photo slide right after it */
+PM.spreadPhotos = function (deck) {
+  if (deck.photosSpread) return 0;
+  deck.photosSpread = true;
+  let made = 0;
+  for (let i = 0; i < deck.slides.length && made < 40; i++) {
+    const s = deck.slides[i];
+    if (s.asis || s.hidden || s.spec.kind !== 'content') continue;
+    const mine = (s.spec.imgs || []).filter(id => deck.assets[id]);
+    if (!mine.length) continue;
+    const shown = new Set((s.objs || []).filter(o => o.t === 'image').map(o => o.src));
+    const left = mine.filter(id => !shown.has(id));
+    if (!left.length || (s.spec.photoOf && !shown.size)) continue;
+    s.spec.imgs = mine.filter(id => shown.has(id));
+    // the photo slide is looked at in its turn, so a long row of pictures becomes as many photo slides as it needs
+    PM.addSlide(deck, { kind: 'content', title: s.spec.title || '', sub: '', eyebrow: s.spec.eyebrow || '', blocks: [], imgs: left, photoOf: s.spec.photoOf || s.id }, i + 1);
+    PM.autoSlide(deck, i + 1);
+    made++;
+  }
+  return made;
 };
 /* page numbers change when slides move: refresh just the page-number boxes */
 PM.renumber = function (deck) {

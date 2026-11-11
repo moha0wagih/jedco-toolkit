@@ -33,6 +33,8 @@ PM.importFile = async function (file, opts = {}) {
   }
   for (const spec of res.specs) {
     if (spec.kind === 'content' && !spec.blocks.length && !spec.imgs.length && !spec.title) continue;
+    // the same text read twice from one slide is shown once
+    if (spec.blocks && spec.blocks.length > 1) { const seen = new Set(); spec.blocks = spec.blocks.filter(b => { const key = b.k + '|' + PM.cleanText(b.text || JSON.stringify(b.items || b.rows || b.chart || b.a || '')); if (seen.has(key)) return false; seen.add(key); return true; }); }
     PM.addSlide(deck, spec);
   }
   // make sure the deck opens and closes properly

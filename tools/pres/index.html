@@ -562,6 +562,18 @@ textarea.inp.dr-ta.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-s
 }
 @media (max-width:480px){ .tb .tbb{padding:0 7px;min-width:0} .tb .tbb.ic{width:32px} .tb{gap:0} }
 @media (min-width:861px){ .modal.dr-framed{padding-bottom:108px} .modal.dr-framed .mbox.dr-box{max-height:calc(100vh - 132px)} }
+/* ---------- build 2 · «بسيط» و«متقدم» ---------- */
+#segMode{margin-inline-end:6px}
+.tb #segMode{display:inline-flex}
+.pm-simple #segBg,.pm-simple #segTone,.pm-simple #bCopilot,.pm-simple #bStory{display:none!important}
+.pm-simple .dock,.pm-simple #dkOpen,.pm-simple #lbPrev,.pm-simple #lbNext,.pm-simple .lb-name,.pm-simple #bLib,.pm-simple #bReview{display:none!important}
+.pm-simple #tabs [data-t="layers"],.pm-simple #tabs [data-t="gen"],.pm-simple #tabs [data-t="notes"]{display:none}
+.pm-simple #tabs{justify-content:flex-start}
+.pm-simple .ctxbar .cbs,.pm-simple .ctxbar [data-a="directive"],.pm-simple .ctxbar [data-a="tabGen"],.pm-simple .ctxbar [data-a="selAll"],.pm-simple .ctxbar [data-a="paint"],.pm-simple .ctxbar [data-a="sug"],.pm-simple .ctxbar [data-a="gen"],.pm-simple .ctxbar [data-a="txReset"],.pm-simple .ctxbar [data-a="pin"],.pm-simple .ctxbar .rng:has(#txW){display:none!important}
+.pm-simple .ctxbar{gap:6px}
+.pm-simple .laybar{justify-content:center}
+@media (max-width:860px){ .tb #segMode{display:none} }
+@media (min-width:861px){ .pm-simple .tb .tbb .t{display:inline!important} }
 
 </style>
 </head>
@@ -583,6 +595,7 @@ textarea.inp.dr-ta.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-s
         <button data-a="find"><svg class="i" data-ic="search"></svg>بحث واستبدال<span class="k">Ctrl+F</span></button>
         <button data-a="recent"><svg class="i" data-ic="history"></svg>ملفاتي…</button>
         <hr>
+        <button data-a="mode"><svg class="i" data-ic="sliders-horizontal"></svg><span>أظهر كل الأدوات (متقدم)</span></button>
         <button data-a="home"><svg class="i" data-ic="house"></svg>شاشة البداية</button>
       </div>
     </div>
@@ -590,6 +603,7 @@ textarea.inp.dr-ta.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-s
     <button class="tbb ic" id="bRedo" title="إعادة (Ctrl+Y)"><svg class="i" data-ic="redo-2"></svg></button>
     <span class="saved" id="savedLbl"></span>
     <span class="sp"></span>
+    <div class="seg" id="segMode" title="بسيط: الأساسيات فقط · متقدم: كل الأدوات"><button data-v="simple" class="on">بسيط</button><button data-v="adv">متقدم</button></div>
     <div class="seg wide" id="segBg" title="لون الصفحات"><button data-v="white">أبيض</button><button data-v="grey">رمادي فاتح</button></div>
     <div class="seg wide" id="segTone" title="نمط العرض"><button data-v="light">فاتح</button><button data-v="dark">داكن</button></div>
     <button class="tbb" id="bDirector" title="المخرج: ابنِ عرض كامل من مادة خام أو فكرة"><svg class="i" data-ic="clapperboard"></svg><span class="t">المخرج</span></button>
@@ -673,7 +687,7 @@ textarea.inp.dr-ta.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-s
       <button class="st-btn hide" id="stBack"><svg class="i" data-ic="arrow-right"></svg>رجوع للعرض الحالي</button>
     </div>
     <div class="st-recent hide" id="stRecent"><h5>ملفاتي (محفوظة تلقائياً على هذا الجهاز)</h5><div id="stRecentList"></div></div>
-    <div class="credit">Designed by Mohammed Wagih · 2026 · v2.0 · build 1</div>
+    <div class="credit">Designed by Mohammed Wagih · 2026 · v2.0 · build 2</div>
   </div>
 </div>
 
@@ -939,6 +953,11 @@ async function parsePptx(zip, opts = {}) {
 
     const tx = (t, x) => t ? (t.ox + (x - t.cox) * t.sx) : x;
     const ty = (t, y) => t ? (t.oy + (y - t.coy) * t.sy) : y;
+    if (bg) {
+      const bbf = kid(kid(bg, 'p:bgPr'), 'a:blipFill'), bblip = bbf && kid(bbf, 'a:blip');
+      const brid = bblip && attr(bblip, 'r:embed', null), br0 = brid && slide.rels[brid];
+      if (br0 && !br0.external) { const bmp = await loadMedia(br0.target); if (bmp) els.push({ name: 'Background picture', ph: null, group: null, x: 0, y: 0, w: SW, h: SH, type: 'pic', media: bmp, svg: null, crop: null, video: false, bg: true }); }
+    }
 
     async function walk(tree, T, groupId) {
       for (const n of kids(tree)) {
@@ -1021,6 +1040,13 @@ async function parsePptx(zip, opts = {}) {
             if (ph && ph.type === 'body' && !isTitle) paras.forEach(p => { if (p.bullet === null) p.bullet = 'inherit'; });
           }
           const hasText = paras.some(p => p.text.trim());
+          // a shape filled with a picture (a photo cropped into a circle or a rounded box) is a picture too
+          const sbf = spPr && kid(spPr, 'a:blipFill');
+          const sblip = sbf && kid(sbf, 'a:blip');
+          if (sblip) {
+            const srid = attr(sblip, 'r:embed', null), sr0 = srid && slide.rels[srid];
+            if (sr0 && !sr0.external) { const smp = await loadMedia(sr0.target); if (smp) els.push({ ...base, type: 'pic', media: smp, svg: null, crop: null, video: false, fromFill: true }); }
+          }
           const isLine = nm === 'p:cxnSp' || ['line', 'straightConnector1', 'bentConnector2', 'bentConnector3', 'curvedConnector3'].includes(prst) || box.h < 2.5 || box.w < 2.5;
           if (isLine && !hasText) { els.push({ ...base, type: 'line', color: line || fill }); continue; }
           if (fill || line) els.push({ ...base, type: 'shape', prst, fill, line, hasText, txIdx: hasText ? els.length + 1 : null });
@@ -5847,9 +5873,16 @@ async function analyzePptx(parsed, opt = {}) {
   };
   const specs = [];
   let ai = 0;
+  // the same picture on half the slides is the old template (logo, corner art, background), not content
+  const mediaOn = {};
+  S.forEach(s => new Set(s.els.filter(e => e.type === 'pic').map(e => e.media)).forEach(m => mediaOn[m] = (mediaOn[m] || 0) + 1));
+  const chromeMedia = m => S.length >= 4 && mediaOn[m] >= Math.max(3, Math.ceil(S.length * 0.5));
+  const assetOf = {};
   for (let si = 0; si < S.length; si++) {
     const s = S[si];
-    const pics = s.els.filter(e => e.type === 'pic' && e.w * e.h > 960 * 540 * 0.05 && !e.video);
+    // every real picture counts: small ones in a grid too (logos and bullets stay out by size)
+    const seenM = new Set();
+    const pics = s.els.filter(e => e.type === 'pic' && !e.video && e.w * e.h > 960 * 540 * 0.016 && Math.min(e.w, e.h) > 46 && !chromeMedia(e.media) && !seenM.has(e.media) && seenM.add(e.media));
     const shapes = s.els.filter(e => e.type === 'shape' && (e.fill || e.line) && e.w * e.h > 960 * 540 * 0.012 && e.w * e.h < 960 * 540 * 0.6 && e.w > 40 && e.h > 30);
     /* segments: one text box may hold an eyebrow + a title + a paragraph; split them by role */
     const segs = [], noteLines = [];
@@ -5873,13 +5906,14 @@ async function analyzePptx(parsed, opt = {}) {
     const segSize = g => Math.max(...g.paras.map(p => p.size || 12));
     const segText = g => g.paras.map(paraText).join('\n');
     const spec = { kind: 'content', title: '', sub: '', eyebrow: '', blocks: [], imgs: [], notes: [s.notes || '', ...noteLines].filter(Boolean).join('\n'), src: s.index };
-    for (const p of pics.sort((a, b) => b.w * b.h - a.w * a.h).slice(0, 4)) {
+    for (const p of pics.sort((a, b) => (a.bg ? 1 : 0) - (b.bg ? 1 : 0) || b.w * b.h - a.w * a.h).slice(0, 8)) {
       const m = parsed.media[p.media]; if (!m) continue;
       const ext = m.ext === 'jpg' ? 'jpeg' : m.ext;
       if (!/^(png|jpeg|gif|webp)$/.test(ext)) continue;
       if (ext === 'png' && decorative(m.bytes)) continue; // transparent line art / patterns, not photos
-      const id = 'p' + (++ai);
-      assets[id] = { kind: 'image', bytes: m.bytes, ext, size: imgSizeOf(m.bytes) };
+      // one picture used on several slides is one asset
+      let id = assetOf[p.media];
+      if (!id) { id = assetOf[p.media] = 'p' + (++ai); assets[id] = { kind: 'image', bytes: m.bytes, ext, size: imgSizeOf(m.bytes) }; }
       spec.imgs.push(id);
     }
     // giant lone digits (section numbers) carry nothing
@@ -6716,17 +6750,46 @@ PM.layoutQuality = function (objs, c) {
   if (!full) { const bal = mw ? Math.abs(mx / mw - 480) / 960 : 0; q *= 1 - Math.min(0.3, Math.max(0, bal - 0.06) * 1.6); const fill = area / (840 * 438); if (fill < 0.2) q *= 0.88; }
   return q;
 };
+/* how well a rendered layout treats the slide's own pictures:
+   shown   — how many of them it really draws
+   factor  — a score multiplier: a layout that hides the pictures loses, one that shows them sharp and barely cropped wins */
+PM.photoFit = function (objs, want, c) {
+  const boxes = {};
+  objs.forEach(o => { if (o.t === 'image' && want.includes(o.src) && !boxes[o.src]) boxes[o.src] = o; });
+  const ids = Object.keys(boxes);
+  if (!ids.length) return { shown: 0, factor: 0.3 };
+  let fit = 0;
+  for (const id of ids) {
+    const o = boxes[id], a = (c.assets || {})[id], sz = a && a.size;
+    let f = 1;
+    if (sz && sz.w && sz.h) {
+      const ai = sz.w / sz.h, ab = o.w / o.h;
+      const kept = Math.min(ai / ab, ab / ai);                        // share of the picture left after filling the frame
+      if (kept < 0.34) f *= 0.6; else if (kept < 0.5) f *= 0.8; else if (kept > 0.8) f *= 1.06;
+      const up = Math.max(o.w * 1.6 / sz.w, o.h * 1.6 / sz.h);       // small pictures blown up to a big frame go soft
+      if (up > 1.5) f *= Math.max(0.3, Math.min(1, 1.5 / up + 0.08));   // the smaller the frame, the sharper a small picture stays
+    }
+    fit += f;
+  }
+  const n = Math.min(want.length, 4);
+  return { shown: ids.length, factor: (fit / ids.length) * (0.86 + 0.44 * Math.min(ids.length, n) / n) };
+};
 PM.autoLayout = function (spec, c, avoid = []) {
   const cand = PM.candidates(spec, c);
+  const want = (spec.imgs || []).filter(id => (c.assets || {})[id]);
   let best = null;
-  for (const { L, s } of cand.slice(0, 14)) {
+  // a slide that came with pictures looks further down the list until it finds a design that shows them
+  const lim = want.length ? 60 : 14;
+  for (const { L, s } of cand.slice(0, lim)) {
+    if (want.length && best && best.shown && s < cand[0].s * 0.8) break;
     const r = PM.renderLayout(L, spec, c);
     if (r.missing && r.missing.length) continue;
     const pen = (r.overflow ? 0.35 : 1) * (avoid.includes(L.fam) ? 0.82 : 1) * (avoid.includes(L.id) ? 0.5 : 1);
     const q = PM.layoutQuality(r.objs, c);
-    const sc = s * pen * (0.45 + 0.55 * q);
-    if (!best || sc > best.sc) best = { L, sc, r };
-    if (!r.overflow && q > 0.97 && s >= cand[0].s * 0.97) break;
+    let sc = s * pen * (0.45 + 0.55 * q), shown = 0;
+    if (want.length) { const f = PM.photoFit(r.objs, want, c); sc *= f.factor; shown = f.shown; }
+    if (!best || sc > best.sc) best = { L, sc, r, shown };
+    if (!want.length && !r.overflow && q > 0.97 && s >= cand[0].s * 0.97) break;
   }
   return best;
 };
@@ -14218,6 +14281,28 @@ PM.addSlide = function (deck, spec, at, o = {}) {
 };
 PM.buildDeck = function (deck) {
   deck.slides.forEach((s, i) => { if (!s.layout) PM.autoSlide(deck, i); else PM.relayout(deck, i); });
+  PM.spreadPhotos(deck);
+};
+/* no picture of the uploaded file is ever dropped: the ones a slide's design could not hold get a photo slide right after it */
+PM.spreadPhotos = function (deck) {
+  if (deck.photosSpread) return 0;
+  deck.photosSpread = true;
+  let made = 0;
+  for (let i = 0; i < deck.slides.length && made < 40; i++) {
+    const s = deck.slides[i];
+    if (s.asis || s.hidden || s.spec.kind !== 'content') continue;
+    const mine = (s.spec.imgs || []).filter(id => deck.assets[id]);
+    if (!mine.length) continue;
+    const shown = new Set((s.objs || []).filter(o => o.t === 'image').map(o => o.src));
+    const left = mine.filter(id => !shown.has(id));
+    if (!left.length || (s.spec.photoOf && !shown.size)) continue;
+    s.spec.imgs = mine.filter(id => shown.has(id));
+    // the photo slide is looked at in its turn, so a long row of pictures becomes as many photo slides as it needs
+    PM.addSlide(deck, { kind: 'content', title: s.spec.title || '', sub: '', eyebrow: s.spec.eyebrow || '', blocks: [], imgs: left, photoOf: s.spec.photoOf || s.id }, i + 1);
+    PM.autoSlide(deck, i + 1);
+    made++;
+  }
+  return made;
 };
 /* page numbers change when slides move: refresh just the page-number boxes */
 PM.renumber = function (deck) {
@@ -15402,6 +15487,8 @@ PM.importFile = async function (file, opts = {}) {
   }
   for (const spec of res.specs) {
     if (spec.kind === 'content' && !spec.blocks.length && !spec.imgs.length && !spec.title) continue;
+    // the same text read twice from one slide is shown once
+    if (spec.blocks && spec.blocks.length > 1) { const seen = new Set(); spec.blocks = spec.blocks.filter(b => { const key = b.k + '|' + PM.cleanText(b.text || JSON.stringify(b.items || b.rows || b.chart || b.a || '')); if (seen.has(key)) return false; seen.add(key); return true; }); }
     PM.addSlide(deck, spec);
   }
   // make sure the deck opens and closes properly
@@ -19817,25 +19904,31 @@ function tidySpecs(specs, o) {
   const fin = res.filter((s, i) => !(s.kind === 'divider' && res[i + 1] && ['divider', 'closing'].includes(res[i + 1].kind)));
   return { specs: fin, split };
 }
-/* pictures of the source file go to the new slide that talks about the same thing */
+/* every picture of the source file comes along: to the new slide that talks about the same thing,
+   otherwise to the slide at the same point of the story (extra pictures get a photo slide of their own at build time) */
 function reattach(specs, src) {
   if (!src || !src.length) return 0;
   const targets = specs.filter(s => s.kind === 'content').map(s => ({ s, t: tok(PM.specText(s)) }));
-  let n = 0;
-  for (const o of src) {
-    if (!(o.imgs || []).length || o.kind === 'cover') continue;
-    const t = tok(PM.specText(o)); if (t.size < 2) continue;
+  if (!targets.length) return 0;
+  const placed = new Set(); let n = 0;
+  const body = src.filter(o => o.kind !== 'cover' && o.kind !== 'closing');
+  body.forEach((o, k) => {
+    const imgs = (o.imgs || []).filter(id => !placed.has(id));
+    if (!imgs.length) return;
+    const t = tok(PM.specText(o));
     let best = null, bs = 0;
-    for (const x of targets) { if ((x.s.imgs || []).length >= 1) continue; let hit = 0; t.forEach(w => { if (x.t.has(w)) hit++; }); const sc = hit / Math.sqrt(t.size * Math.max(1, x.t.size)); if (sc > bs) { bs = sc; best = x; } }
-    if (best && bs >= 0.22) { best.s.imgs = o.imgs.slice(0, 1); n++; }
-  }
+    if (t.size >= 2) for (const x of targets) { let hit = 0; t.forEach(w => { if (x.t.has(w)) hit++; }); const sc = hit / Math.sqrt(t.size * Math.max(1, x.t.size)); if (sc > bs) { bs = sc; best = x; } }
+    if (!best || bs < 0.22) best = targets[Math.min(targets.length - 1, Math.round(k / Math.max(1, body.length - 1) * (targets.length - 1)))];
+    best.s.imgs = (best.s.imgs || []).concat(imgs);
+    imgs.forEach(id => placed.add(id)); n += imgs.length;
+  });
   return n;
 }
 D.buildDeck = function (specs, o) {
   const d = PM.newDeck({ lang: o.lang, grey: !!o.grey, dark: !!o.dark, name: o.name || '' });
   for (const [id, a] of Object.entries(o.assets || {})) {
     if (!a) continue;
-    if (a.bytes && !a.kind) d.assets[id] = { kind: 'image', bytes: a.bytes, ext: a.ext === 'jpg' ? 'jpeg' : a.ext, size: a.size || PM.imgSizeOf(a.bytes), fromFile: true };
+    if (a.bytes && (!a.kind || a.kind === 'image')) d.assets[id] = { kind: 'image', bytes: a.bytes, ext: a.ext === 'jpg' ? 'jpeg' : a.ext, size: a.size || PM.imgSizeOf(a.bytes), fromFile: true };
     else if (!d.assets[id]) d.assets[id] = a;
   }
   const CH = { col: 'ch-col', line: 'ch-line', donut: 'ch-donut', pie: 'ch-donut', hbar: 'ch-bar', area: 'ch-area' };
@@ -20256,7 +20349,7 @@ D.report = function (r) {
   const extra = [];
   if (r.via === 'copilot' && !r.ended) extra.push({ lv: 'warn', t: 'رد Copilot كان مقطوع', d: 'بنيت الشرائح اللي وصلت. لو ناقص شي اطلب من Copilot يكمل وابنِ من جديد.' });
   if (r.split) extra.push({ lv: 'info', t: `قسّمت ${r.split} شريحة مزدحمة على شريحتين`, d: 'عشان ما ينضغط النص ويصغر الخط' });
-  if (r.pics) extra.push({ lv: 'info', t: `رجّعت ${r.pics} صورة من ملفك لشرائحها`, d: 'باقي صور الملف موجودة في تبويب «الصور»' });
+  if (r.pics) extra.push({ lv: 'info', t: `رجّعت ${r.pics} صورة من ملفك لشرائحها`, d: 'كل صورة راحت للشريحة اللي تتكلم عن موضوعها، والصور الزايدة أخذت شريحة صور لحالها' });
   if (r.via === 'local' && r.mode === 'idea') extra.push({ lv: 'info', t: 'هذا هيكل القصة فقط', d: 'اكتب نصك مكان كل شريحة بضغطتين، أو ابنِ مع كوبايلوت ليكتب المحتوى' });
   const clean = !issues.filter(x => x.lv !== 'info').length;
   const body = `<div class="rv-top"><div class="rv-ring" style="--c:${story.score >= 8 ? '#0E8A5F' : story.score >= 6 ? '#004EAA' : '#B7791F'};--p:${story.score * 10}"><b class="num">${story.score}</b><span>من 10</span></div>
@@ -20280,6 +20373,42 @@ D.mount = function () {
   const b = $('#bDirector'); if (b) b.onclick = () => D.open(ST.deck && ST.deck.slides.length > 2 && !S.text && !S.idea && !S.data ? 'file' : null);
 };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(D.mount, 0)); else setTimeout(D.mount, 0);
+})(window.PM);
+
+/* ---- 45_simple.js ---- */
+/* ==========================================================================
+   صانع العروض 2 — «بسيط» و«متقدم»
+   The editor opens calm: the slides, the slide, one place for designs and the
+   few tools everyone needs. «متقدم» brings every tool back. Nothing is removed,
+   the choice is remembered on this device.
+   ========================================================================== */
+(function (PM) {
+'use strict';
+const KEY = 'pm.ui.mode';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const M = PM.Mode = { cur: 'simple' };
+const SIMPLE_TABS = ['design', 'insert', 'photos'];
+M.set = function (mode, o = {}) {
+  M.cur = mode === 'adv' ? 'adv' : 'simple';
+  try { localStorage.setItem(KEY, M.cur); } catch (e) { }
+  const app = $('#app'); if (!app) return;
+  app.classList.toggle('pm-simple', M.cur === 'simple');
+  $$('#segMode button').forEach(b => b.classList.toggle('on', b.dataset.v === M.cur));
+  const mi = $('#mFile [data-a="mode"] span'); if (mi) mi.textContent = M.cur === 'simple' ? 'أظهر كل الأدوات (متقدم)' : 'واجهة بسيطة';
+  // a tab that the simple view does not show hands over to «التصميم»
+  if (M.cur === 'simple' && PM.UI && PM.UI.tab && !SIMPLE_TABS.includes(PM.UI.tab)) { const b = $('#tabs [data-t="design"]'); if (b) b.click(); }
+  if (PM.ST.deck && PM.Ed && PM.Ed.fit) setTimeout(() => PM.Ed.fit(), 30);
+  if (o.say && PM.UI) PM.UI.toast(M.cur === 'simple' ? 'واجهة بسيطة: الأساسيات فقط. كل الأدوات ترجع من «متقدم»' : 'واجهة متقدمة: كل الأدوات ظاهرة', 3200);
+};
+M.mount = function () {
+  let saved = null; try { saved = localStorage.getItem(KEY); } catch (e) { }
+  $$('#segMode button').forEach(b => b.onclick = () => M.set(b.dataset.v, { say: true }));
+  const mi = $('#mFile [data-a="mode"]');
+  if (mi) mi.addEventListener('click', e => { e.stopPropagation(); $('#mFile').classList.add('hide'); M.set(M.cur === 'simple' ? 'adv' : 'simple', { say: true }); });
+  M.set(saved || 'simple');
+};
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(M.mount, 0)); else setTimeout(M.mount, 0);
 })(window.PM);
 
 

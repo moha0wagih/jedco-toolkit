@@ -233,6 +233,11 @@ async function parsePptx(zip, opts = {}) {
 
     const tx = (t, x) => t ? (t.ox + (x - t.cox) * t.sx) : x;
     const ty = (t, y) => t ? (t.oy + (y - t.coy) * t.sy) : y;
+    if (bg) {
+      const bbf = kid(kid(bg, 'p:bgPr'), 'a:blipFill'), bblip = bbf && kid(bbf, 'a:blip');
+      const brid = bblip && attr(bblip, 'r:embed', null), br0 = brid && slide.rels[brid];
+      if (br0 && !br0.external) { const bmp = await loadMedia(br0.target); if (bmp) els.push({ name: 'Background picture', ph: null, group: null, x: 0, y: 0, w: SW, h: SH, type: 'pic', media: bmp, svg: null, crop: null, video: false, bg: true }); }
+    }
 
     async function walk(tree, T, groupId) {
       for (const n of kids(tree)) {
@@ -315,6 +320,13 @@ async function parsePptx(zip, opts = {}) {
             if (ph && ph.type === 'body' && !isTitle) paras.forEach(p => { if (p.bullet === null) p.bullet = 'inherit'; });
           }
           const hasText = paras.some(p => p.text.trim());
+          // a shape filled with a picture (a photo cropped into a circle or a rounded box) is a picture too
+          const sbf = spPr && kid(spPr, 'a:blipFill');
+          const sblip = sbf && kid(sbf, 'a:blip');
+          if (sblip) {
+            const srid = attr(sblip, 'r:embed', null), sr0 = srid && slide.rels[srid];
+            if (sr0 && !sr0.external) { const smp = await loadMedia(sr0.target); if (smp) els.push({ ...base, type: 'pic', media: smp, svg: null, crop: null, video: false, fromFill: true }); }
+          }
           const isLine = nm === 'p:cxnSp' || ['line', 'straightConnector1', 'bentConnector2', 'bentConnector3', 'curvedConnector3'].includes(prst) || box.h < 2.5 || box.w < 2.5;
           if (isLine && !hasText) { els.push({ ...base, type: 'line', color: line || fill }); continue; }
           if (fill || line) els.push({ ...base, type: 'shape', prst, fill, line, hasText, txIdx: hasText ? els.length + 1 : null });

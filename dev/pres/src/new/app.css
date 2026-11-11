@@ -552,3 +552,15 @@ textarea.inp.dr-ta.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-s
 }
 @media (max-width:480px){ .tb .tbb{padding:0 7px;min-width:0} .tb .tbb.ic{width:32px} .tb{gap:0} }
 @media (min-width:861px){ .modal.dr-framed{padding-bottom:108px} .modal.dr-framed .mbox.dr-box{max-height:calc(100vh - 132px)} }
+/* ---------- build 2 · «بسيط» و«متقدم» ---------- */
+#segMode{margin-inline-end:6px}
+.tb #segMode{display:inline-flex}
+.pm-simple #segBg,.pm-simple #segTone,.pm-simple #bCopilot,.pm-simple #bStory{display:none!important}
+.pm-simple .dock,.pm-simple #dkOpen,.pm-simple #lbPrev,.pm-simple #lbNext,.pm-simple .lb-name,.pm-simple #bLib,.pm-simple #bReview{display:none!important}
+.pm-simple #tabs [data-t="layers"],.pm-simple #tabs [data-t="gen"],.pm-simple #tabs [data-t="notes"]{display:none}
+.pm-simple #tabs{justify-content:flex-start}
+.pm-simple .ctxbar .cbs,.pm-simple .ctxbar [data-a="directive"],.pm-simple .ctxbar [data-a="tabGen"],.pm-simple .ctxbar [data-a="selAll"],.pm-simple .ctxbar [data-a="paint"],.pm-simple .ctxbar [data-a="sug"],.pm-simple .ctxbar [data-a="gen"],.pm-simple .ctxbar [data-a="txReset"],.pm-simple .ctxbar [data-a="pin"],.pm-simple .ctxbar .rng:has(#txW){display:none!important}
+.pm-simple .ctxbar{gap:6px}
+.pm-simple .laybar{justify-content:center}
+@media (max-width:860px){ .tb #segMode{display:none} }
+@media (min-width:861px){ .pm-simple .tb .tbb .t{display:inline!important} }

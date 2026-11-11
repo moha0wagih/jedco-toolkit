@@ -212,9 +212,16 @@ async function analyzePptx(parsed, opt = {}) {
   };
   const specs = [];
   let ai = 0;
+  // the same picture on half the slides is the old template (logo, corner art, background), not content
+  const mediaOn = {};
+  S.forEach(s => new Set(s.els.filter(e => e.type === 'pic').map(e => e.media)).forEach(m => mediaOn[m] = (mediaOn[m] || 0) + 1));
+  const chromeMedia = m => S.length >= 4 && mediaOn[m] >= Math.max(3, Math.ceil(S.length * 0.5));
+  const assetOf = {};
   for (let si = 0; si < S.length; si++) {
     const s = S[si];
-    const pics = s.els.filter(e => e.type === 'pic' && e.w * e.h > 960 * 540 * 0.05 && !e.video);
+    // every real picture counts: small ones in a grid too (logos and bullets stay out by size)
+    const seenM = new Set();
+    const pics = s.els.filter(e => e.type === 'pic' && !e.video && e.w * e.h > 960 * 540 * 0.016 && Math.min(e.w, e.h) > 46 && !chromeMedia(e.media) && !seenM.has(e.media) && seenM.add(e.media));
     const shapes = s.els.filter(e => e.type === 'shape' && (e.fill || e.line) && e.w * e.h > 960 * 540 * 0.012 && e.w * e.h < 960 * 540 * 0.6 && e.w > 40 && e.h > 30);
     /* segments: one text box may hold an eyebrow + a title + a paragraph; split them by role */
     const segs = [], noteLines = [];
@@ -238,13 +245,14 @@ async function analyzePptx(parsed, opt = {}) {
     const segSize = g => Math.max(...g.paras.map(p => p.size || 12));
     const segText = g => g.paras.map(paraText).join('\n');
     const spec = { kind: 'content', title: '', sub: '', eyebrow: '', blocks: [], imgs: [], notes: [s.notes || '', ...noteLines].filter(Boolean).join('\n'), src: s.index };
-    for (const p of pics.sort((a, b) => b.w * b.h - a.w * a.h).slice(0, 4)) {
+    for (const p of pics.sort((a, b) => (a.bg ? 1 : 0) - (b.bg ? 1 : 0) || b.w * b.h - a.w * a.h).slice(0, 8)) {
       const m = parsed.media[p.media]; if (!m) continue;
       const ext = m.ext === 'jpg' ? 'jpeg' : m.ext;
       if (!/^(png|jpeg|gif|webp)$/.test(ext)) continue;
       if (ext === 'png' && decorative(m.bytes)) continue; // transparent line art / patterns, not photos
-      const id = 'p' + (++ai);
-      assets[id] = { kind: 'image', bytes: m.bytes, ext, size: imgSizeOf(m.bytes) };
+      // one picture used on several slides is one asset
+      let id = assetOf[p.media];
+      if (!id) { id = assetOf[p.media] = 'p' + (++ai); assets[id] = { kind: 'image', bytes: m.bytes, ext, size: imgSizeOf(m.bytes) }; }
       spec.imgs.push(id);
     }
     // giant lone digits (section numbers) carry nothing

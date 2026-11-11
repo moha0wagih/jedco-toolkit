@@ -563,25 +563,31 @@ function tidySpecs(specs, o) {
   const fin = res.filter((s, i) => !(s.kind === 'divider' && res[i + 1] && ['divider', 'closing'].includes(res[i + 1].kind)));
   return { specs: fin, split };
 }
-/* pictures of the source file go to the new slide that talks about the same thing */
+/* every picture of the source file comes along: to the new slide that talks about the same thing,
+   otherwise to the slide at the same point of the story (extra pictures get a photo slide of their own at build time) */
 function reattach(specs, src) {
   if (!src || !src.length) return 0;
   const targets = specs.filter(s => s.kind === 'content').map(s => ({ s, t: tok(PM.specText(s)) }));
-  let n = 0;
-  for (const o of src) {
-    if (!(o.imgs || []).length || o.kind === 'cover') continue;
-    const t = tok(PM.specText(o)); if (t.size < 2) continue;
+  if (!targets.length) return 0;
+  const placed = new Set(); let n = 0;
+  const body = src.filter(o => o.kind !== 'cover' && o.kind !== 'closing');
+  body.forEach((o, k) => {
+    const imgs = (o.imgs || []).filter(id => !placed.has(id));
+    if (!imgs.length) return;
+    const t = tok(PM.specText(o));
     let best = null, bs = 0;
-    for (const x of targets) { if ((x.s.imgs || []).length >= 1) continue; let hit = 0; t.forEach(w => { if (x.t.has(w)) hit++; }); const sc = hit / Math.sqrt(t.size * Math.max(1, x.t.size)); if (sc > bs) { bs = sc; best = x; } }
-    if (best && bs >= 0.22) { best.s.imgs = o.imgs.slice(0, 1); n++; }
-  }
+    if (t.size >= 2) for (const x of targets) { let hit = 0; t.forEach(w => { if (x.t.has(w)) hit++; }); const sc = hit / Math.sqrt(t.size * Math.max(1, x.t.size)); if (sc > bs) { bs = sc; best = x; } }
+    if (!best || bs < 0.22) best = targets[Math.min(targets.length - 1, Math.round(k / Math.max(1, body.length - 1) * (targets.length - 1)))];
+    best.s.imgs = (best.s.imgs || []).concat(imgs);
+    imgs.forEach(id => placed.add(id)); n += imgs.length;
+  });
   return n;
 }
 D.buildDeck = function (specs, o) {
   const d = PM.newDeck({ lang: o.lang, grey: !!o.grey, dark: !!o.dark, name: o.name || '' });
   for (const [id, a] of Object.entries(o.assets || {})) {
     if (!a) continue;
-    if (a.bytes && !a.kind) d.assets[id] = { kind: 'image', bytes: a.bytes, ext: a.ext === 'jpg' ? 'jpeg' : a.ext, size: a.size || PM.imgSizeOf(a.bytes), fromFile: true };
+    if (a.bytes && (!a.kind || a.kind === 'image')) d.assets[id] = { kind: 'image', bytes: a.bytes, ext: a.ext === 'jpg' ? 'jpeg' : a.ext, size: a.size || PM.imgSizeOf(a.bytes), fromFile: true };
     else if (!d.assets[id]) d.assets[id] = a;
   }
   const CH = { col: 'ch-col', line: 'ch-line', donut: 'ch-donut', pie: 'ch-donut', hbar: 'ch-bar', area: 'ch-area' };
@@ -1002,7 +1008,7 @@ D.report = function (r) {
   const extra = [];
   if (r.via === 'copilot' && !r.ended) extra.push({ lv: 'warn', t: 'رد Copilot كان مقطوع', d: 'بنيت الشرائح اللي وصلت. لو ناقص شي اطلب من Copilot يكمل وابنِ من جديد.' });
   if (r.split) extra.push({ lv: 'info', t: `قسّمت ${r.split} شريحة مزدحمة على شريحتين`, d: 'عشان ما ينضغط النص ويصغر الخط' });
-  if (r.pics) extra.push({ lv: 'info', t: `رجّعت ${r.pics} صورة من ملفك لشرائحها`, d: 'باقي صور الملف موجودة في تبويب «الصور»' });
+  if (r.pics) extra.push({ lv: 'info', t: `رجّعت ${r.pics} صورة من ملفك لشرائحها`, d: 'كل صورة راحت للشريحة اللي تتكلم عن موضوعها، والصور الزايدة أخذت شريحة صور لحالها' });
   if (r.via === 'local' && r.mode === 'idea') extra.push({ lv: 'info', t: 'هذا هيكل القصة فقط', d: 'اكتب نصك مكان كل شريحة بضغطتين، أو ابنِ مع كوبايلوت ليكتب المحتوى' });
   const clean = !issues.filter(x => x.lv !== 'info').length;
   const body = `<div class="rv-top"><div class="rv-ring" style="--c:${story.score >= 8 ? '#0E8A5F' : story.score >= 6 ? '#004EAA' : '#B7791F'};--p:${story.score * 10}"><b class="num">${story.score}</b><span>من 10</span></div>

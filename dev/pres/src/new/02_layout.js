@@ -325,17 +325,46 @@ PM.layoutQuality = function (objs, c) {
   if (!full) { const bal = mw ? Math.abs(mx / mw - 480) / 960 : 0; q *= 1 - Math.min(0.3, Math.max(0, bal - 0.06) * 1.6); const fill = area / (840 * 438); if (fill < 0.2) q *= 0.88; }
   return q;
 };
+/* how well a rendered layout treats the slide's own pictures:
+   shown   — how many of them it really draws
+   factor  — a score multiplier: a layout that hides the pictures loses, one that shows them sharp and barely cropped wins */
+PM.photoFit = function (objs, want, c) {
+  const boxes = {};
+  objs.forEach(o => { if (o.t === 'image' && want.includes(o.src) && !boxes[o.src]) boxes[o.src] = o; });
+  const ids = Object.keys(boxes);
+  if (!ids.length) return { shown: 0, factor: 0.3 };
+  let fit = 0;
+  for (const id of ids) {
+    const o = boxes[id], a = (c.assets || {})[id], sz = a && a.size;
+    let f = 1;
+    if (sz && sz.w && sz.h) {
+      const ai = sz.w / sz.h, ab = o.w / o.h;
+      const kept = Math.min(ai / ab, ab / ai);                        // share of the picture left after filling the frame
+      if (kept < 0.34) f *= 0.6; else if (kept < 0.5) f *= 0.8; else if (kept > 0.8) f *= 1.06;
+      const up = Math.max(o.w * 1.6 / sz.w, o.h * 1.6 / sz.h);       // small pictures blown up to a big frame go soft
+      if (up > 1.5) f *= Math.max(0.3, Math.min(1, 1.5 / up + 0.08));   // the smaller the frame, the sharper a small picture stays
+    }
+    fit += f;
+  }
+  const n = Math.min(want.length, 4);
+  return { shown: ids.length, factor: (fit / ids.length) * (0.86 + 0.44 * Math.min(ids.length, n) / n) };
+};
 PM.autoLayout = function (spec, c, avoid = []) {
   const cand = PM.candidates(spec, c);
+  const want = (spec.imgs || []).filter(id => (c.assets || {})[id]);
   let best = null;
-  for (const { L, s } of cand.slice(0, 14)) {
+  // a slide that came with pictures looks further down the list until it finds a design that shows them
+  const lim = want.length ? 60 : 14;
+  for (const { L, s } of cand.slice(0, lim)) {
+    if (want.length && best && best.shown && s < cand[0].s * 0.8) break;
     const r = PM.renderLayout(L, spec, c);
     if (r.missing && r.missing.length) continue;
     const pen = (r.overflow ? 0.35 : 1) * (avoid.includes(L.fam) ? 0.82 : 1) * (avoid.includes(L.id) ? 0.5 : 1);
     const q = PM.layoutQuality(r.objs, c);
-    const sc = s * pen * (0.45 + 0.55 * q);
-    if (!best || sc > best.sc) best = { L, sc, r };
-    if (!r.overflow && q > 0.97 && s >= cand[0].s * 0.97) break;
+    let sc = s * pen * (0.45 + 0.55 * q), shown = 0;
+    if (want.length) { const f = PM.photoFit(r.objs, want, c); sc *= f.factor; shown = f.shown; }
+    if (!best || sc > best.sc) best = { L, sc, r, shown };
+    if (!want.length && !r.overflow && q > 0.97 && s >= cand[0].s * 0.97) break;
   }
   return best;
 };
