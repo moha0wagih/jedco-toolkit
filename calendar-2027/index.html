@@ -815,7 +815,7 @@ function trkSet(rows){
 function loadScript(src, cb){ var s = document.createElement("script"); s.src = src; s.onload = cb; s.onerror = function(){}; document.head.appendChild(s); }
 function trackerInit(){
   if(!TRK.base || window.claude) return;
-  var b = $("trkBtn"); b.href = TRK.base+"index.html";
+  var b = $("trkBtn"); b.href = "https://ccpr-tracker.github.io/";
   if(/[?&]demo\b/.test(location.search)){
     TRK.demo = true; b.href += "?demo";
     var demo = function(){ try{ var d = JSON.parse(localStorage.getItem("trk-demo-v1")||"null"); if(d) trkSet(d.tasks.concat(d.projects)); }catch(e){} };
@@ -834,7 +834,7 @@ function trackerInit(){
       }
       function kick(){ clearTimeout(t); t = setTimeout(pull, 600); }
       sb.auth.getSession().then(function(r){
-        if(!r.data || !r.data.session){ b.textContent = "Tracker \u00B7 sign in"; return; }
+        if(!r.data || !r.data.session){ b.textContent = "Tracker"; return; }
         pull();
         sb.channel("cal-trk").on("postgres_changes",{event:"*",schema:"public",table:"tasks"},kick)
           .on("postgres_changes",{event:"*",schema:"public",table:"projects"},kick).subscribe();
