@@ -331,12 +331,87 @@ html[dir="rtl"] .ghead[aria-expanded="false"] .chev{transform:rotate(90deg)}
 .plist button:hover,.plist button:focus-visible{background:var(--tint)}
 .plist small{color:var(--ink-soft);font-size:11.5px;display:block}
 .plist .pe{color:var(--ink-soft);font-size:12.5px;padding:6px 8px}
-.demobar{background:var(--pur);color:#fff;border-radius:12px;padding:9px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px}
+.demobar{background:#7A0FC0;color:#fff;border-radius:12px;padding:9px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px}
 .demobar button{border:1px solid rgba(255,255,255,.6);background:transparent;color:#fff;border-radius:8px;padding:5px 10px;font-size:12.5px;cursor:pointer}
 .glinks{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-size:13px}
 .glinks a{color:#fff;opacity:.85}
 .pop a.btn{text-decoration:none;text-align:center}
 .pav,img.av{box-shadow:0 0 0 1px var(--line)}
+/* ---------- v1.5: theme switch, demo roles, executive report ---------- */
+.themeb{width:34px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.themeb svg{width:17px;height:17px}
+.gate .themeb{color:#fff;border-color:rgba(255,255,255,.35)}
+.gtools{display:flex;gap:8px;align-items:center}
+.demobar .dsw{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.demobar button[aria-pressed="true"]{background:#fff;color:#4B0A78;border-color:#fff}
+.fc[data-fs="all"][aria-pressed="true"]{color:var(--surface)}
+.gdemo{display:flex;gap:8px;flex-wrap:wrap}
+.gdemo .btn{flex:1 1 150px}
+#repHost{position:fixed;inset:0;z-index:70;overflow:auto;background:#E3E9F1;color-scheme:light;
+  --bg:#F3F6FA;--surface:#FFFFFF;--soft:#F7F9FC;--tint:#EEF6FD;--ink:#002657;--ink-soft:#4A618A;--accent:#004EAA;--accent-ink:#FFFFFF;--sky:#62B6F3;--line:#D9E2EE;
+  --ns:#8E9AB0;--ip:#004EAA;--ot:#00B2BA;--ar:#FC5C17;--dl:#D93025;--ok:#0B8A43;--pur:#9C12F2;color:var(--ink)}
+.rbar{position:sticky;top:0;z-index:2;background:#002657;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+  padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.rbar b{font-family:var(--display);font-size:14px}
+.rbar span{display:flex;gap:8px}
+.rbar button{border:1px solid rgba(255,255,255,.5);background:transparent;color:#fff;border-radius:9px;padding:7px 13px;font-size:13px;cursor:pointer}
+.rbar button.go{background:#fff;color:#002657;border-color:#fff}
+.rpage{background:#fff;max-width:1180px;margin:18px auto 40px;border-radius:16px;padding:26px 28px;display:flex;flex-direction:column;gap:18px}
+.rhead{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;border-bottom:3px solid var(--accent);padding-bottom:14px}
+.rhead svg{height:36px;width:auto;fill:#004EAA;display:block}
+.rhead h1{font-family:var(--display);font-weight:700;font-size:24px;margin:8px 0 0;line-height:1.2}
+.rhead p{margin:0;color:var(--ink-soft);font-size:13.5px}
+.rk{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.rk div{border:1px solid var(--line);border-radius:14px;padding:12px 14px;border-top:4px solid var(--c,var(--accent));min-width:0}
+.rk b{display:block;font-family:var(--display);font-weight:700;font-size:28px;line-height:1.05;color:var(--c,var(--ink))}
+.rk span{font-size:12.5px;color:var(--ink-soft)}
+.rk small{display:block;font-size:11.5px;color:var(--ink-soft)}
+.r2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:14px}
+.r3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.rbox{border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0;break-inside:avoid;overflow-x:auto}
+.rbox h2{font-family:var(--display);font-weight:700;font-size:14px;margin:0;display:flex;align-items:center;gap:8px}
+.rbox h2::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--c,var(--accent));flex:none}
+.rstack{display:flex;height:22px;border-radius:999px;overflow:hidden;background:var(--soft)}
+.rstack i{display:block;background:var(--c);min-width:3px}
+.rleg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 14px;font-size:13px}
+.rleg div{display:flex;align-items:center;gap:8px;min-width:0}
+.rleg i{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+.rleg b{margin-inline-start:auto;font-family:var(--display);font-size:12px}
+.rt{width:100%;border-collapse:collapse;font-size:13px}
+.rt th{text-align:start;font-weight:400;color:var(--accent);font-size:11.5px;padding:4px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+.rt td{padding:6px;border-bottom:1px solid var(--line);vertical-align:middle}
+.rt tr:last-child td{border-bottom:0}
+.rt .n{font-family:var(--display);font-size:12px;white-space:nowrap}
+.rt .bad{color:var(--dl);font-weight:700}
+.rbar2{height:8px;border-radius:999px;background:var(--line);overflow:hidden;min-width:70px}
+.rbar2 i{display:block;height:100%;background:var(--ok)}
+.rl{display:flex;flex-direction:column;font-size:13px}
+.rl div{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.rl div:last-child{border-bottom:0}
+.rl span:first-child{min-width:0;overflow-wrap:anywhere}
+.rl small{color:var(--ink-soft);display:block;font-size:11.5px}
+.rl .n{white-space:nowrap;font-size:12px;color:var(--ink-soft)}
+.rempty{color:var(--ink-soft);font-size:13px}
+.rfoot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--ink-soft);font-size:11.5px}
+#repHost .pill{animation:none;box-shadow:none;font-size:11.5px;padding:3px 9px}
+@media (max-width:900px){.rk{grid-template-columns:repeat(3,minmax(0,1fr))}.r2,.r3{grid-template-columns:minmax(0,1fr)}.rpage{padding:18px 16px;margin:10px 8px 30px}}
+@media print{
+  html.rep-on,html.rep-on body{background:#fff!important}
+  html.rep-on body>*:not(#repHost){display:none!important}
+  html.rep-on #repHost{position:static;overflow:visible;background:#fff}
+  html.rep-on .rbar{display:none}
+  html.rep-on .rpage{margin:0;max-width:none;border-radius:0;padding:0;gap:12px}
+  html.rep-on .rk{grid-template-columns:repeat(6,minmax(0,1fr))}
+  html.rep-on .r2{grid-template-columns:minmax(0,1fr) minmax(0,1.5fr)}
+  html.rep-on .r3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  html.rep-on{-webkit-print-color-adjust:exact;print-color-adjust:exact;color-scheme:light!important}
+  html.rep-on .rk b{font-size:22px}html.rep-on .rk div{padding:8px 12px}html.rep-on .rbox{padding:10px 12px;gap:7px}html.rep-on .rt td{padding:3.5px 6px}
+  html.rep-on .rhead h1{font-size:20px}html.rep-on .rhead svg{height:30px}html.rep-on .rhead{padding-bottom:9px}html.rep-on .rl div{padding:4px 0}
+  html.rep-on .rbox{overflow:visible}
+  html.rep-on .ratt{break-before:page;break-inside:auto}
+  html.rep-on .ratt tr{break-inside:avoid}
+}
+@page{size:A4 landscape;margin:10mm}
 @media (max-width:1100px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.dgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:820px){
   .cols{display:none}
@@ -357,12 +432,12 @@ html[dir="rtl"] .ghead[aria-expanded="false"] .chev{transform:rotate(90deg)}
 <!-- sign in / sign up -->
 <div class="gate" id="gate" data-hub-autosave hidden>
   <div class="gbox">
-    <div class="gtop"><div class="glogo" role="img" aria-label="Jeddah Airports"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="75.00 65.75 651.75 200.50"><g><path d="M481.91,65.81l-16.45,9.81v68.2h16.45v-78ZM385.51,70.58h-16.44v16.44h16.44v-16.44ZM407.88,70.58h-16.44v16.44h16.44v-16.44ZM432.64,94.71v32.66h-74.61c-10.34,0-16.53-4.51-16.53-14.59v-20.72s-16.44,9.81-16.44,9.81v12.6c0,18.92,9.11,29.35,29.43,29.35h61.04l16.88-10.06v10.06h16.67v-61.73l-16.45,9.81v2.83ZM726.6,118.05h0c-.22-16.67-10.67-25.77-26.24-25.77h-35.54v16.44h35.54c5.88,0,9.75,2.55,9.81,9.35-.06,6.8-3.93,9.35-9.81,9.35h-.09s-6.24,0-6.24,0v-.05h-12.8v-18.65l-16.42,9.76v8.89h-21.25v-5.75c0-18.56-10.61-29.26-29.17-29.35h-17.5v-26.47l-16.45,9.81-.04,33.19h35.49c6.9,0,11.14,3.62,11.14,9.9v8.66h-30.14v-18.56l-16.51,9.84-.02,8.72h-33.93v-61.56s-16.44,9.81-16.44,9.81v68.2h33.45l16.88-10.06v10.06l119.95.04h.09c15.57,0,26.02-9.1,26.24-25.77h0v-.05M497.99,139.66c0,6.54-3.27,8.75-7.25,8.75-2.43,0-4.45,0-7.54-.17l-7.94,13.32c4.92,1.7,14.51,1.7,17.16,1.7,14.59,0,22.01-5.66,22.01-26.43v-54.75l-16.45,9.81v47.78Z"/><g><rect x="257.74" y="149.07" width="16.44" height="16.44"/><path d="M268.41,92.3h-25.19v16.53h26.7c6.9,0,11.14,3.62,11.14,9.9v8.66h-79.82v12.17l9.75-5.81v10.08h86.6v-22.19c0-18.56-10.61-29.26-29.17-29.35"/><rect x="106.92" y="70.58" width="16.44" height="16.44"/><rect x="84.55" y="70.58" width="16.44" height="16.44"/><path d="M136.98,118.04h0c-.22-16.67-10.67-25.77-26.24-25.77h-35.54v16.44h35.54c5.88,0,9.75,2.55,9.81,9.35-.06,6.8-3.93,9.35-9.81,9.35h-.09s-19.04-.04-19.04-.04v-18.65l-16.42,9.76v25.37h35.54M110.65,143.86h.09c15.57,0,26.02-9.1,26.24-25.77h0v-.05"/><path d="M181.82,92.3h-25.19v16.53h26.7c6.9,0,11.14,3.62,11.14,9.9v8.66h-48.9v16.44h48.51l16.92-10.08v-12.1c0-18.56-10.61-29.26-29.17-29.35"/></g></g><g><g><path d="M403.3,249.68h5.06l11.79-11.13h-15.4v-9.13h15.4v20.26h13.96v-36.96c0-6.54-5.87-12.32-12.51-12.32h-25.64v11.11h19.38c3.72,0,4.82,1.12,4.82,4.25v4.07h-17.04c-6.54,0-12.32,5.4-12.32,12.04v5.49c0,6.54,5.87,12.32,12.51,12.32"/><polygon points="499.73 200.41 468.84 200.41 468.84 211.57 482.74 211.57 468.83 219.83 468.83 249.68 482.79 249.68 482.79 211.57 499.73 211.57 499.73 200.41"/><g><rect x="444.4" y="200.41" width="13.96" height="49.28"/><rect x="444.4" y="184.08" width="13.96" height="11.72"/></g><g><polygon points="615.08 249.68 629.04 249.68 629.04 211.54 615.08 219.83 615.08 249.68"/><rect x="615.08" y="200.41" width="30.89" height="11.11"/></g><path d="M679.65,211.57v-11.16h-12.41v-16.33l-13.96,8.88v18.55h6.28v.06h7.31l-13.59,8.26v17.53c0,6.54,5.87,12.32,12.51,12.32h13.85s0-11.13,0-11.13h-12.41v-26.98h12.41Z"/><path d="M726.6,234.22v-3.03c0-6.54-5.87-12.32-12.51-12.32h-9.1s-.15,0-.15,0c-3.72,0-4.82-1.12-4.82-4.25v-.11c0-3.13,1.1-4.25,4.82-4.25h19.35v-11.11h-22.82c-6.64,0-12.51,5.78-12.51,12.32v6.18c0,6.54,5.87,12.32,12.51,12.32h9.1s.15,0,.15,0c3.72,0,4.82,1.12,4.82,4.25v.11c0,3.13-1.1,4.25-4.82,4.25h-19.35v11.11h22.82c6.64,0,12.51-5.78,12.51-12.32v-3.15Z"/><path d="M538.18,200.41h-18.62s0,0,0,0h-12.51v65.31h13.96v-27.14h0v-27.07h10.92c3.72,0,4.81,1.12,4.81,4.25v18.57c0,3.13-1.1,4.25-4.81,4.25h-10.92l11.76,11.1h5.42c6.64,0,12.51-5.78,12.51-12.32v-24.64c0-6.54-5.87-12.32-12.51-12.32Z"/><path d="M591.98,200.41h-18.36c-6.24,0-11.79,5.1-12.45,11.13l24.55-.02c3.72,0,4.81,1.12,4.81,4.25v22.82h-10.59c-3.72,0-4.81-1.12-4.81-4.25v-22.79l-13.96,8.29v17.54c0,6.54,5.87,12.32,12.51,12.32h18.29c6.64,0,12.51-5.78,12.51-12.32v-24.64c0-6.54-5.87-12.32-12.51-12.32"/></g><g><path d="M191.22,200.41h-16.11c-6.64,0-12.51,5.78-12.51,12.32v24.64c0,6.54,5.87,12.32,12.51,12.32h30.11v-38.14l-13.96,8.29v18.75h-9.9c-3.72,0-4.81-1.12-4.81-4.25v-22.79h28.67v-27.46l-14,8.32v8.02Z"/><path d="M85.57,200.43h13.96l-13.96,8.29v41.38c0,3.18-1.65,4.81-4.84,4.81h-5.54v11.11h11.78c6.66,0,12.55-5.87,12.55-12.51v-64.12h-13.96v11.04Z"/><path d="M140.82,200.41h-18.36c-6.24,0-11.79,5.1-12.45,11.13h29.36v9.6h-15.4v-9.6l-13.96,8.29v17.54c0,6.54,5.87,12.32,12.51,12.32h28.4v-11.11h-22.14c-3.72,0-4.82-1.12-4.82-4.25v-3.6h29.36v-18c0-6.54-5.87-12.32-12.51-12.32"/><path d="M244.37,200.41h-16.11c-6.64,0-12.51,5.78-12.51,12.32v24.64c0,6.54,5.87,12.32,12.51,12.32h30.11v-38.14l-13.96,8.29v18.75h-9.9c-3.72,0-4.81-1.12-4.81-4.25v-22.79h28.67v-27.46l-14,8.32v8.02Z"/><path d="M279.51,249.68h5.06l11.79-11.13h-15.4v-9.13h15.4v20.26h13.96v-36.96c0-6.54-5.87-12.32-12.51-12.32h-25.64v11.11h19.38c3.72,0,4.82,1.12,4.82,4.25v4.07h-17.04c-6.54,0-12.32,5.4-12.32,12.04v5.49c0,6.54,5.87,12.32,12.51,12.32"/><path d="M350.91,200.41h-16.11v-16.33l-14,8.32v19.15h28.67v38.14h13.96v-36.96c0-6.54-5.87-12.32-12.51-12.32Z"/><polygon points="334.77 249.68 334.77 219.83 320.82 211.54 320.82 249.68 334.77 249.68"/></g></g></svg></div><button class="btn ghost sm langb" type="button" data-nt></button></div>
+    <div class="gtop"><div class="glogo" role="img" aria-label="Jeddah Airports"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="75.00 65.75 651.75 200.50"><g><path d="M481.91,65.81l-16.45,9.81v68.2h16.45v-78ZM385.51,70.58h-16.44v16.44h16.44v-16.44ZM407.88,70.58h-16.44v16.44h16.44v-16.44ZM432.64,94.71v32.66h-74.61c-10.34,0-16.53-4.51-16.53-14.59v-20.72s-16.44,9.81-16.44,9.81v12.6c0,18.92,9.11,29.35,29.43,29.35h61.04l16.88-10.06v10.06h16.67v-61.73l-16.45,9.81v2.83ZM726.6,118.05h0c-.22-16.67-10.67-25.77-26.24-25.77h-35.54v16.44h35.54c5.88,0,9.75,2.55,9.81,9.35-.06,6.8-3.93,9.35-9.81,9.35h-.09s-6.24,0-6.24,0v-.05h-12.8v-18.65l-16.42,9.76v8.89h-21.25v-5.75c0-18.56-10.61-29.26-29.17-29.35h-17.5v-26.47l-16.45,9.81-.04,33.19h35.49c6.9,0,11.14,3.62,11.14,9.9v8.66h-30.14v-18.56l-16.51,9.84-.02,8.72h-33.93v-61.56s-16.44,9.81-16.44,9.81v68.2h33.45l16.88-10.06v10.06l119.95.04h.09c15.57,0,26.02-9.1,26.24-25.77h0v-.05M497.99,139.66c0,6.54-3.27,8.75-7.25,8.75-2.43,0-4.45,0-7.54-.17l-7.94,13.32c4.92,1.7,14.51,1.7,17.16,1.7,14.59,0,22.01-5.66,22.01-26.43v-54.75l-16.45,9.81v47.78Z"/><g><rect x="257.74" y="149.07" width="16.44" height="16.44"/><path d="M268.41,92.3h-25.19v16.53h26.7c6.9,0,11.14,3.62,11.14,9.9v8.66h-79.82v12.17l9.75-5.81v10.08h86.6v-22.19c0-18.56-10.61-29.26-29.17-29.35"/><rect x="106.92" y="70.58" width="16.44" height="16.44"/><rect x="84.55" y="70.58" width="16.44" height="16.44"/><path d="M136.98,118.04h0c-.22-16.67-10.67-25.77-26.24-25.77h-35.54v16.44h35.54c5.88,0,9.75,2.55,9.81,9.35-.06,6.8-3.93,9.35-9.81,9.35h-.09s-19.04-.04-19.04-.04v-18.65l-16.42,9.76v25.37h35.54M110.65,143.86h.09c15.57,0,26.02-9.1,26.24-25.77h0v-.05"/><path d="M181.82,92.3h-25.19v16.53h26.7c6.9,0,11.14,3.62,11.14,9.9v8.66h-48.9v16.44h48.51l16.92-10.08v-12.1c0-18.56-10.61-29.26-29.17-29.35"/></g></g><g><g><path d="M403.3,249.68h5.06l11.79-11.13h-15.4v-9.13h15.4v20.26h13.96v-36.96c0-6.54-5.87-12.32-12.51-12.32h-25.64v11.11h19.38c3.72,0,4.82,1.12,4.82,4.25v4.07h-17.04c-6.54,0-12.32,5.4-12.32,12.04v5.49c0,6.54,5.87,12.32,12.51,12.32"/><polygon points="499.73 200.41 468.84 200.41 468.84 211.57 482.74 211.57 468.83 219.83 468.83 249.68 482.79 249.68 482.79 211.57 499.73 211.57 499.73 200.41"/><g><rect x="444.4" y="200.41" width="13.96" height="49.28"/><rect x="444.4" y="184.08" width="13.96" height="11.72"/></g><g><polygon points="615.08 249.68 629.04 249.68 629.04 211.54 615.08 219.83 615.08 249.68"/><rect x="615.08" y="200.41" width="30.89" height="11.11"/></g><path d="M679.65,211.57v-11.16h-12.41v-16.33l-13.96,8.88v18.55h6.28v.06h7.31l-13.59,8.26v17.53c0,6.54,5.87,12.32,12.51,12.32h13.85s0-11.13,0-11.13h-12.41v-26.98h12.41Z"/><path d="M726.6,234.22v-3.03c0-6.54-5.87-12.32-12.51-12.32h-9.1s-.15,0-.15,0c-3.72,0-4.82-1.12-4.82-4.25v-.11c0-3.13,1.1-4.25,4.82-4.25h19.35v-11.11h-22.82c-6.64,0-12.51,5.78-12.51,12.32v6.18c0,6.54,5.87,12.32,12.51,12.32h9.1s.15,0,.15,0c3.72,0,4.82,1.12,4.82,4.25v.11c0,3.13-1.1,4.25-4.82,4.25h-19.35v11.11h22.82c6.64,0,12.51-5.78,12.51-12.32v-3.15Z"/><path d="M538.18,200.41h-18.62s0,0,0,0h-12.51v65.31h13.96v-27.14h0v-27.07h10.92c3.72,0,4.81,1.12,4.81,4.25v18.57c0,3.13-1.1,4.25-4.81,4.25h-10.92l11.76,11.1h5.42c6.64,0,12.51-5.78,12.51-12.32v-24.64c0-6.54-5.87-12.32-12.51-12.32Z"/><path d="M591.98,200.41h-18.36c-6.24,0-11.79,5.1-12.45,11.13l24.55-.02c3.72,0,4.81,1.12,4.81,4.25v22.82h-10.59c-3.72,0-4.81-1.12-4.81-4.25v-22.79l-13.96,8.29v17.54c0,6.54,5.87,12.32,12.51,12.32h18.29c6.64,0,12.51-5.78,12.51-12.32v-24.64c0-6.54-5.87-12.32-12.51-12.32"/></g><g><path d="M191.22,200.41h-16.11c-6.64,0-12.51,5.78-12.51,12.32v24.64c0,6.54,5.87,12.32,12.51,12.32h30.11v-38.14l-13.96,8.29v18.75h-9.9c-3.72,0-4.81-1.12-4.81-4.25v-22.79h28.67v-27.46l-14,8.32v8.02Z"/><path d="M85.57,200.43h13.96l-13.96,8.29v41.38c0,3.18-1.65,4.81-4.84,4.81h-5.54v11.11h11.78c6.66,0,12.55-5.87,12.55-12.51v-64.12h-13.96v11.04Z"/><path d="M140.82,200.41h-18.36c-6.24,0-11.79,5.1-12.45,11.13h29.36v9.6h-15.4v-9.6l-13.96,8.29v17.54c0,6.54,5.87,12.32,12.51,12.32h28.4v-11.11h-22.14c-3.72,0-4.82-1.12-4.82-4.25v-3.6h29.36v-18c0-6.54-5.87-12.32-12.51-12.32"/><path d="M244.37,200.41h-16.11c-6.64,0-12.51,5.78-12.51,12.32v24.64c0,6.54,5.87,12.32,12.51,12.32h30.11v-38.14l-13.96,8.29v18.75h-9.9c-3.72,0-4.81-1.12-4.81-4.25v-22.79h28.67v-27.46l-14,8.32v8.02Z"/><path d="M279.51,249.68h5.06l11.79-11.13h-15.4v-9.13h15.4v20.26h13.96v-36.96c0-6.54-5.87-12.32-12.51-12.32h-25.64v11.11h19.38c3.72,0,4.82,1.12,4.82,4.25v4.07h-17.04c-6.54,0-12.32,5.4-12.32,12.04v5.49c0,6.54,5.87,12.32,12.51,12.32"/><path d="M350.91,200.41h-16.11v-16.33l-14,8.32v19.15h28.67v38.14h13.96v-36.96c0-6.54-5.87-12.32-12.51-12.32Z"/><polygon points="334.77 249.68 334.77 219.83 320.82 211.54 320.82 249.68 334.77 249.68"/></g></g></svg></div><span class="gtools"><button class="btn ghost sm themeb" type="button"></button><button class="btn ghost sm langb" type="button" data-nt></button></span></div>
     <div><h1>CCPR Tracker</h1></div>
     <p id="gLead">Projects and tasks of Corporate Communication, live for the whole team.</p>
     <div class="gcard" id="gCard"></div>
     <div class="glinks" id="gLinks"></div>
-    <div class="gfoot">Designed by Mohammed Wagih · v1.4</div>
+    <div class="gfoot">Designed by Mohammed Wagih · v1.5</div>
   </div>
 </div>
 
@@ -373,6 +448,7 @@ html[dir="rtl"] .ghead[aria-expanded="false"] .chev{transform:rotate(90deg)}
     <div class="who">
       <span class="live" id="live" data-s="on">Live</span>
       <div class="avs" id="avs" aria-label="Online now"></div>
+      <button class="btn ghost sm themeb" type="button"></button>
       <button class="btn ghost sm langb" type="button" data-nt></button>
       <div class="menu">
         <button class="btn ghost sm" id="meBtn" type="button" aria-haspopup="true" aria-expanded="false"></button>
@@ -380,16 +456,18 @@ html[dir="rtl"] .ghead[aria-expanded="false"] .chev{transform:rotate(90deg)}
           <div><label class="lb" for="meName">Your name</label><input class="field" id="meName" maxlength="60" autocomplete="name"></div>
           <button class="btn ghost sm" id="meSave" type="button">Save name</button>
           <button class="btn ghost sm" id="xlsBtn" type="button">Export to Excel</button>
+          <button class="btn ghost sm" type="button" data-report>Executive report</button>
           <a class="btn ghost sm" href="guide.html" target="_blank" rel="noopener">How to use</a>
+          <a class="btn ghost sm" href="?demo" target="_blank" rel="noopener" id="demoLink">Try the demo</a>
           <button class="btn ghost sm" id="outBtn" type="button">Sign out</button>
         </div>
       </div>
     </div>
   </header>
-  <div class="demobar" id="demoBar" hidden><span>Demo: try anything. Nothing here is saved to the cloud or seen by the team.</span><span><button type="button" id="demoReset">Reset demo</button></span></div>
+  <div class="demobar" id="demoBar" hidden></div>
   <nav class="tabs" id="tabs" role="tablist"></nav>
   <main id="view"></main>
-  <footer class="foot"><span id="demoNote"></span><span>Designed by Mohammed Wagih · v1.4</span></footer>
+  <footer class="foot"><span id="demoNote"></span><span>Designed by Mohammed Wagih · v1.5</span></footer>
 </div>
 
 <div id="drawerHost" data-hub-autosave></div>
@@ -401,6 +479,18 @@ html[dir="rtl"] .ghead[aria-expanded="false"] .chev{transform:rotate(90deg)}
 <script>
 "use strict";
 var CFG = window.TRACKER_CONFIG || {};
+/* Light or dark: follows the device until the person picks one. */
+var THEME = (function(){ try{ var v = localStorage.getItem("trk-theme"); return v==="dark"||v==="light" ? v : ""; }catch(e){ return ""; } })();
+function themeNow(){ return THEME || (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); }
+var SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>';
+var MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg>';
+function applyTheme(){
+  var h = document.documentElement; if(THEME) h.setAttribute("data-theme", THEME); else h.removeAttribute("data-theme");
+  var dark = themeNow()==="dark";
+  [].forEach.call(document.querySelectorAll(".themeb"), function(b){ b.innerHTML = dark ? SUN : MOON; var l = dark ? "Switch to light mode" : "Switch to dark mode"; b.setAttribute("aria-label", typeof T==="function" ? T(l) : l); b.setAttribute("title", b.getAttribute("aria-label")); b.setAttribute("data-nt",""); });
+}
+if(THEME) document.documentElement.setAttribute("data-theme", THEME);
+document.addEventListener("click", function(e){ if(e.target.closest && e.target.closest(".themeb")){ THEME = themeNow()==="dark" ? "light" : "dark"; try{ localStorage.setItem("trk-theme", THEME); }catch(x){} applyTheme(); } });
 var DEMO = /[?&]demo\b/.test(location.search);
 var STATUS = ["Not Started","In Progress","On Track","At Risk","Delayed","Completed"];
 var ST_VAR = {"Not Started":"--ns","In Progress":"--ip","On Track":"--ot","At Risk":"--ar","Delayed":"--dl","Completed":"--ok"};
@@ -428,6 +518,14 @@ Object.assign(AR, {"All":"الكل","Past due":"تجاوزت موعدها","Add 
   "Demo: try anything. Nothing here is saved to the cloud or seen by the team.":"نسخة تجريبية: جرّب أي شي. لا شيء هنا ينحفظ في السحابة ولا يشوفه الفريق.","Reset demo":"إعادة ضبط التجربة",
   "Enter the demo":"ادخل التجربة","Try the demo":"جرّب النسخة التجريبية","How to use":"طريقة الاستخدام","Open the real tracker":"افتح التراكر الحقيقي",
   "Show or hide this team":"إظهار أو إخفاء هذا الفريق","no account yet":"بدون حساب حتى الآن"});
+Object.assign(AR, {"Executive report":"تقرير تنفيذي","Executive summary":"الملخص التنفيذي","Corporate Communication & PR":"التواصل المؤسسي والعلاقات العامة","As of {0}":"حتى تاريخ {0}",
+  "Save as PDF":"حفظ PDF","Close":"إغلاق","All tasks":"كل المهام","Open":"مفتوحة","Status overview":"نظرة على الحالات","By team":"حسب الفريق","Done":"المنجز","Needs attention":"تحتاج انتباه",
+  "Nothing needs attention.":"لا يوجد ما يحتاج انتباه.","Waiting on a CEO decision":"بانتظار قرار الرئيس التنفيذي","Nothing is waiting on a decision.":"لا يوجد ما ينتظر قرار.",
+  "Due in the next 14 days":"تسليمات خلال 14 يوم","Nothing is due in the next 14 days.":"لا توجد تسليمات خلال 14 يوم.","No projects yet.":"لا توجد مشاريع حتى الآن.","{0} of {1} tasks":"{0} من {1} مهمة",
+  "{0}% of all tasks":"{0}% من كل المهام","Attention":"انتباه","In the print window choose “Save as PDF”.":"في نافذة الطباعة اختر «حفظ كـ PDF».",
+  "Switch to dark mode":"التحويل للوضع الداكن","Switch to light mode":"التحويل للوضع الفاتح",
+  "Manager view":"واجهة المدير","Member view":"واجهة المستخدم","Enter as manager":"ادخل كمدير","Enter as team member":"ادخل كمستخدم","You are viewing the demo as:":"تشوف التجربة كـ:",
+  "Demo. Nothing here is saved to the cloud or seen by the team.":"نسخة تجريبية. لا شيء هنا ينحفظ في السحابة ولا يشوفه الفريق.","Team":"الفريق","Total":"الإجمالي"});
 function T(s,a,b){ var r = (LANG==="ar" && AR[s]) || s; if(a!==undefined) r = r.replace("{0}",a); if(b!==undefined) r = r.replace("{1}",b); return r; }
 function mon(i){ return LANG==="ar" ? AR_MONTHS[i] : MON[i]; }
 function monthName(i){ return LANG==="ar" ? AR_MONTHS[i] : MONTHS[i]; }
@@ -451,7 +549,7 @@ function tr(root){
   var w = document.createTreeWalker(root, 5), n;
   while((n = w.nextNode())){ if(n.nodeType===3) trText(n); else trAttr(n); }
 }
-function applyLang(){
+function applyLang(){ applyTheme();
   var h = document.documentElement; h.lang = LANG; h.dir = LANG==="ar" ? "rtl" : "ltr";
   [].forEach.call(document.querySelectorAll(".langb"), function(b){ b.textContent = LANG==="ar" ? "English" : "العربية"; b.setAttribute("aria-label", LANG==="ar" ? "Switch to English" : "التحويل إلى العربية"); });
 }
@@ -552,7 +650,7 @@ function SupaAPI(){
 
 /* Demo back end: same rules as the database, kept in this browser only. Tabs talk to each other so "live" can be tried. */
 function MockAPI(){
-  var KEY = "trk-demo-v1", H = null, bc = null, me = null;
+  var KEY = "trk-demo-v2", H = null, bc = null, me = null;
   try{ bc = new BroadcastChannel("trk-demo"); }catch(e){}
   function uuid(){ return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,function(c){ var r = Math.random()*16|0; return (c==="x"?r:(r&3|8)).toString(16); }); }
   function db(){ var d = null; try{ d = JSON.parse(localStorage.getItem(KEY)||"null"); }catch(e){}
@@ -560,7 +658,7 @@ function MockAPI(){
       var seed = window.__SEED || demoSeed(), du = {};
       if(!window.__SEED){ [["Demo User","you@demo.test","owner"],["Sara Ahmed","sara@demo.test","member"],["Omar Khalid","omar@demo.test","member"],["Lina Hassan","lina@demo.test","admin"]].forEach(function(x){
         var u = {id:uuid(),name:x[0],email:x[1],pw:"demo-"+uuid(),role:x[2],created_at:new Date().toISOString()}; d.users.push(u); du[x[0].split(" ")[0]] = u.id; });
-        d.demoOwner = d.users[0].id;
+        d.demoOwner = d.users[0].id; d.demoMember = d.users[1].id;
         ["projects","tasks"].forEach(function(t){ (seed[t]||[]).forEach(function(r){ r.assignees = (r.who||[]).map(function(n){ return du[n]; }).filter(Boolean); delete r.who; }); }); }
       ["projects","tasks"].forEach(function(t){ (seed[t]||[]).forEach(function(r,i){ d[t].push(Object.assign({id:uuid(),areas:[],assignees:[],owner_text:"",notes:"",sort:i+1,created_by:null,updated_by:null,updated_at:new Date().toISOString(),created_at:new Date().toISOString(),project_id:null,start_date:null,due_date:null,due_text:null,priority:null,status:"Not Started"}, r)); }); });
       save(d); }
@@ -578,7 +676,10 @@ function MockAPI(){
   function P(fn){ return new Promise(function(res,rej){ setTimeout(function(){ try{ res(fn()); }catch(e){ rej(e); } }, 60); }); }
   function auth(){ var d = db(), u = cur(d); me = u; H.auth(u ? pub(u) : null, u ? "in" : "out"); }
   return {
-    demoIn:function(){ return P(function(){ var d = db(); if(d.demoOwner){ sid(d.demoOwner); setTimeout(auth,0); } }); },
+    demoIn:function(role){ return P(function(){ var d = db(), id = role==="member" ? d.demoMember : d.demoOwner;
+      if(!id){ try{ localStorage.removeItem(KEY); }catch(e){} d = db(); id = role==="member" ? d.demoMember : d.demoOwner; }
+      d.left = false; save(d); sid(id); setTimeout(auth,0); }); },
+    demoWho:function(){ var d = db(), s = sid(); return s && s===d.demoOwner ? "owner" : s && s===d.demoMember ? "member" : ""; },
     demoReset:function(){ try{ localStorage.removeItem(KEY); sessionStorage.removeItem(KEY+"-me"); }catch(e){} location.reload(); },
     init:function(h){ H = h; H.live(true);
       (function(){ var d0 = db(); if(d0.demoOwner && !sid() && !d0.left){ sid(d0.demoOwner); } })();
@@ -693,10 +794,10 @@ function chipsBar(board){
   var f = UI.f[board], all = D.tasks.filter(function(t){ return t.board===board; });
   function fc(key, label, n, on, s, c){ return '<button type="button" class="fc" data-fs="'+key+'" aria-pressed="'+on+'"'+(s?' data-s="'+s+'"':'')+' style="--c:'+c+'"><i></i><span>'+label+'</span><b class="num">'+n+'</b></button>'; }
   return '<div class="chipsbar" role="group" aria-label="Quick filters">'+
-    fc("all","All",all.length,!f.status&&!f.mine&&!f.late,"","var(--ink)")+
-    fc("mine","Mine",all.filter(isMine).length,f.mine,"","var(--accent)")+
-    fc("late","Past due",all.filter(isLate).length,f.late,"dl","var(--dl)")+
-    STATUS.map(function(s){ return fc("st:"+s, s, all.filter(function(t){ return t.status===s; }).length, f.status===s, ST_KEY[s], "var("+ST_VAR[s]+")"); }).join("")+'</div>';
+    fc("all","All",countIf(board,{status:"",mine:false,late:false}),!f.status&&!f.mine&&!f.late,"","var(--ink)")+
+    fc("mine","Mine",countIf(board,{mine:true}),f.mine,"","var(--accent)")+
+    fc("late","Past due",countIf(board,{late:true}),f.late,"dl","var(--dl)")+
+    STATUS.map(function(s){ return fc("st:"+s, s, countIf(board,{status:s}), f.status===s, ST_KEY[s], "var("+ST_VAR[s]+")"); }).join("")+'</div>';
 }
 var DETAIL_BTN = '<button type="button" class="btn ghost sm" data-detail><span class="s-on">More details</span><span class="s-off">Simple view</span></button>';
 /* ---------- people directory (names, titles, photos) ---------- */
@@ -771,7 +872,7 @@ function showGate(kind, msg){
       '<button class="btn" id="gGo" type="button" data-act="'+(up?"up":"in")+'">'+(up?"Create account":"Sign in")+'</button>'+
       (up?'':'<button class="linkb" id="gForgot" type="button">Forgot your password?</button>');
   }
-  if(DEMO && kind!=="pending" && kind!=="blocked" && api && api.demoIn) h = '<button class="btn" id="gDemo" type="button">Enter the demo</button>'+h;
+  if(DEMO && kind!=="pending" && kind!=="blocked" && api && api.demoIn) h = '<div class="gdemo"><button class="btn" data-gdemo="owner" type="button">Enter as manager</button><button class="btn" data-gdemo="member" type="button">Enter as team member</button></div>'+h;
   c.innerHTML = h;
   $("gLinks").innerHTML = '<a href="guide.html" target="_blank" rel="noopener">How to use</a>'+(DEMO ? '<a href="./">Open the real tracker</a>' : '<a href="?demo" target="_blank" rel="noopener">Try the demo</a>');
 }
@@ -803,7 +904,7 @@ $("gate").addEventListener("click", function(e){
   var g = e.target.closest("[data-g]"); if(g){ UI.gate = g.dataset.g; showGate("auth"); return; }
   if(e.target.id==="gShow"){ var i = $("gPw"); i.type = i.type==="password" ? "text" : "password"; e.target.textContent = T(i.type==="password" ? "Show" : "Hide"); return; }
   if(e.target.id==="gGo"){ gateSubmit(); return; }
-  if(e.target.id==="gDemo"){ api.demoIn().catch(fail); return; }
+  var gd = e.target.closest("[data-gdemo]"); if(gd){ api.demoIn(gd.dataset.gdemo).catch(fail); return; }
   if(e.target.id==="gOut"){ api.signOut().catch(fail); return; }
   if(e.target.id==="gBack"){ UI.gate = "in"; showGate("auth"); return; }
   if(e.target.id==="gForgot"){ var em = $("gEmail").value.trim();
@@ -881,7 +982,9 @@ function renderShell(){
   var tabs = [["main","Tasks"],["t4","T4 Tracker"],["proj","Projects"],["cal","Calendar"],["dash","Dashboard"],["team","Team"]];
   $("tabs").innerHTML = tabs.map(function(t){ return '<button type="button" role="tab" data-view="'+t[0]+'" aria-selected="'+(UI.view===t[0])+'">'+t[1]+(t[0]==="team"&&pend?'<em>'+pend+'</em>':'')+'</button>'; }).join("");
   $("meBtn").textContent = me.name+(me.role!=="member" ? " · "+T(me.role) : ""); $("meBtn").setAttribute("data-nt","");
-  $("demoNote").textContent = ""; $("demoBar").hidden = !DEMO;
+  $("demoNote").textContent = ""; $("demoBar").hidden = !DEMO; $("demoLink").hidden = DEMO;
+  if(DEMO){ var dw = api.demoWho ? api.demoWho() : "";
+    $("demoBar").innerHTML = '<span>Demo. Nothing here is saved to the cloud or seen by the team.</span><span class="dsw">'+(api.demoIn ? '<span>You are viewing the demo as:</span><button type="button" data-demo="owner" aria-pressed="'+(dw==="owner")+'">Manager view</button><button type="button" data-demo="member" aria-pressed="'+(dw==="member")+'">Member view</button>' : '')+'<button type="button" id="demoReset">Reset demo</button></span>'; }
   if(SIMPLE) tabs = tabs.filter(function(x){ return x[0]!=="dash" && (x[0]!=="team" || isAdmin()); });
   if(!tabs.some(function(x){ return x[0]===UI.view; })) UI.view = "main";
   $("tabs").innerHTML = tabs.map(function(t){ return '<button type="button" role="tab" data-view="'+t[0]+'" aria-selected="'+(UI.view===t[0])+'">'+t[1]+(t[0]==="team"&&pend?'<em>'+pend+'</em>':'')+'</button>'; }).join("");
@@ -898,7 +1001,9 @@ document.addEventListener("click", function(e){ if(!e.target.closest(".menu")){ 
 $("meSave").addEventListener("click", function(){ var n = $("meName").value.trim(); if(n.length<2){ toast("Enter your name.", true); return; }
   api.rename(n).then(function(){ me.name = n; upsert(D.profiles, me); renderShell(); render(); toast("Name saved."); $("mePop").hidden = true; }).catch(fail); });
 $("outBtn").addEventListener("click", function(){ $("mePop").hidden = true; api.signOut().catch(fail); });
-$("demoReset").addEventListener("click", function(){ if(api && api.demoReset) api.demoReset(); });
+$("demoBar").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return;
+  if(b.id==="demoReset"){ if(api && api.demoReset) api.demoReset(); return; }
+  if(b.dataset.demo && b.getAttribute("aria-pressed")!=="true"){ closeDrawer(); closeReport(); api.demoIn(b.dataset.demo).catch(fail); } });
 $("xlsBtn").addEventListener("click", function(){ $("mePop").hidden = true; exportExcel(); });
 
 /* ---------- views ---------- */
@@ -912,21 +1017,23 @@ function render(){
   else el.innerHTML = viewTeam();
 }
 function opt(v,cur,label){ return '<option value="'+esc(v)+'"'+(v===cur?" selected":"")+'>'+esc(label==null?v:label)+'</option>'; }
-function filtered(board){
-  var f = UI.f[board], q = f.q.trim().toLowerCase();
-  return D.tasks.filter(function(t){
-    if(t.board!==board) return false;
-    if(f.team && t.team!==f.team) return false;
-    if(f.status && t.status!==f.status) return false;
-    if(f.prio && t.priority!==f.prio) return false;
-    if(f.person && ownerLabel(t).toLowerCase().indexOf(f.person.toLowerCase())<0) return false;
-    if(f.mine && !isMine(t)) return false;
-    if(f.late && !isLate(t)) return false;
-    if(f.ceo && t.ceo_decision!=="Yes") return false;
-    if(q && (t.name+" "+t.notes+" "+ownerLabel(t)+" "+t.team+" "+projectName(t.project_id)).toLowerCase().indexOf(q)<0) return false;
-    return true;
-  }).sort(function(a,b){ return (a.sort-b.sort) || (a.created_at<b.created_at?-1:1); });
+function passes(t, f, board){
+  var q = f.q.trim().toLowerCase();
+  if(t.board!==board) return false;
+  if(f.team && t.team!==f.team) return false;
+  if(f.status && t.status!==f.status) return false;
+  if(f.prio && t.priority!==f.prio) return false;
+  if(f.person && ownerLabel(t).toLowerCase().indexOf(f.person.toLowerCase())<0) return false;
+  if(f.mine && !isMine(t)) return false;
+  if(f.late && !isLate(t)) return false;
+  if(f.ceo && t.ceo_decision!=="Yes") return false;
+  if(q && (t.name+" "+t.notes+" "+ownerLabel(t)+" "+t.team+" "+projectName(t.project_id)).toLowerCase().indexOf(q)<0) return false;
+  return true;
 }
+function filtered(board){ var f = UI.f[board];
+  return D.tasks.filter(function(t){ return passes(t, f, board); }).sort(function(a,b){ return (a.sort-b.sort) || (a.created_at<b.created_at?-1:1); }); }
+/* The number on a quick-filter chip is exactly what you get when you press it, with every other filter kept. */
+function countIf(board, over){ var f = Object.assign({}, UI.f[board], over); return D.tasks.filter(function(t){ return passes(t, f, board); }).length; }
 function uniq(arr){ var s = {}, o = []; arr.forEach(function(x){ if(x && !s[x]){ s[x] = 1; o.push(x); } }); return o; }
 function teamsOf(board){ return uniq(D.tasks.filter(function(t){ return t.board===board; }).map(function(t){ return t.team; })); }
 function ownersOf(board){ var o = []; D.tasks.forEach(function(t){ if(t.board===board) ownerLabel(t).split(/\s*(?:,|\/|\+|&| and )\s*/i).forEach(function(n){ n = n.trim(); if(n) o.push(n); }); }); return uniq(o).sort(); }
@@ -955,7 +1062,7 @@ function viewTasks(board){
     (SIMPLE && hiddenFilters(f) ? '<button type="button" class="btn ghost sm" data-clearf aria-pressed="true">Filtered · clear</button>' : '')+
     '<span class="sp"></span><span class="count"><span class="num">'+list.length+'</span> of <span class="num">'+total+'</span></span>'+
     '<button type="button" class="btn ghost sm xd" data-mode="table" aria-pressed="'+(mode==="table")+'">List</button>'+
-    '<button type="button" class="btn ghost sm xd" data-mode="board" aria-pressed="'+(mode==="board")+'">Board</button>'+DETAIL_BTN+
+    '<button type="button" class="btn ghost sm xd" data-mode="board" aria-pressed="'+(mode==="board")+'">Board</button>'+'<button type="button" class="btn ghost sm" data-report>Executive report</button>'+DETAIL_BTN+
     '<button type="button" class="btn sm" data-new="task">New task</button></div>'+chipsBar(board);
   if(!list.length){ h += '<div class="group"><div class="empty">'+(total?"No tasks match these filters.":"No tasks yet. Add the first one with New task.")+'</div></div>'; }
   else if(mode==="board"){
@@ -1306,6 +1413,56 @@ host.addEventListener("change", function(e){
   save(UI.open.type, it, patch);
 });
 document.addEventListener("keydown", function(e){ if(e.key==="Escape"){ if(UI.open) closeDrawer(); else { $("mePop").hidden = true; } } });
+
+/* ---------- executive report: one page for meetings, saved as PDF from the print window ---------- */
+var LOGO_HTML = (function(){ var s = document.querySelector(".brand svg"); return s ? s.outerHTML : ""; })();
+function reportHtml(){
+  var all = D.tasks, open = all.filter(function(t){ return t.status!=="Completed"; }), done = all.length-open.length, t0 = todayIso(), wk = addDays(t0,14);
+  var late = open.filter(isLate), cnt = function(s){ return all.filter(function(t){ return t.status===s; }).length; };
+  var pct = all.length ? Math.round(done/all.length*100) : 0;
+  function tk(t){ return (t.board==="t4" ? "T4 \u00B7 " : "")+(t.team||T("No team")); }
+  function k(n, label, c, sub){ return '<div style="--c:'+c+'"><b>'+n+'</b><span>'+esc(T(label))+'</span>'+(sub?'<small>'+esc(sub)+'</small>':'')+'</div>'; }
+  function due(t){ return t.due_date ? fmtPlain(t.due_date) : (t.due_text ? esc(t.due_text) : "\u2014"); }
+  function pill(s){ return '<span class="pill" '+stStyle(s)+'>'+esc(T(s))+'</span>'; }
+  function line(t, right){ return '<div><span><span dir="auto">'+esc(t.name)+'</span><small dir="auto">'+esc(tk(t))+(ownerLabel(t)?' \u00B7 '+esc(ownerLabel(t)):'')+'</small></span><span class="n">'+right+'</span></div>'; }
+  var h = '<div class="rbar"><b>'+esc(T("Executive report"))+'</b><span><button type="button" class="go" id="repPrint" title="'+esc(T("In the print window choose “Save as PDF”."))+'">'+esc(T("Save as PDF"))+'</button><button type="button" id="repClose">'+esc(T("Close"))+'</button></span></div>'+
+    '<div class="rpage"><div class="rhead"><div>'+LOGO_HTML+'<h1>CCPR Tracker \u00B7 '+esc(T("Executive summary"))+'</h1></div><p>'+esc(T("Corporate Communication & PR"))+'<br>'+esc(T("As of {0}", fmtPlain(t0)))+'</p></div>';
+  h += '<div class="rk">'+k(all.length,"All tasks","var(--ink)")+k(pct+"%","Completed","var(--ok)",T("{0} of {1} tasks", done, all.length))+k(open.length,"Open","var(--accent)")+
+    k(late.length,"Past due","var(--dl)")+k(cnt("Delayed"),"Delayed","var(--dl)")+k(cnt("At Risk"),"At Risk","var(--ar)")+'</div>';
+  h += '<div class="r2"><div class="rbox"><h2>'+esc(T("Status overview"))+'</h2><div class="rstack">'+STATUS.map(function(s){ var n = cnt(s); return n?'<i style="flex:'+n+';--c:var('+ST_VAR[s]+')"></i>':''; }).join("")+'</div>'+
+    '<div class="rleg">'+STATUS.map(function(s){ return '<div style="--c:var('+ST_VAR[s]+')"><i></i><span>'+esc(T(s))+'</span><b>'+cnt(s)+'</b></div>'; }).join("")+'</div></div>';
+  var teams = uniq(all.map(tk));
+  h += '<div class="rbox" style="--c:var(--ot)"><h2>'+esc(T("By team"))+'</h2><table class="rt"><thead><tr><th>'+esc(T("Team"))+'</th><th>'+esc(T("Total"))+'</th><th>'+esc(T("Done"))+'</th><th></th><th>'+esc(T("Past due"))+'</th><th>'+esc(T("Attention"))+'</th></tr></thead><tbody>'+
+    teams.map(function(tm){ var it = all.filter(function(t){ return tk(t)===tm; }), d = it.filter(function(t){ return t.status==="Completed"; }).length, l = it.filter(isLate).length,
+      a = it.filter(function(t){ return t.status==="Delayed"||t.status==="At Risk"; }).length, pc = it.length?Math.round(d/it.length*100):0;
+      return '<tr><td dir="auto">'+esc(tm)+'</td><td class="n">'+it.length+'</td><td class="n">'+pc+'%</td><td><div class="rbar2"><i style="width:'+pc+'%"></i></div></td><td class="n'+(l?" bad":"")+'">'+l+'</td><td class="n'+(a?" bad":"")+'">'+a+'</td></tr>'; }).join("")+'</tbody></table></div></div>';
+  var soon = open.filter(function(t){ return t.due_date && t.due_date>=t0 && t.due_date<=wk; }).sort(function(a,b){ return a.due_date<b.due_date ? -1 : 1; }), ceo = open.filter(function(t){ return t.ceo_decision==="Yes"; });
+  function box(title, c, items, empty, fn){ return '<div class="rbox" style="--c:'+c+'"><h2>'+esc(T(title))+' ('+items.length+')</h2>'+(items.length ? '<div class="rl">'+items.slice(0,5).map(fn).join("")+'</div>'+(items.length>5?'<span class="rempty">'+esc(T("and {0} more", items.length-5))+'</span>':'') : '<span class="rempty">'+esc(T(empty))+'</span>')+'</div>'; }
+  h += '<div class="r3">'+box("Due in the next 14 days","var(--accent)",soon,"Nothing is due in the next 14 days.",function(t){ return line(t, due(t)); })+
+    box("Waiting on a CEO decision","var(--pur)",ceo,"Nothing is waiting on a decision.",function(t){ return line(t, due(t)); })+
+    box("Projects","var(--ot)",D.projects,"No projects yet.",function(p){ var tkk = D.tasks.filter(function(t){ return t.project_id===p.id; }), dn = tkk.filter(function(t){ return t.status==="Completed"; }).length;
+      return '<div><span><span dir="auto">'+esc(p.name)+'</span><small>'+(p.due_date?fmtPlain(p.due_date):(p.due_text?esc(p.due_text):""))+(tkk.length?' \u00B7 '+esc(T("{0} of {1} tasks", dn, tkk.length)):'')+'</small></span><span>'+pill(p.status)+'</span></div>'; })+'</div>';
+  var att = open.filter(function(t){ return isLate(t) || t.status==="Delayed" || t.status==="At Risk"; }).sort(function(a,b){ return (a.due_date||"9")<(b.due_date||"9") ? -1 : 1; });
+  h += '<div class="rbox ratt" style="--c:var(--dl)"><h2>'+esc(T("Needs attention"))+' ('+att.length+')</h2>'+(att.length ? '<table class="rt"><thead><tr><th>'+esc(T("Task"))+'</th><th>'+esc(T("Team"))+'</th><th>'+esc(T("Owner"))+'</th><th>'+esc(T("Due"))+'</th><th>'+esc(T("Status"))+'</th></tr></thead><tbody>'+
+    att.slice(0,14).map(function(t){ return '<tr><td dir="auto">'+esc(t.name)+'</td><td dir="auto">'+esc(tk(t))+'</td><td dir="auto">'+esc(ownerLabel(t))+'</td><td class="n'+(isLate(t)?" bad":"")+'">'+due(t)+'</td><td>'+pill(t.status)+'</td></tr>'; }).join("")+'</tbody></table>'+
+    (att.length>14 ? '<span class="rempty">'+esc(T("and {0} more", att.length-14))+'</span>' : '') : '<span class="rempty">'+esc(T("Nothing needs attention."))+'</span>')+'</div>';
+  h += '<div class="rfoot"><span>CCPR Tracker \u00B7 '+fmtPlain(t0)+'</span><span>Designed by Mohammed Wagih \u00B7 v1.5</span></div></div>';
+  return h;
+}
+function openReport(){
+  if(!ready) return; closeDrawer(); $("mePop").hidden = true;
+  var el = $("repHost"); if(!el){ el = document.createElement("div"); el.id = "repHost"; el.setAttribute("data-nt",""); el.setAttribute("role","dialog"); el.setAttribute("aria-modal","true"); document.body.appendChild(el); }
+  el.setAttribute("aria-label", T("Executive report")); el.innerHTML = reportHtml(); el.scrollTop = 0; document.documentElement.classList.add("rep-on"); $("repClose").focus();
+}
+function closeReport(){ var el = $("repHost"); if(el) el.remove(); document.documentElement.classList.remove("rep-on"); }
+document.addEventListener("click", function(e){
+  if(!e.target.closest) return;
+  if(e.target.closest("[data-report]")){ openReport(); return; }
+  if(e.target.closest("#repClose")){ closeReport(); return; }
+  if(e.target.closest("#repPrint")){ var old = document.title; document.title = "CCPR-Tracker-Executive-Summary-"+todayIso(); var back = function(){ document.title = old; window.removeEventListener("afterprint", back); };
+    window.addEventListener("afterprint", back); try{ window.print(); }catch(x){ back(); } }
+});
+document.addEventListener("keydown", function(e){ if(e.key==="Escape" && $("repHost")){ e.stopImmediatePropagation(); closeReport(); } }, true);
 
 /* ---------- Excel ---------- */
 function exportExcel(){

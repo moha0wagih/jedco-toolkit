@@ -71,7 +71,7 @@ html[dir="rtl"] body{font-size:16px}
     <div class="cta"><a id="a_open" href="./"></a><a class="alt" id="a_demo" href="./?demo"></a></div>
   </header>
   <main id="main"></main>
-  <footer class="foot"><span class="url">https://moha0wagih.github.io/jedco-toolkit/tools/tracker/</span><span>Designed by Mohammed Wagih · v1.4</span></footer>
+  <footer class="foot"><span class="url">https://moha0wagih.github.io/jedco-toolkit/tools/tracker/</span><span>Designed by Mohammed Wagih · v1.5</span></footer>
 </div>
 <script>
 "use strict";
@@ -102,7 +102,9 @@ ar:{dir:"rtl", btn:"English", title:"دليل استخدام CCPR Tracker", lead
     ["تبحث وتفلتر","اكتب في خانة البحث، أو اضغط على أي لون في الشريط (مثلاً «متأخرة»)."],
     ["تخفي فريق","اضغط على اسم الفريق عشان تطوي مهامه أو تفتحها."],
     ["تشوف كل الخانات","زر «تفاصيل أكثر» يظهر الأولوية، الفرق المشاركة، البورد، والداشبورد."],
-    ["المشاريع و T4","لها تبويبات فوق، وتشتغل بنفس الطريقة."]]},
+    ["المشاريع و T4","لها تبويبات فوق، وتشتغل بنفس الطريقة."],
+    ["تقرير تنفيذي","زر «تقرير تنفيذي» يعطيك صفحة واحدة موجزة للاجتماعات، وتحفظها PDF."],
+    ["الوضع الداكن","زر الشمس أو القمر فوق يبدّل بين الفاتح والداكن."]]},
   {h:"ألوان الحالات", c:"var(--dl)", type:"legend", items:[
     ["لم تبدأ","ns","ما بدأ العمل عليها."],["قيد التنفيذ","ip","العمل جاري."],["على المسار","ot dk","ماشية حسب الخطة."],
     ["في خطر","ar dk","فيه شي ممكن يأخرها."],["متأخرة","dl glow","تأخرت، وتوهج بالأحمر."],["مكتملة","ok","خلصت."]]},
@@ -111,7 +113,7 @@ ar:{dir:"rtl", btn:"English", title:"دليل استخدام CCPR Tracker", lead
     ["الأدمن","يعدّل كل شي ويوافق على الحسابات الجديدة."],
     ["لو حذفت مهمة بالغلط","ما تضيع. بلّغ الأدمن ويرجعها من تبويب «الفريق»."],
     ["نسيت كلمة المرور","اكتب إيميلك في صفحة الدخول واضغط «نسيت كلمة المرور؟»."],
-    ["تبغى تجرب بدون خوف","افتح النسخة التجريبية. كل شي فيها وهمي وما ينحفظ ولا يشوفه أحد."]]}
+    ["تبغى تجرب بدون خوف","افتح النسخة التجريبية. كل شي فيها وهمي وما ينحفظ ولا يشوفه أحد، وتقدر تشوفها كمدير أو كمستخدم."]]}
   ]},
 en:{dir:"ltr", btn:"العربية", title:"CCPR Tracker guide", lead:"One place for every Corporate Communication task and project. Any update you make shows for the whole team at the same moment.",
   open:"Open the tracker", demo:"Try the demo",
@@ -139,7 +141,9 @@ en:{dir:"ltr", btn:"العربية", title:"CCPR Tracker guide", lead:"One place
     ["Search and filter","Type in the search box, or click any colour in the bar (Delayed, for example)."],
     ["Hide a team","Click a team name to fold or unfold its tasks."],
     ["See every field","More details shows priority, involved teams, the board and the dashboard."],
-    ["Projects and T4","They have their own tabs and work the same way."]]},
+    ["Projects and T4","They have their own tabs and work the same way."],
+    ["Executive report","Executive report gives a one-page summary for meetings that you can save as a PDF."],
+    ["Dark mode","The sun or moon button at the top switches between light and dark."]]},
   {h:"Status colours", c:"var(--dl)", type:"legend", items:[
     ["Not Started","ns","Work hasn’t begun."],["In Progress","ip","Work is under way."],["On Track","ot dk","Going to plan."],
     ["At Risk","ar dk","Something may delay it."],["Delayed","dl glow","It is late, and it glows red."],["Completed","ok","Done."]]},
@@ -148,7 +152,7 @@ en:{dir:"ltr", btn:"العربية", title:"CCPR Tracker guide", lead:"One place
     ["Admins","Edit everything and approve new accounts."],
     ["Deleted a task by mistake","It isn’t lost. Tell an admin and they restore it from the Team tab."],
     ["Forgot your password","Type your email on the sign-in page and choose Forgot your password?"],
-    ["Want to try safely","Open the demo. Everything there is sample data that is never saved or seen by anyone."]]}
+    ["Want to try safely","Open the demo. Everything there is sample data that is never saved or seen by anyone, and you can view it as a manager or as a member."]]}
   ]}
 };
 function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
