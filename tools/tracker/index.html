@@ -112,6 +112,24 @@ label.lb{font-size:12px;color:var(--ink-soft);display:block;margin-bottom:5px}
 .tools .sp{flex:1}
 .count{font-size:12.5px;color:var(--ink-soft)}
 
+/* ---------- people photos + simple view ---------- */
+.pav{width:30px;height:30px;border-radius:50%;object-fit:cover;flex:none;background:var(--tint);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;
+  font-size:9.5px;font-family:var(--display);border:1.5px solid var(--surface);box-sizing:border-box}
+.pavs{display:inline-flex;flex:none}
+.pavs .pav+.pav{margin-inline-start:-8px}
+img.av{object-fit:cover;padding:0}
+.row .own,.kc .own{display:flex;align-items:center;gap:8px;overflow:visible}
+.own>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.tgp{display:inline-flex;align-items:center;gap:6px;padding-block:3px;padding-inline:4px 11px}
+.tgp .pav{width:24px;height:24px;border-width:0}
+.psel{width:auto;max-width:180px;padding:5px 8px;font-size:12px;border-radius:8px}
+.dmore{align-self:flex-start}
+body.simple .xd{display:none!important}
+body.simple .s-off,body:not(.simple) .s-on{display:none}
+@media (min-width:821px){
+  body.simple .cols,body.simple .row{grid-template-columns:minmax(200px,2.4fr) minmax(150px,1.3fr) 140px minmax(96px,.7fr)}
+}
+
 /* ---------- pills ---------- */
 .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 9px 3px 7px;font-size:12px;white-space:nowrap;
   background:color-mix(in srgb,var(--c) 15%,var(--surface));color:var(--ink)}
@@ -286,7 +304,7 @@ html[dir="rtl"] .nm b,html[dir="rtl"] .nm small,html[dir="rtl"] .kc b,html[dir="
     <div><h1>CCPR Tracker</h1></div>
     <p id="gLead">Projects and tasks of Corporate Communication, live for the whole team.</p>
     <div class="gcard" id="gCard"></div>
-    <div class="gfoot">Designed by Mohammed Wagih · v1.2</div>
+    <div class="gfoot">Designed by Mohammed Wagih · v1.3</div>
   </div>
 </div>
 
@@ -311,7 +329,7 @@ html[dir="rtl"] .nm b,html[dir="rtl"] .nm small,html[dir="rtl"] .kc b,html[dir="
   </header>
   <nav class="tabs" id="tabs" role="tablist"></nav>
   <main id="view"></main>
-  <footer class="foot"><span id="demoNote"></span><span>Designed by Mohammed Wagih · v1.2</span></footer>
+  <footer class="foot"><span id="demoNote"></span><span>Designed by Mohammed Wagih · v1.3</span></footer>
 </div>
 
 <div id="drawerHost" data-hub-autosave></div>
@@ -339,6 +357,10 @@ function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){ ret
 var LANG = (function(){ try{ return localStorage.getItem("trk-lang")==="ar" ? "ar" : "en"; }catch(e){ return "en"; } })();
 var AR_MONTHS = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
 var AR = {"Projects and tasks of Corporate Communication, live for the whole team.": "\u0645\u0634\u0627\u0631\u064a\u0639 \u0648\u0645\u0647\u0627\u0645 \u0627\u0644\u062a\u0648\u0627\u0635\u0644 \u0627\u0644\u0645\u0624\u0633\u0633\u064a\u060c \u0644\u0627\u064a\u0641 \u0644\u0644\u0641\u0631\u064a\u0642 \u0643\u0644\u0647.", "Sign in": "\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644", "Create account": "\u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628", "Full name": "\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0643\u0627\u0645\u0644", "Email": "\u0627\u0644\u0625\u064a\u0645\u064a\u0644", "Password": "\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631", "Show": "\u0625\u0638\u0647\u0627\u0631", "Hide": "\u0625\u062e\u0641\u0627\u0621", "Forgot your password?": "\u0646\u0633\u064a\u062a \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631\u061f", "As your team knows you": "\u0632\u064a \u0645\u0627 \u064a\u0639\u0631\u0641\u0643 \u0641\u0631\u064a\u0642\u0643", "At least 8 characters. An admin approves new accounts before they open.": "\u0668 \u0623\u062d\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644. \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a \u0627\u0644\u062c\u062f\u064a\u062f\u0629 \u062a\u0646\u0641\u062a\u062d \u0628\u0639\u062f \u0645\u0648\u0627\u0641\u0642\u0629 \u0627\u0644\u0623\u062f\u0645\u0646.", "One moment\u2026": "\u0644\u062d\u0638\u0629\u2026", "Sign out": "\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c", "Thanks, {0}. Your account is waiting for approval.": "\u0634\u0643\u0631\u0627\u064b {0}. \u062d\u0633\u0627\u0628\u0643 \u0628\u0627\u0646\u062a\u0638\u0627\u0631 \u0627\u0644\u0645\u0648\u0627\u0641\u0642\u0629.", "You\u2019ll get in automatically once an admin approves you. You can keep this page open.": "\u0628\u062a\u062f\u062e\u0644 \u062a\u0644\u0642\u0627\u0626\u064a\u0627\u064b \u0623\u0648\u0644 \u0645\u0627 \u064a\u0648\u0627\u0641\u0642 \u0639\u0644\u064a\u0643 \u0627\u0644\u0623\u062f\u0645\u0646. \u062a\u0642\u062f\u0631 \u062a\u062e\u0644\u064a \u0627\u0644\u0635\u0641\u062d\u0629 \u0645\u0641\u062a\u0648\u062d\u0629.", "This account doesn\u2019t have access to the tracker.": "\u0647\u0630\u0627 \u0627\u0644\u062d\u0633\u0627\u0628 \u0645\u0627 \u0639\u0646\u062f\u0647 \u0635\u0644\u0627\u062d\u064a\u0629 \u062f\u062e\u0648\u0644 \u0644\u0644\u062a\u0631\u0627\u0643\u0631.", "Contact the tracker owner if you think this is a mistake.": "\u062a\u0648\u0627\u0635\u0644 \u0645\u0639 \u0645\u0627\u0644\u0643 \u0627\u0644\u062a\u0631\u0627\u0643\u0631 \u0644\u0648 \u062a\u0634\u0648\u0641 \u0625\u0646 \u0647\u0630\u0627 \u062e\u0637\u0623.", "The tracker is being connected to its database.": "\u0627\u0644\u062a\u0631\u0627\u0643\u0631 \u0642\u064a\u062f \u0627\u0644\u0631\u0628\u0637 \u0628\u0642\u0627\u0639\u062f\u0629 \u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a.", "It opens here as soon as the setup is finished.": "\u0628\u064a\u0646\u0641\u062a\u062d \u0647\u0646\u0627 \u0623\u0648\u0644 \u0645\u0627 \u064a\u062e\u0644\u0635 \u0627\u0644\u0625\u0639\u062f\u0627\u062f.", "Choose a new password": "\u0627\u062e\u062a\u0631 \u0643\u0644\u0645\u0629 \u0645\u0631\u0648\u0631 \u062c\u062f\u064a\u062f\u0629", "New password": "\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0627\u0644\u062c\u062f\u064a\u062f\u0629", "Save password": "\u062d\u0641\u0638 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631", "Check your email": "\u0634\u064a\u0651\u0643 \u0639\u0644\u0649 \u0625\u064a\u0645\u064a\u0644\u0643", "We sent a confirmation link to {0}. Open it, then come back and sign in.": "\u0623\u0631\u0633\u0644\u0646\u0627 \u0631\u0627\u0628\u0637 \u062a\u0623\u0643\u064a\u062f \u0625\u0644\u0649 {0}. \u0627\u0641\u062a\u062d\u0647\u060c \u0648\u0628\u0639\u062f\u0647\u0627 \u0627\u0631\u062c\u0639 \u0648\u0633\u062c\u0651\u0644 \u062f\u062e\u0648\u0644\u0643.", "Back to sign in": "\u0631\u062c\u0648\u0639 \u0644\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644", "Enter your full name.": "\u0627\u0643\u062a\u0628 \u0627\u0633\u0645\u0643 \u0627\u0644\u0643\u0627\u0645\u0644.", "Enter a valid email.": "\u0627\u0643\u062a\u0628 \u0625\u064a\u0645\u064a\u0644 \u0635\u062d\u064a\u062d.", "Use a password of at least 8 characters.": "\u0627\u0633\u062a\u062e\u062f\u0645 \u0643\u0644\u0645\u0629 \u0645\u0631\u0648\u0631 \u0645\u0646 \u0668 \u0623\u062d\u0631\u0641 \u0639\u0644\u0649 \u0627\u0644\u0623\u0642\u0644.", "Enter your password.": "\u0627\u0643\u062a\u0628 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631.", "Type your email above first.": "\u0627\u0643\u062a\u0628 \u0625\u064a\u0645\u064a\u0644\u0643 \u0641\u0648\u0642 \u0623\u0648\u0644.", "If this email has an account, a reset link is on its way.": "\u0644\u0648 \u0647\u0630\u0627 \u0627\u0644\u0625\u064a\u0645\u064a\u0644 \u0644\u0647 \u062d\u0633\u0627\u0628\u060c \u0631\u0627\u0628\u0637 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u062a\u0639\u064a\u064a\u0646 \u0641\u064a \u0627\u0644\u0637\u0631\u064a\u0642.", "The email or password isn\u2019t right.": "\u0627\u0644\u0625\u064a\u0645\u064a\u0644 \u0623\u0648 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u063a\u064a\u0631 \u0635\u062d\u064a\u062d\u0629.", "This email already has an account. Sign in instead.": "\u0647\u0630\u0627 \u0627\u0644\u0625\u064a\u0645\u064a\u0644 \u0644\u0647 \u062d\u0633\u0627\u0628. \u0633\u062c\u0651\u0644 \u062f\u062e\u0648\u0644\u0643.", "Confirm your email first. Check your inbox for the link.": "\u0623\u0643\u0651\u062f \u0625\u064a\u0645\u064a\u0644\u0643 \u0623\u0648\u0644. \u0627\u0644\u0631\u0627\u0628\u0637 \u0641\u064a \u0628\u0631\u064a\u062f\u0643.", "Too many tries. Wait a minute and try again.": "\u0645\u062d\u0627\u0648\u0644\u0627\u062a \u0643\u062b\u064a\u0631\u0629. \u0627\u0646\u062a\u0638\u0631 \u062f\u0642\u064a\u0642\u0629 \u0648\u062c\u0631\u0651\u0628 \u0645\u0631\u0629 \u062b\u0627\u0646\u064a\u0629.", "Can\u2019t reach the server. Check your connection.": "\u0645\u0627 \u0642\u062f\u0631\u0646\u0627 \u0646\u0648\u0635\u0644 \u0644\u0644\u0633\u064a\u0631\u0641\u0631. \u062a\u0623\u0643\u062f \u0645\u0646 \u0627\u0644\u0627\u062a\u0635\u0627\u0644.", "Something went wrong. Try again.": "\u0635\u0627\u0631 \u062e\u0637\u0623. \u062c\u0631\u0651\u0628 \u0645\u0631\u0629 \u062b\u0627\u0646\u064a\u0629.", "Live": "\u0644\u0627\u064a\u0641", "Reconnecting\u2026": "\u062c\u0627\u0631\u064a \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u0627\u062a\u0635\u0627\u0644\u2026", "Your name": "\u0627\u0633\u0645\u0643", "Save name": "\u062d\u0641\u0638 \u0627\u0644\u0627\u0633\u0645", "Export to Excel": "\u062a\u0635\u062f\u064a\u0631 Excel", "Dashboard": "\u0627\u0644\u062f\u0627\u0634\u0628\u0648\u0631\u062f", "Tasks": "\u0627\u0644\u0645\u0647\u0627\u0645", "T4 Tracker": "\u062a\u0631\u0627\u0643\u0631 T4", "Projects": "\u0627\u0644\u0645\u0634\u0627\u0631\u064a\u0639", "Calendar": "\u0627\u0644\u062a\u0642\u0648\u064a\u0645", "Team": "\u0627\u0644\u0641\u0631\u064a\u0642", "Demo mode. Everything here stays in this browser only.": "\u0648\u0636\u0639 \u062a\u062c\u0631\u064a\u0628\u064a. \u0643\u0644 \u0634\u064a \u0647\u0646\u0627 \u064a\u0628\u0642\u0649 \u0641\u064a \u0647\u0630\u0627 \u0627\u0644\u0645\u062a\u0635\u0641\u062d \u0641\u0642\u0637.", "owner": "\u0627\u0644\u0645\u0627\u0644\u0643", "admin": "\u0623\u062f\u0645\u0646", "member": "\u0639\u0636\u0648", "waiting": "\u0628\u0627\u0646\u062a\u0638\u0627\u0631 \u0627\u0644\u0645\u0648\u0627\u0641\u0642\u0629", "blocked": "\u0645\u0648\u0642\u0648\u0641", "pending": "\u0628\u0627\u0646\u062a\u0638\u0627\u0631 \u0627\u0644\u0645\u0648\u0627\u0641\u0642\u0629", "Name saved.": "\u0627\u0646\u062d\u0641\u0638 \u0627\u0644\u0627\u0633\u0645.", "Enter your name.": "\u0627\u0643\u062a\u0628 \u0627\u0633\u0645\u0643.", "Password saved.": "\u0627\u0646\u062d\u0641\u0638\u062a \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631.", "Excel file saved.": "\u0627\u0646\u062d\u0641\u0638 \u0645\u0644\u0641 Excel.", "The Excel tool didn\u2019t load. Reload the page and try again.": "\u0623\u062f\u0627\u0629 Excel \u0645\u0627 \u062d\u0645\u0651\u0644\u062a. \u062d\u062f\u0651\u062b \u0627\u0644\u0635\u0641\u062d\u0629 \u0648\u062c\u0631\u0651\u0628 \u0645\u0631\u0629 \u062b\u0627\u0646\u064a\u0629.", "Couldn\u2019t build the Excel file. Try again.": "\u0645\u0627 \u0642\u062f\u0631\u0646\u0627 \u0646\u062c\u0647\u0632 \u0645\u0644\u0641 Excel. \u062c\u0631\u0651\u0628 \u0645\u0631\u0629 \u062b\u0627\u0646\u064a\u0629.", "You don\u2019t have permission to edit this.": "\u0645\u0627 \u0639\u0646\u062f\u0643 \u0635\u0644\u0627\u062d\u064a\u0629 \u062a\u0639\u062f\u0644 \u0647\u0630\u0627.", "You don\u2019t have permission to delete this.": "\u0645\u0627 \u0639\u0646\u062f\u0643 \u0635\u0644\u0627\u062d\u064a\u0629 \u062a\u062d\u0630\u0641 \u0647\u0630\u0627.", "This item was deleted.": "\u0647\u0630\u0627 \u0627\u0644\u0639\u0646\u0635\u0631 \u0627\u0646\u062d\u0630\u0641.", "Deleted.": "\u0627\u0646\u062d\u0630\u0641.", "Not Started": "\u0644\u0645 \u062a\u0628\u062f\u0623", "In Progress": "\u0642\u064a\u062f \u0627\u0644\u062a\u0646\u0641\u064a\u0630", "On Track": "\u0639\u0644\u0649 \u0627\u0644\u0645\u0633\u0627\u0631", "At Risk": "\u0641\u064a \u062e\u0637\u0631", "Delayed": "\u0645\u062a\u0623\u062e\u0631\u0629", "Completed": "\u0645\u0643\u062a\u0645\u0644\u0629", "High": "\u0639\u0627\u0644\u064a\u0629", "Medium": "\u0645\u062a\u0648\u0633\u0637\u0629", "Low": "\u0645\u0646\u062e\u0641\u0636\u0629", "None": "\u0628\u062f\u0648\u0646", "none": "\u0628\u062f\u0648\u0646", "Not set": "\u063a\u064a\u0631 \u0645\u062d\u062f\u062f", "Yes": "\u0646\u0639\u0645", "No": "\u0644\u0627", "Brand Mgmt": "\u0625\u062f\u0627\u0631\u0629 \u0627\u0644\u0639\u0644\u0627\u0645\u0629", "Digital Comm.": "\u0627\u0644\u062a\u0648\u0627\u0635\u0644 \u0627\u0644\u0631\u0642\u0645\u064a", "Internal Comm.": "\u0627\u0644\u062a\u0648\u0627\u0635\u0644 \u0627\u0644\u062f\u0627\u062e\u0644\u064a", "Events": "\u0627\u0644\u0641\u0639\u0627\u0644\u064a\u0627\u062a", "PR": "\u0627\u0644\u0639\u0644\u0627\u0642\u0627\u062a \u0627\u0644\u0639\u0627\u0645\u0629", "Protocol": "\u0627\u0644\u0645\u0631\u0627\u0633\u0645", "Media": "\u0627\u0644\u0625\u0639\u0644\u0627\u0645", "Main Project": "\u0645\u0634\u0631\u0648\u0639 \u0631\u0626\u064a\u0633\u064a", "Shared Project": "\u0645\u0634\u0631\u0648\u0639 \u0645\u0634\u062a\u0631\u0643", "Lead": "\u0627\u0644\u0642\u0627\u0626\u062f", "Search tasks, notes, people": "\u0627\u0628\u062d\u062b \u0641\u064a \u0627\u0644\u0645\u0647\u0627\u0645 \u0648\u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0648\u0627\u0644\u0623\u0634\u062e\u0627\u0635", "Search projects": "\u0627\u0628\u062d\u062b \u0641\u064a \u0627\u0644\u0645\u0634\u0627\u0631\u064a\u0639", "All teams": "\u0643\u0644 \u0627\u0644\u0641\u0631\u0642", "Any status": "\u0623\u064a \u062d\u0627\u0644\u0629", "Any priority": "\u0623\u064a \u0623\u0648\u0644\u0648\u064a\u0629", "Anyone": "\u0627\u0644\u0643\u0644", "Mine": "\u0645\u0647\u0627\u0645\u064a", "Overdue": "\u0627\u0644\u0645\u062a\u0623\u062e\u0631\u0629", "CEO decision": "\u0642\u0631\u0627\u0631 \u0627\u0644\u0631\u0626\u064a\u0633 \u0627\u0644\u062a\u0646\u0641\u064a\u0630\u064a", "List": "\u0642\u0627\u0626\u0645\u0629", "Board": "\u0628\u0648\u0631\u062f", "New task": "\u0645\u0647\u0645\u0629 \u062c\u062f\u064a\u062f\u0629", "New project": "\u0645\u0634\u0631\u0648\u0639 \u062c\u062f\u064a\u062f", "of": "\u0645\u0646", "completed": "\u0645\u0643\u062a\u0645\u0644\u0629", "people": "\u0623\u0634\u062e\u0627\u0635", "No tasks match these filters.": "\u0645\u0627 \u0641\u064a \u0645\u0647\u0627\u0645 \u062a\u0637\u0627\u0628\u0642 \u0647\u0630\u064a \u0627\u0644\u0641\u0644\u0627\u062a\u0631.", "No tasks yet. Add the first one with New task.": "\u0645\u0627 \u0641\u064a \u0645\u0647\u0627\u0645 \u0644\u0633\u0627. \u0623\u0636\u0641 \u0623\u0648\u0644 \u0645\u0647\u0645\u0629 \u0645\u0646 \u00ab\u0645\u0647\u0645\u0629 \u062c\u062f\u064a\u062f\u0629\u00bb.", "No projects match.": "\u0645\u0627 \u0641\u064a \u0645\u0634\u0627\u0631\u064a\u0639 \u0645\u0637\u0627\u0628\u0642\u0629.", "No projects yet. Add the first one with New project.": "\u0645\u0627 \u0641\u064a \u0645\u0634\u0627\u0631\u064a\u0639 \u0644\u0633\u0627. \u0623\u0636\u0641 \u0623\u0648\u0644 \u0645\u0634\u0631\u0648\u0639 \u0645\u0646 \u00ab\u0645\u0634\u0631\u0648\u0639 \u062c\u062f\u064a\u062f\u00bb.", "Task": "\u0627\u0644\u0645\u0647\u0645\u0629", "Involved teams": "\u0627\u0644\u0641\u0631\u0642 \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u0629", "Owner": "\u0627\u0644\u0645\u0633\u0624\u0648\u0644", "Priority": "\u0627\u0644\u0623\u0648\u0644\u0648\u064a\u0629", "Status": "\u0627\u0644\u062d\u0627\u0644\u0629", "Due": "\u0627\u0644\u062a\u0633\u0644\u064a\u0645", "Project": "\u0627\u0644\u0645\u0634\u0631\u0648\u0639", "No team": "\u0628\u062f\u0648\u0646 \u0641\u0631\u064a\u0642", "Open tasks": "\u0645\u0647\u0627\u0645 \u0645\u0641\u062a\u0648\u062d\u0629", "Due in the next 7 days": "\u062a\u0633\u0644\u064a\u0645\u0647\u0627 \u062e\u0644\u0627\u0644 \u0667 \u0623\u064a\u0627\u0645", "Waiting on a CEO decision": "\u0628\u0627\u0646\u062a\u0638\u0627\u0631 \u0642\u0631\u0627\u0631 \u0627\u0644\u0631\u0626\u064a\u0633 \u0627\u0644\u062a\u0646\u0641\u064a\u0630\u064a", "Completed ({0} of {1})": "\u0645\u0643\u062a\u0645\u0644\u0629 ({0} \u0645\u0646 {1})", "By team": "\u062d\u0633\u0628 \u0627\u0644\u0641\u0631\u064a\u0642", "Open tasks per person": "\u0627\u0644\u0645\u0647\u0627\u0645 \u0627\u0644\u0645\u0641\u062a\u0648\u062d\u0629 \u0644\u0643\u0644 \u0634\u062e\u0635", "No open tasks.": "\u0645\u0627 \u0641\u064a \u0645\u0647\u0627\u0645 \u0645\u0641\u062a\u0648\u062d\u0629.", "My open tasks": "\u0645\u0647\u0627\u0645\u064a \u0627\u0644\u0645\u0641\u062a\u0648\u062d\u0629", "Nothing is assigned to you yet.": "\u0645\u0627 \u0641\u064a \u0634\u064a \u0645\u0633\u0646\u062f \u0644\u0643 \u0644\u0633\u0627.", "Nothing is overdue.": "\u0645\u0627 \u0641\u064a \u0634\u064a \u0645\u062a\u0623\u062e\u0631.", "Latest changes": "\u0622\u062e\u0631 \u0627\u0644\u062a\u063a\u064a\u064a\u0631\u0627\u062a", "Changes show up here as the team works.": "\u0627\u0644\u062a\u063a\u064a\u064a\u0631\u0627\u062a \u062a\u0638\u0647\u0631 \u0647\u0646\u0627 \u0645\u0639 \u0634\u063a\u0644 \u0627\u0644\u0641\u0631\u064a\u0642.", "and {0} more": "\u0648{0} \u063a\u064a\u0631\u0647\u0627", "Today": "\u0627\u0644\u064a\u0648\u0645", "\u2190": "\u2192", "\u2192": "\u2190", "Open in \u062a\u0642\u0648\u064a\u0645\u064a": "\u0627\u0641\u062a\u062d \u0641\u064a \u062a\u0642\u0648\u064a\u0645\u064a", "See it in \u062a\u0642\u0648\u064a\u0645\u064a": "\u0634\u0648\u0641\u0647\u0627 \u0641\u064a \u062a\u0642\u0648\u064a\u0645\u064a", "No fixed date yet": "\u0628\u062f\u0648\u0646 \u062a\u0627\u0631\u064a\u062e \u0645\u062d\u062f\u062f", "Sun": "\u0623\u062d\u062f", "Mon": "\u0627\u062b\u0646\u064a\u0646", "Tue": "\u062b\u0644\u0627\u062b\u0627\u0621", "Wed": "\u0623\u0631\u0628\u0639\u0627\u0621", "Thu": "\u062e\u0645\u064a\u0633", "Fri": "\u062c\u0645\u0639\u0629", "Sat": "\u0633\u0628\u062a", "Waiting for approval": "\u0628\u0627\u0646\u062a\u0638\u0627\u0631 \u0627\u0644\u0645\u0648\u0627\u0641\u0642\u0629", "Nobody is waiting. New sign-ups appear here.": "\u0645\u0627 \u0641\u064a \u0623\u062d\u062f \u064a\u0646\u062a\u0638\u0631. \u0627\u0644\u062a\u0633\u062c\u064a\u0644\u0627\u062a \u0627\u0644\u062c\u062f\u064a\u062f\u0629 \u062a\u0638\u0647\u0631 \u0647\u0646\u0627.", "No access": "\u0628\u062f\u0648\u0646 \u0635\u0644\u0627\u062d\u064a\u0629", "Approve": "\u0645\u0648\u0627\u0641\u0642\u0629", "Approve only": "\u0645\u0648\u0627\u0641\u0642\u0629 \u0641\u0642\u0637", "Approve and link {0} tasks": "\u0645\u0648\u0627\u0641\u0642\u0629 \u0648\u0631\u0628\u0637 {0} \u0645\u0647\u0645\u0629", "Decline": "\u0631\u0641\u0636", "Remove access": "\u0633\u062d\u0628 \u0627\u0644\u0635\u0644\u0627\u062d\u064a\u0629", "Give access back": "\u0625\u0631\u062c\u0627\u0639 \u0627\u0644\u0635\u0644\u0627\u062d\u064a\u0629", "Make admin": "\u062a\u0639\u064a\u064a\u0646 \u0623\u062f\u0645\u0646", "Remove admin": "\u0625\u0644\u063a\u0627\u0621 \u0627\u0644\u0623\u062f\u0645\u0646", "Link {0} tasks named {1}": "\u0631\u0628\u0637 {0} \u0645\u0647\u0645\u0629 \u0628\u0627\u0633\u0645 {1}", "(you)": "(\u0623\u0646\u062a)", "{0} open task": "{0} \u0645\u0647\u0645\u0629 \u0645\u0641\u062a\u0648\u062d\u0629", "{0} open tasks": "{0} \u0645\u0647\u0627\u0645 \u0645\u0641\u062a\u0648\u062d\u0629", "signed up {0}": "\u0633\u062c\u0651\u0644 {0}", "You are the owner: you choose the admins. Admins approve people and can edit every task. Members edit the tasks they are on.": "\u0623\u0646\u062a \u0627\u0644\u0645\u0627\u0644\u0643: \u0623\u0646\u062a \u062a\u062e\u062a\u0627\u0631 \u0627\u0644\u0623\u062f\u0645\u0646. \u0627\u0644\u0623\u062f\u0645\u0646 \u064a\u0648\u0627\u0641\u0642 \u0639\u0644\u0649 \u0627\u0644\u0623\u0634\u062e\u0627\u0635 \u0648\u064a\u0639\u062f\u0644 \u0643\u0644 \u0627\u0644\u0645\u0647\u0627\u0645. \u0627\u0644\u0639\u0636\u0648 \u064a\u0639\u062f\u0644 \u0627\u0644\u0645\u0647\u0627\u0645 \u0627\u0644\u0644\u064a \u0647\u0648 \u0639\u0644\u064a\u0647\u0627.", "As an admin you approve people and can edit every task. Only the owner chooses admins.": "\u0643\u0623\u062f\u0645\u0646 \u062a\u0648\u0627\u0641\u0642 \u0639\u0644\u0649 \u0627\u0644\u0623\u0634\u062e\u0627\u0635 \u0648\u062a\u0639\u062f\u0644 \u0643\u0644 \u0627\u0644\u0645\u0647\u0627\u0645. \u0627\u0644\u0645\u0627\u0644\u0643 \u0641\u0642\u0637 \u064a\u062e\u062a\u0627\u0631 \u0627\u0644\u0623\u062f\u0645\u0646.", "Members edit the tasks they are on. Admins can edit everything.": "\u0627\u0644\u0639\u0636\u0648 \u064a\u0639\u062f\u0644 \u0627\u0644\u0645\u0647\u0627\u0645 \u0627\u0644\u0644\u064a \u0647\u0648 \u0639\u0644\u064a\u0647\u0627. \u0627\u0644\u0623\u062f\u0645\u0646 \u064a\u0639\u062f\u0644 \u0643\u0644 \u0634\u064a.", "{0} tasks linked to {1}.": "\u0627\u0646\u0631\u0628\u0637\u062a {0} \u0645\u0647\u0645\u0629 \u0628\u0640{1}.", "{0} no longer has access.": "{0} \u0645\u0627 \u0639\u0627\u062f \u0639\u0646\u062f\u0647 \u0635\u0644\u0627\u062d\u064a\u0629.", "{0} is now an admin.": "{0} \u0635\u0627\u0631 \u0623\u062f\u0645\u0646.", "{0} has access and is on {1} tasks.": "{0} \u0635\u0627\u0631 \u0639\u0646\u062f\u0647 \u0635\u0644\u0627\u062d\u064a\u0629 \u0648\u0627\u0646\u0631\u0628\u0637 \u0628\u0640{1} \u0645\u0647\u0645\u0629.", "{0} has access.": "{0} \u0635\u0627\u0631 \u0639\u0646\u062f\u0647 \u0635\u0644\u0627\u062d\u064a\u0629.", "You can read and comment. Editing is for the people on this task and admins.": "\u062a\u0642\u062f\u0631 \u062a\u0642\u0631\u0623 \u0648\u062a\u0639\u0644\u0651\u0642. \u0627\u0644\u062a\u0639\u062f\u064a\u0644 \u0644\u0644\u0623\u0634\u062e\u0627\u0635 \u0627\u0644\u0644\u064a \u0639\u0644\u0649 \u0647\u0630\u064a \u0627\u0644\u0645\u0647\u0645\u0629 \u0648\u0644\u0644\u0623\u062f\u0645\u0646.", "You can read and comment. Editing is for the people on this project and admins.": "\u062a\u0642\u062f\u0631 \u062a\u0642\u0631\u0623 \u0648\u062a\u0639\u0644\u0651\u0642. \u0627\u0644\u062a\u0639\u062f\u064a\u0644 \u0644\u0644\u0623\u0634\u062e\u0627\u0635 \u0627\u0644\u0644\u064a \u0639\u0644\u0649 \u0647\u0630\u0627 \u0627\u0644\u0645\u0634\u0631\u0648\u0639 \u0648\u0644\u0644\u0623\u062f\u0645\u0646.", "Start date": "\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0628\u062f\u0627\u064a\u0629", "Due date": "\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u0633\u0644\u064a\u0645", "Due note (when there is no exact date)": "\u0645\u0644\u0627\u062d\u0638\u0629 \u0627\u0644\u062a\u0633\u0644\u064a\u0645 (\u0644\u0645\u0627 \u0645\u0627 \u064a\u0643\u0648\u0646 \u0641\u064a \u062a\u0627\u0631\u064a\u062e \u0645\u062d\u062f\u062f)", "e.g. TBC, late November": "\u0645\u062b\u0627\u0644: TBC\u060c \u0623\u0648\u0627\u062e\u0631 \u0646\u0648\u0641\u0645\u0628\u0631", "Needs a CEO decision": "\u062a\u062d\u062a\u0627\u062c \u0642\u0631\u0627\u0631 \u0627\u0644\u0631\u0626\u064a\u0633 \u0627\u0644\u062a\u0646\u0641\u064a\u0630\u064a", "Linked project": "\u0627\u0644\u0645\u0634\u0631\u0648\u0639 \u0627\u0644\u0645\u0631\u062a\u0628\u0637", "Tracker": "\u0627\u0644\u062a\u0631\u0627\u0643\u0631", "Standalone": "\u0645\u0633\u062a\u0642\u0644\u0629", "Type": "\u0627\u0644\u0646\u0648\u0639", "Lead area": "\u0627\u0644\u062c\u0647\u0629 \u0627\u0644\u0642\u0627\u0626\u062f\u0629", "Owner (as written)": "\u0627\u0644\u0645\u0633\u0624\u0648\u0644 (\u0643\u0645\u0627 \u0647\u0648 \u0645\u0643\u062a\u0648\u0628)", "People on this task": "\u0627\u0644\u0623\u0634\u062e\u0627\u0635 \u0639\u0644\u0649 \u0647\u0630\u064a \u0627\u0644\u0645\u0647\u0645\u0629", "People on this project": "\u0627\u0644\u0623\u0634\u062e\u0627\u0635 \u0639\u0644\u0649 \u0647\u0630\u0627 \u0627\u0644\u0645\u0634\u0631\u0648\u0639", "No approved members yet.": "\u0645\u0627 \u0641\u064a \u0623\u0639\u0636\u0627\u0621 \u0645\u0639\u062a\u0645\u062f\u064a\u0646 \u0644\u0633\u0627.", "Follow-up notes": "\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0627\u0644\u0645\u062a\u0627\u0628\u0639\u0629", "Delete": "\u062d\u0630\u0641", "Click again to delete for everyone": "\u0627\u0636\u063a\u0637 \u0645\u0631\u0629 \u062b\u0627\u0646\u064a\u0629 \u0644\u0644\u062d\u0630\u0641 \u0639\u0646\u062f \u0627\u0644\u0643\u0644", "Comments and history": "\u0627\u0644\u062a\u0639\u0644\u064a\u0642\u0627\u062a \u0648\u0627\u0644\u0633\u062c\u0644", "Write a comment": "\u0627\u0643\u062a\u0628 \u062a\u0639\u0644\u064a\u0642", "Send": "\u0625\u0631\u0633\u0627\u0644", "Loading history\u2026": "\u062c\u0627\u0631\u064a \u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u0633\u062c\u0644\u2026", "No comments or changes yet.": "\u0645\u0627 \u0641\u064a \u062a\u0639\u0644\u064a\u0642\u0627\u062a \u0623\u0648 \u062a\u063a\u064a\u064a\u0631\u0627\u062a \u0644\u0633\u0627.", "History isn\u2019t available right now.": "\u0627\u0644\u0633\u062c\u0644 \u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u0627\u0644\u0622\u0646.", "updated {0}": "\u0622\u062e\u0631 \u062a\u062d\u062f\u064a\u062b {0}", "by": "\u0628\u0648\u0627\u0633\u0637\u0629", "just now": "\u0627\u0644\u0622\u0646", "{0} min ago": "\u0642\u0628\u0644 {0} \u062f", "{0} h ago": "\u0642\u0628\u0644 {0} \u0633", "{0} d ago": "\u0642\u0628\u0644 {0} \u064a\u0648\u0645", "Someone": "\u0623\u062d\u062f \u0627\u0644\u0623\u0639\u0636\u0627\u0621", "{0} commented on {1}": "{0} \u0639\u0644\u0651\u0642 \u0639\u0644\u0649 {1}", "{0} added {1}": "{0} \u0623\u0636\u0627\u0641 {1}", "{0} deleted {1}": "{0} \u062d\u0630\u0641 {1}", "{0} changed {1}": "{0} \u063a\u064a\u0651\u0631 {1}", "to": "\u0625\u0644\u0649", "on": "\u0641\u064a", "details": "\u0627\u0644\u062a\u0641\u0627\u0635\u064a\u0644", "status": "\u0627\u0644\u062d\u0627\u0644\u0629", "priority": "\u0627\u0644\u0623\u0648\u0644\u0648\u064a\u0629", "due date": "\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u0633\u0644\u064a\u0645", "due note": "\u0645\u0644\u0627\u062d\u0638\u0629 \u0627\u0644\u062a\u0633\u0644\u064a\u0645", "start date": "\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0628\u062f\u0627\u064a\u0629", "notes": "\u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0627\u062a", "name": "\u0627\u0644\u0627\u0633\u0645", "team": "\u0627\u0644\u0641\u0631\u064a\u0642", "areas": "\u0627\u0644\u0641\u0631\u0642 \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u0629", "linked project": "\u0627\u0644\u0645\u0634\u0631\u0648\u0639 \u0627\u0644\u0645\u0631\u062a\u0628\u0637", "type": "\u0627\u0644\u0646\u0648\u0639", "lead area": "\u0627\u0644\u062c\u0647\u0629 \u0627\u0644\u0642\u0627\u0626\u062f\u0629", "board": "\u0627\u0644\u062a\u0631\u0627\u0643\u0631", "Recently deleted": "\u0627\u0644\u0645\u062d\u0630\u0648\u0641\u0627\u062a \u0627\u0644\u0623\u062e\u064a\u0631\u0629", "Restore": "\u0627\u0633\u062a\u0631\u062c\u0627\u0639", "Restored.": "\u062a\u0645 \u0627\u0644\u0627\u0633\u062a\u0631\u062c\u0627\u0639.", "deleted {0} by {1}": "\u0627\u0646\u062d\u0630\u0641 {0} \u0628\u0648\u0627\u0633\u0637\u0629 {1}", "Deleted. It can be restored from Team.": "\u0627\u0646\u062d\u0630\u0641. \u062a\u0642\u062f\u0631 \u062a\u0633\u062a\u0631\u062c\u0639\u0647 \u0645\u0646 \u0635\u0641\u062d\u0629 \u0627\u0644\u0641\u0631\u064a\u0642.", "Backups": "\u0627\u0644\u0646\u0633\u062e \u0627\u0644\u0627\u062d\u062a\u064a\u0627\u0637\u064a", "Last backup {0}": "\u0622\u062e\u0631 \u0646\u0633\u062e\u0629 \u0627\u062d\u062a\u064a\u0627\u0637\u064a\u0629 {0}", "No backup has been taken yet.": "\u0645\u0627 \u0641\u064a \u0623\u064a \u0646\u0633\u062e\u0629 \u0627\u062d\u062a\u064a\u0627\u0637\u064a\u0629 \u0644\u0633\u0627.", "tasks and accounts saved": "\u0627\u0644\u0645\u0647\u0627\u0645 \u0648\u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a \u0645\u062d\u0641\u0648\u0638\u0629", "tasks saved, accounts NOT saved": "\u0627\u0644\u0645\u0647\u0627\u0645 \u0645\u062d\u0641\u0648\u0638\u0629\u060c \u0627\u0644\u062d\u0633\u0627\u0628\u0627\u062a \u063a\u064a\u0631 \u0645\u062d\u0641\u0648\u0638\u0629", "Backups have stopped. Check the backup Mac.": "\u0627\u0644\u0646\u0633\u062e \u0645\u062a\u0648\u0642\u0641. \u062a\u0623\u0643\u062f \u0645\u0646 \u062c\u0647\u0627\u0632 \u0627\u0644\u0646\u0633\u062e.", "Make owner": "\u062a\u0639\u064a\u064a\u0646 \u0645\u0627\u0644\u0643", "Click again: you become an admin": "\u0627\u0636\u063a\u0637 \u0645\u0631\u0629 \u062b\u0627\u0646\u064a\u0629: \u0623\u0646\u062a \u0628\u062a\u0635\u064a\u0631 \u0623\u062f\u0645\u0646", "Ownership handed over.": "\u0627\u0646\u062a\u0642\u0644\u062a \u0627\u0644\u0645\u0644\u0643\u064a\u0629.", "This item was already restored": "\u0647\u0630\u0627 \u0627\u0644\u0639\u0646\u0635\u0631 \u0645\u0633\u062a\u0631\u062c\u0639 \u0645\u0646 \u0642\u0628\u0644", "Not allowed": "\u063a\u064a\u0631 \u0645\u0633\u0645\u0648\u062d", "Live copy: on": "\u0627\u0644\u0646\u0633\u062e\u0629 \u0627\u0644\u062d\u064a\u0629: \u0634\u063a\u0627\u0644\u0629", "Live copy: not connected": "\u0627\u0644\u0646\u0633\u062e\u0629 \u0627\u0644\u062d\u064a\u0629: \u063a\u064a\u0631 \u0645\u0631\u0628\u0648\u0637\u0629", "Live copy: some changes are waiting to be re-sent": "\u0627\u0644\u0646\u0633\u062e\u0629 \u0627\u0644\u062d\u064a\u0629: \u0628\u0639\u0636 \u0627\u0644\u062a\u063a\u064a\u064a\u0631\u0627\u062a \u0628\u0627\u0646\u062a\u0638\u0627\u0631 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u0625\u0631\u0633\u0627\u0644", "last change copied {0}": "\u0622\u062e\u0631 \u062a\u063a\u064a\u064a\u0631 \u0627\u0646\u062a\u0633\u062e {0}"};
+Object.assign(AR, {"More details":"تفاصيل أكثر","Fewer details":"تفاصيل أقل","Simple view":"عرض مبسّط","Filtered · clear":"فلتر مفعّل · إلغاء","Team photos":"صور الفريق",
+  "Upload photos file":"رفع ملف الصور","{0} photos loaded":"{0} صورة محمّلة","No photos yet.":"ما في صور حتى الآن.",
+  "Photos show next to names. Only signed-in team members can see them.":"الصور تظهر بجنب الأسماء، ويشوفها أعضاء الفريق المسجلين فقط.",
+  "Photo: automatic":"الصورة: تلقائي","{0} photos added.":"تمت إضافة {0} صورة.","This isn’t a team photos file.":"هذا مو ملف صور الفريق.","Photo updated.":"تم تحديث الصورة.","Photo":"الصورة"});
 function T(s,a,b){ var r = (LANG==="ar" && AR[s]) || s; if(a!==undefined) r = r.replace("{0}",a); if(b!==undefined) r = r.replace("{1}",b); return r; }
 function mon(i){ return LANG==="ar" ? AR_MONTHS[i] : MON[i]; }
 function monthName(i){ return LANG==="ar" ? AR_MONTHS[i] : MONTHS[i]; }
@@ -423,7 +445,7 @@ function SupaAPI(){
     },
     signUp:function(name,email,pw){ return sb.auth.signUp({email:email,password:pw,options:{data:{name:name},emailRedirectTo:location.origin+location.pathname}}).then(function(r){ var d = ok(r); return {session:!!d.session}; }); },
     signIn:function(email,pw){ return sb.auth.signInWithPassword({email:email,password:pw}).then(ok); },
-    signOut:function(){ return sb.auth.signOut().then(ok); },
+    signOut:function(){ try{ localStorage.removeItem("trk-people"); }catch(e){} return sb.auth.signOut().then(ok); },
     resetPassword:function(email){ return sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname}).then(ok); },
     setPassword:function(pw){ return sb.auth.updateUser({password:pw}).then(ok); },
     loadAll:function(){ return Promise.all([sb.from("profiles").select("*").order("created_at"), sb.from("projects").select("*").order("sort"), sb.from("tasks").select("*").order("sort")])
@@ -442,6 +464,16 @@ function SupaAPI(){
     lastBackup:function(){ return sb.from("backup_runs").select("at,place,tasks,accounts").order("at",{ascending:false}).limit(1).then(function(r){ var d = ok(r); return d[0] || null; }); },
     transferOwner:function(id){ return sb.rpc("transfer_ownership",{target:id}).then(ok); },
     liveCopy:function(){ return sb.rpc("mirror_status").then(ok); },
+    /* Staff photos live in the database (members only), never in the public page. A small check first so photos download only when they changed. */
+    people:function(){ return sb.from("people").select("id,updated_at").then(function(r){
+      var m = ok(r), sig = m.map(function(x){ return x.id+"@"+x.updated_at; }).sort().join("|"), c = null;
+      try{ c = JSON.parse(localStorage.getItem("trk-people")||"null"); }catch(e){}
+      if(c && c.sig===sig && Array.isArray(c.rows)) return c.rows;
+      return sb.from("people").select("*").order("sort").then(function(r2){ var rows = ok(r2); try{ localStorage.setItem("trk-people", JSON.stringify({sig:sig,rows:rows})); }catch(e){} return rows; }); }); },
+    importPeople:function(rows){ return sb.from("people").upsert(rows,{onConflict:"id"}).select("id").then(function(r){ return ok(r).length; }); },
+    linkPerson:function(personId, profileId){ return sb.from("people").update({profile_id:null}).eq("profile_id",profileId).select("id").then(ok).then(function(){
+      if(!personId) return null;
+      return sb.from("people").update({profile_id:profileId}).eq("id",personId).select("id").then(function(r){ if(!ok(r).length) throw new Error("You don’t have permission to edit this."); }); }); },
     presence:function(me){
       if(onCh) return;
       onCh = sb.channel("trk-online",{config:{presence:{key:me.id}}});
@@ -524,6 +556,12 @@ function MockAPI(){
       d[t].push(r); x.restored_at = new Date().toISOString(); var a = log(d,u,x.item_type,r,"create"); save(d); emit(t,"INSERT",r); emit("activity","INSERT",a); return r.id; }); },
     lastBackup:function(){ return P(function(){ return db().backup || null; }); },
     liveCopy:function(){ return P(function(){ return db().mirror || null; }); },
+    people:function(){ return P(function(){ return db().people || []; }); },
+    importPeople:function(rows){ return P(function(){ var d = db(), u = cur(d); if(!admin(u)) throw new Error("Not allowed"); d.people = d.people || [];
+      rows.forEach(function(r){ var old = d.people.filter(function(x){ return x.id===r.id; })[0]; if(old) Object.assign(old, r); else d.people.push(Object.assign({profile_id:null}, r)); });
+      d.people.sort(function(a,b){ return (a.sort||0)-(b.sort||0); }); save(d); return rows.length; }); },
+    linkPerson:function(personId, profileId){ return P(function(){ var d = db(), u = cur(d); if(!admin(u)) throw new Error("Not allowed");
+      (d.people||[]).forEach(function(x){ if(x.profile_id===profileId) x.profile_id = null; if(x.id===personId) x.profile_id = profileId; }); save(d); }); },
     transferOwner:function(id){ return P(function(){ var d = db(), u = cur(d), x = d.users.filter(function(y){ return y.id===id; })[0];
       if(u.role!=="owner") throw new Error("Only the owner can hand over ownership"); if(!x || !member(x)) throw new Error("Choose an approved member");
       u.role = "admin"; x.role = "owner"; save(d); emit("profiles","UPDATE",pub(u)); emit("profiles","UPDATE",pub(x)); if(bc) bc.postMessage({t:"auth"}); setTimeout(auth,0); }); },
@@ -546,7 +584,7 @@ function demoSeed(){
    App
    ===================================================================== */
 var api = null, me = null, online = [], ready = false;
-var D = {profiles:[], projects:[], tasks:[], recent:[], trash:null, backup:undefined};
+var D = {profiles:[], projects:[], tasks:[], recent:[], trash:null, backup:undefined, people:[]};
 /* Safety data (recycle bin, last backup). Stays hidden when the safety layer isn't installed in the database. */
 function loadSafety(){
   api.trashList().then(function(r){ D.trash = r; }, function(){ D.trash = null; })
@@ -554,8 +592,46 @@ function loadSafety(){
     .then(function(){ return isAdmin() ? api.liveCopy().then(function(m){ D.mirror = m; }, function(){ D.mirror = null; }) : null; })
     .then(function(){ if(ready && UI.view==="team") render(); });
 }
-var UI = {view:"dash", mode:{main:"table",t4:"table"}, f:{main:newFilter(),t4:newFilter()}, pq:"", cal:null, open:null, gate:"in", tl:[]};
+var UI = {view:"main", mode:{main:"table",t4:"table"}, f:{main:newFilter(),t4:newFilter()}, pq:"", cal:null, open:null, gate:"in", tl:[]};
 function newFilter(){ return {q:"",team:"",status:"",prio:"",person:"",mine:false,late:false,ceo:false}; }
+/* Simple view is the default: the essentials only. "More details" brings back every column, filter and field. */
+var SIMPLE = (function(){ try{ return localStorage.getItem("trk-detail")!=="1"; }catch(e){ return true; } })();
+function applySimple(){ document.body.classList.toggle("simple", SIMPLE); }
+function setSimple(v){ SIMPLE = v; try{ localStorage.setItem("trk-detail", v ? "0" : "1"); }catch(e){} applySimple();
+  if(v){ UI.mode.main = "table"; UI.mode.t4 = "table"; } if(ready) render(); }
+applySimple();
+function hiddenFilters(f){ return !!(f.team||f.status||f.prio||f.person||f.ceo); }
+var DETAIL_BTN = '<button type="button" class="btn ghost sm" data-detail><span class="s-on">More details</span><span class="s-off">Simple view</span></button>';
+/* ---------- people directory (names, titles, photos) ---------- */
+var PHOTO_OK = /^data:image\/(?:jpeg|png);base64,[A-Za-z0-9+\/=]+$/;
+var NAME_SPLIT = /\s*(?:,|\/|\+|&| and )\s*/i;
+function nrm(s){ return String(s||"").toLowerCase().replace(/\s+/g," ").trim(); }
+function teamKey(s){ s = nrm(s); return s.indexOf("brand")>=0 ? "brand" : s.indexOf("digital")>=0 ? "digital" : s.indexOf("internal")>=0 ? "internal" : s.indexOf("event")>=0 ? "events"
+  : s.indexOf("protocol")>=0 ? "protocol" : s.indexOf("media")>=0 ? "media" : (s==="pr"||s.indexOf("public rel")>=0) ? "pr" : s; }
+/* A written name ("Hibah", "Raed", "Mohammed Wagih") to one person, or nobody when it could be two people. */
+function personByName(label, team){
+  var n = nrm(label), L = D.people, i, c; if(!n || !L.length) return null;
+  for(i=0;i<L.length;i++) if(nrm(L[i].name)===n || (L[i].aliases||[]).some(function(a){ return nrm(a)===n; })) return L[i];
+  var tk = n.split(" ");
+  if(tk.length>1) c = L.filter(function(p){ var q = nrm(p.name).split(" "); return q[0]===tk[0] && q[q.length-1]===tk[tk.length-1]; });
+  else c = L.filter(function(p){ var q = nrm(p.name).split(" "); return q[0]===n || q[q.length-1]===n; });
+  if(c.length>1 && team){ var k = teamKey(team), d = c.filter(function(p){ return teamKey(p.team)===k; }); if(d.length===1) return d[0]; }
+  return c.length===1 ? c[0] : null;
+}
+function personOf(pr){ if(!pr) return null; for(var i=0;i<D.people.length;i++) if(D.people[i].profile_id===pr.id) return D.people[i];
+  var p = personByName(pr.name); return p && !p.profile_id ? p : null; }
+function pav(name, person, cls, title){
+  var ph = person && typeof person.photo==="string" && PHOTO_OK.test(person.photo) ? person.photo : "", c = cls || "pav", tt = ' title="'+esc(title||name)+'" data-nt';
+  return ph ? '<img class="'+c+'" src="'+ph+'" alt=""'+tt+'>' : '<span class="'+c+'"'+tt+'>'+esc(initials(name))+'</span>';
+}
+function ownersOfItem(it){
+  var a = (it.assignees||[]).map(function(id){ return profile(id); }).filter(Boolean);
+  if(a.length) return a.map(function(p){ return {name:p.name, person:personOf(p)}; });
+  return String(it.owner_text||"").split(NAME_SPLIT).map(function(n){ return n.trim(); }).filter(Boolean).map(function(n){ return {name:n, person:personByName(n, it.team || it.lead_area)}; });
+}
+function ownerHtml(it){ var o = ownersOfItem(it); if(!o.length) return "";
+  return '<span class="pavs">'+o.slice(0,3).map(function(x){ return pav(x.name, x.person); }).join("")+'</span><span dir="auto">'+esc(ownerLabel(it))+'</span>'; }
+function loadPeople(){ return api.people().then(function(r){ D.people = Array.isArray(r) ? r : []; }, function(){ D.people = []; }).then(function(){ if(ready){ paintOnline(); render(); if(UI.open) syncDrawer(); } }); }
 function isAdmin(){ return me && (me.role==="admin"||me.role==="owner"); }
 function canEdit(it){ return !!me && (isAdmin() || (it.assignees||[]).indexOf(me.id)>=0 || it.created_by===me.id); }
 function profile(id){ for(var i=0;i<D.profiles.length;i++) if(D.profiles[i].id===id) return D.profiles[i]; return null; }
@@ -639,7 +715,7 @@ function boot(){
     $("gate").hidden = true; $("app").hidden = false;
     api.presence(me); renderShell(); render();
     api.recent(30).then(function(r){ D.recent = r; if(UI.view==="dash") render(); }).catch(function(){});
-    loadSafety();
+    loadSafety(); loadPeople();
     var m = location.search.match(/[?&]open=([0-9a-f-]{36})/i);
     if(m){ var it = find("task",m[1]) || find("project",m[1]); if(it) openDrawer(find("task",m[1])?"task":"project", m[1]); }
   }).catch(function(e){ showGate("auth", niceAuthError(e)); });
@@ -698,7 +774,7 @@ function describe(a, withName){
 /* ---------- shell ---------- */
 function renderShell(){
   var pend = isAdmin() ? D.profiles.filter(function(p){ return p.role==="pending"; }).length : 0;
-  var tabs = [["dash","Dashboard"],["main","Tasks"],["t4","T4 Tracker"],["proj","Projects"],["cal","Calendar"],["team","Team"]];
+  var tabs = [["main","Tasks"],["t4","T4 Tracker"],["proj","Projects"],["cal","Calendar"],["dash","Dashboard"],["team","Team"]];
   $("tabs").innerHTML = tabs.map(function(t){ return '<button type="button" role="tab" data-view="'+t[0]+'" aria-selected="'+(UI.view===t[0])+'">'+t[1]+(t[0]==="team"&&pend?'<em>'+pend+'</em>':'')+'</button>'; }).join("");
   $("meBtn").textContent = me.name+(me.role!=="member" ? " · "+T(me.role) : ""); $("meBtn").setAttribute("data-nt","");
   $("demoNote").textContent = DEMO ? "Demo mode. Everything here stays in this browser only." : "";
@@ -706,7 +782,7 @@ function renderShell(){
 }
 function paintOnline(){
   var ids = online.filter(function(id){ return profile(id); });
-  $("avs").innerHTML = ids.slice(0,6).map(function(id){ var p = profile(id); return '<span class="av" title="'+esc(p.name)+(id===me.id?" (you)":"")+' is online">'+esc(initials(p.name))+'</span>'; }).join("")+(ids.length>6?'<span class="av">+'+(ids.length-6)+'</span>':'');
+  $("avs").innerHTML = ids.slice(0,6).map(function(id){ var p = profile(id); return pav(p.name, personOf(p), "av", p.name+(id===me.id?" (you)":"")+" is online"); }).join("")+(ids.length>6?'<span class="av">+'+(ids.length-6)+'</span>':'');
 }
 $("tabs").addEventListener("click", function(e){ var b = e.target.closest("[data-view]"); if(b) go(b.dataset.view); });
 function go(v){ UI.view = v; renderShell(); render(); window.scrollTo(0,0); if(v==="team") loadSafety(); }
@@ -752,53 +828,54 @@ function statusCell(t){
 }
 function rowHtml(t){
   return '<div class="row'+(t.status==="Completed"?" done":"")+(isMine(t)?" mine":"")+'" data-open="task:'+t.id+'" tabindex="0" role="button" aria-label="Open '+esc(t.name)+'">'+
-    '<div class="nm"><b dir="auto">'+esc(t.name)+'</b>'+(t.notes?'<small dir="auto">'+esc(t.notes.split("\n")[0])+'</small>':'')+'</div>'+
-    '<div class="areas">'+(t.areas||[]).map(function(a){ return '<span class="area">'+esc(a)+'</span>'; }).join("")+'</div>'+
-    '<div class="own" dir="auto">'+esc(ownerLabel(t))+'</div>'+
-    '<div class="prio" data-p="'+esc(t.priority||"")+'">'+esc(t.priority||"")+'</div>'+
+    '<div class="nm"><b dir="auto">'+esc(t.name)+'</b>'+(t.notes?'<small class="xd" dir="auto">'+esc(t.notes.split("\n")[0])+'</small>':'')+'</div>'+
+    '<div class="areas xd">'+(t.areas||[]).map(function(a){ return '<span class="area">'+esc(a)+'</span>'; }).join("")+'</div>'+
+    '<div class="own">'+ownerHtml(t)+'</div>'+
+    '<div class="prio xd" data-p="'+esc(t.priority||"")+'">'+esc(t.priority||"")+'</div>'+
     '<div>'+statusCell(t)+'</div>'+
     '<div class="due">'+dueHtml(t)+'</div>'+
-    '<div class="ceo">'+(t.ceo_decision==="Yes"?"CEO":"")+'</div></div>';
+    '<div class="ceo xd">'+(t.ceo_decision==="Yes"?"CEO":"")+'</div></div>';
 }
 function viewTasks(board){
   var f = UI.f[board], list = filtered(board), mode = UI.mode[board], total = D.tasks.filter(function(t){ return t.board===board; }).length;
   var h = '<div class="lists"><div class="tools">'+
     '<input class="field q" id="fq" type="search" placeholder="Search tasks, notes, people" value="'+esc(f.q)+'" aria-label="Search tasks">'+
-    '<select class="field" data-f="team" aria-label="Team" data-nt>'+opt("",f.team,T("All teams"))+teamsOf(board).map(function(x){ return opt(x,f.team); }).join("")+'</select>'+
-    '<select class="field" data-f="status" aria-label="Status">'+opt("",f.status,"Any status")+STATUS.map(function(x){ return opt(x,f.status); }).join("")+'</select>'+
-    '<select class="field" data-f="prio" aria-label="Priority">'+opt("",f.prio,"Any priority")+PRIORITY.map(function(x){ return opt(x,f.prio); }).join("")+'</select>'+
-    '<select class="field" data-f="person" aria-label="Owner" data-nt>'+opt("",f.person,T("Anyone"))+ownersOf(board).map(function(x){ return opt(x,f.person); }).join("")+'</select>'+
+    '<select class="field xd" data-f="team" aria-label="Team" data-nt>'+opt("",f.team,T("All teams"))+teamsOf(board).map(function(x){ return opt(x,f.team); }).join("")+'</select>'+
+    '<select class="field xd" data-f="status" aria-label="Status">'+opt("",f.status,"Any status")+STATUS.map(function(x){ return opt(x,f.status); }).join("")+'</select>'+
+    '<select class="field xd" data-f="prio" aria-label="Priority">'+opt("",f.prio,"Any priority")+PRIORITY.map(function(x){ return opt(x,f.prio); }).join("")+'</select>'+
+    '<select class="field xd" data-f="person" aria-label="Owner" data-nt>'+opt("",f.person,T("Anyone"))+ownersOf(board).map(function(x){ return opt(x,f.person); }).join("")+'</select>'+
     '<button type="button" class="btn ghost sm" data-ft="mine" aria-pressed="'+f.mine+'">Mine</button>'+
     '<button type="button" class="btn ghost sm" data-ft="late" aria-pressed="'+f.late+'">Overdue</button>'+
-    '<button type="button" class="btn ghost sm" data-ft="ceo" aria-pressed="'+f.ceo+'">CEO decision</button>'+
+    '<button type="button" class="btn ghost sm xd" data-ft="ceo" aria-pressed="'+f.ceo+'">CEO decision</button>'+
+    (SIMPLE && hiddenFilters(f) ? '<button type="button" class="btn ghost sm" data-clearf aria-pressed="true">Filtered · clear</button>' : '')+
     '<span class="sp"></span><span class="count"><span class="num">'+list.length+'</span> of <span class="num">'+total+'</span></span>'+
-    '<button type="button" class="btn ghost sm" data-mode="table" aria-pressed="'+(mode==="table")+'">List</button>'+
-    '<button type="button" class="btn ghost sm" data-mode="board" aria-pressed="'+(mode==="board")+'">Board</button>'+
+    '<button type="button" class="btn ghost sm xd" data-mode="table" aria-pressed="'+(mode==="table")+'">List</button>'+
+    '<button type="button" class="btn ghost sm xd" data-mode="board" aria-pressed="'+(mode==="board")+'">Board</button>'+DETAIL_BTN+
     '<button type="button" class="btn sm" data-new="task">New task</button></div>';
   if(!list.length){ h += '<div class="group"><div class="empty">'+(total?"No tasks match these filters.":"No tasks yet. Add the first one with New task.")+'</div></div>'; }
   else if(mode==="board"){
     h += '<div class="board">'+STATUS.map(function(s){ var items = list.filter(function(t){ return t.status===s; });
       return '<div class="bcol" data-drop="'+s+'"><h3><span class="pill" '+stStyle(s)+'>'+s+'</span><i>'+items.length+'</i></h3>'+items.map(function(t){
-        return '<div class="kc" data-open="task:'+t.id+'" data-card="'+t.id+'" draggable="'+canEdit(t)+'" tabindex="0"><b dir="auto">'+esc(t.name)+'</b><div><span dir="auto">'+esc(ownerLabel(t))+'</span><span>'+dueHtml(t)+'</span></div></div>'; }).join("")+'</div>'; }).join("")+'</div>';
+        return '<div class="kc" data-open="task:'+t.id+'" data-card="'+t.id+'" draggable="'+canEdit(t)+'" tabindex="0"><b dir="auto">'+esc(t.name)+'</b><div><span class="own">'+ownerHtml(t)+'</span><span>'+dueHtml(t)+'</span></div></div>'; }).join("")+'</div>'; }).join("")+'</div>';
   } else {
     var teams = uniq(list.map(function(t){ return t.team||"No team"; }));
     teams.forEach(function(team){ var items = list.filter(function(t){ return (t.team||"No team")===team; });
       var doneN = items.filter(function(t){ return t.status==="Completed"; }).length;
       h += '<section class="group"><div class="ghead"><h2 dir="auto">'+esc(team)+'</h2><span><span class="num">'+doneN+'</span> of <span class="num">'+items.length+'</span> completed</span></div>'+
-        '<div class="cols"><span>Task</span><span>Involved teams</span><span>Owner</span><span>Priority</span><span>Status</span><span>Due</span><span></span></div>'+items.map(rowHtml).join("")+'</section>'; });
+        '<div class="cols"><span>Task</span><span class="xd">Involved teams</span><span>Owner</span><span class="xd">Priority</span><span>Status</span><span>Due</span><span class="xd"></span></div>'+items.map(rowHtml).join("")+'</section>'; });
   }
   return h+'</div>';
 }
 function viewProjects(){
   var q = UI.pq.trim().toLowerCase(), list = D.projects.filter(function(p){ return !q || (p.name+" "+ownerLabel(p)+" "+p.notes).toLowerCase().indexOf(q)>=0; });
-  var h = '<div class="lists"><div class="tools"><input class="field q" id="pq" type="search" placeholder="Search projects" value="'+esc(UI.pq)+'" aria-label="Search projects"><span class="sp"></span><button type="button" class="btn sm" data-new="project">New project</button></div>';
+  var h = '<div class="lists"><div class="tools"><input class="field q" id="pq" type="search" placeholder="Search projects" value="'+esc(UI.pq)+'" aria-label="Search projects"><span class="sp"></span>'+DETAIL_BTN+'<button type="button" class="btn sm" data-new="project">New project</button></div>';
   if(!list.length) return h+'<div class="group"><div class="empty">'+(D.projects.length?"No projects match.":"No projects yet. Add the first one with New project.")+'</div></div></div>';
-  h += '<section class="group"><div class="cols"><span>Project</span><span>Involved teams</span><span>Owner</span><span>Priority</span><span>Status</span><span>Due</span><span>Tasks</span></div>'+list.map(function(p){
+  h += '<section class="group"><div class="cols"><span>Project</span><span class="xd">Involved teams</span><span>Owner</span><span class="xd">Priority</span><span>Status</span><span>Due</span><span class="xd">Tasks</span></div>'+list.map(function(p){
     var tk = D.tasks.filter(function(t){ return t.project_id===p.id; }), dn = tk.filter(function(t){ return t.status==="Completed"; }).length;
-    return '<div class="row'+(isMine(p)?" mine":"")+'" data-open="project:'+p.id+'" tabindex="0" role="button"><div class="nm"><b dir="auto">'+esc(p.name)+'</b><small data-nt>'+esc(T(p.type))+(p.lead_area?" · "+T("Lead")+": "+esc(T(p.lead_area)):"")+'</small></div>'+
-      '<div class="areas">'+(p.areas||[]).map(function(a){ return '<span class="area">'+esc(a)+'</span>'; }).join("")+'</div><div class="own" dir="auto">'+esc(ownerLabel(p))+'</div>'+
-      '<div class="prio" data-p="'+esc(p.priority||"")+'">'+esc(p.priority||"")+'</div><div><span class="pill" '+stStyle(p.status)+'>'+esc(p.status)+'</span></div><div class="due">'+dueHtml(p)+'</div>'+
-      '<div class="ceo num">'+(tk.length?dn+"/"+tk.length:"")+'</div></div>'; }).join("")+'</section>';
+    return '<div class="row'+(isMine(p)?" mine":"")+'" data-open="project:'+p.id+'" tabindex="0" role="button"><div class="nm"><b dir="auto">'+esc(p.name)+'</b><small class="xd" data-nt>'+esc(T(p.type))+(p.lead_area?" · "+T("Lead")+": "+esc(T(p.lead_area)):"")+'</small></div>'+
+      '<div class="areas xd">'+(p.areas||[]).map(function(a){ return '<span class="area">'+esc(a)+'</span>'; }).join("")+'</div><div class="own">'+ownerHtml(p)+'</div>'+
+      '<div class="prio xd" data-p="'+esc(p.priority||"")+'">'+esc(p.priority||"")+'</div><div><span class="pill" '+stStyle(p.status)+'>'+esc(p.status)+'</span></div><div class="due">'+dueHtml(p)+'</div>'+
+      '<div class="ceo num xd">'+(tk.length?dn+"/"+tk.length:"")+'</div></div>'; }).join("")+'</section>';
   return h+'</div>';
 }
 function viewDash(){
@@ -860,7 +937,10 @@ function viewTeam(){
       if(own && p.role==="admin") a += '<button type="button" class="btn ghost sm" data-role="member" data-u="'+p.id+'">Remove admin</button><button type="button" class="btn ghost sm" data-owner="'+p.id+'">Make owner</button>';
       if(p.role!=="blocked" && (own || p.role!=="admin")) a += '<button type="button" class="btn danger sm" data-role="blocked" data-u="'+p.id+'">'+(p.role==="pending"?"Decline":"Remove access")+'</button>';
     }
-    return '<div class="person"><span class="av lg">'+esc(initials(p.name))+'</span><div class="pi"><b dir="auto">'+esc(p.name)+(p.id===me.id?" "+T("(you)"):"")+'</b><small data-nt>'+esc(p.email)+' · '+(p.role!=="pending"&&p.role!=="blocked"?T(n===1?"{0} open task":"{0} open tasks", n):T("signed up {0}", ago(p.created_at)))+'</small></div>'+
+    var mem = ["member","admin","owner"].indexOf(p.role)>=0, lp = null;
+    if(adm && mem && D.people.length){ D.people.forEach(function(x){ if(x.profile_id===p.id) lp = x; });
+      a = '<select class="field psel" data-plink="'+p.id+'" aria-label="Photo" data-nt>'+opt("", lp?lp.id:"", T("Photo: automatic"))+D.people.map(function(x){ return opt(x.id, lp?lp.id:"", x.name); }).join("")+'</select>'+a; }
+    return '<div class="person">'+pav(p.name, personOf(p), "av lg")+'<div class="pi"><b dir="auto">'+esc(p.name)+(p.id===me.id?" "+T("(you)"):"")+'</b><small data-nt>'+esc(p.email)+' · '+(p.role!=="pending"&&p.role!=="blocked"?T(n===1?"{0} open task":"{0} open tasks", n):T("signed up {0}", ago(p.created_at)))+'</small></div>'+
       '<div class="pa"><span class="role" data-r="'+p.role+'">'+(p.role==="pending"?"waiting":p.role)+'</span>'+a+'</div></div>';
   }
   var pend = D.profiles.filter(function(p){ return p.role==="pending"; }), act = members(), blk = D.profiles.filter(function(p){ return p.role==="blocked"; });
@@ -870,6 +950,9 @@ function viewTeam(){
   if(adm && blk.length) h += '<section class="group"><div class="ghead"><h2>No access</h2><span><span class="num">'+blk.length+'</span></span></div>'+blk.map(person).join("")+'</section>';
   if(D.trash && D.trash.length) h += '<section class="group"><div class="ghead"><h2>Recently deleted</h2><span><span class="num">'+D.trash.length+'</span></span></div>'+D.trash.map(function(x){
     return '<div class="person"><div class="pi"><b dir="auto">'+esc(x.item_name)+'</b><small data-nt>'+T(x.item_type==="task"?"Task":"Project")+' \u00B7 '+T("deleted {0} by {1}", ago(x.deleted_at), esc(x.deleted_by_name||T("Someone")))+'</small></div><div class="pa"><button type="button" class="btn ghost sm" data-restore="'+x.id+'">Restore</button></div></div>'; }).join("")+'</section>';
+  if(adm){ var phN = D.people.filter(function(x){ return x.photo; }).length;
+    h += '<section class="group"><div class="ghead"><h2>Team photos</h2><span></span></div><div class="person"><div class="pi"><b data-nt>'+(phN ? T("{0} photos loaded", phN) : T("No photos yet."))+'</b>'+
+      '<small>Photos show next to names. Only signed-in team members can see them.</small></div><div class="pa"><button type="button" class="btn ghost sm" data-pplpick>Upload photos file</button><input id="pplFile" type="file" accept=".json,application/json" hidden></div></div></section>'; }
   if(adm && D.backup!==undefined){
     var late = !D.backup || (Date.now()-new Date(D.backup.at).getTime()) > 2*86400000;
     h += '<section class="group"><div class="ghead"><h2>Backups</h2><span></span></div><div class="person"><div class="pi"><b data-nt'+(late?' class="late"':'')+'>'+
@@ -890,6 +973,9 @@ view.addEventListener("click", function(e){
   var b;
   if((b = t.closest("[data-ft]"))){ var f = UI.f[UI.view]; f[b.dataset.ft] = !f[b.dataset.ft]; render(); return; }
   if((b = t.closest("[data-mode]"))){ UI.mode[UI.view] = b.dataset.mode; render(); return; }
+  if((b = t.closest("[data-clearf]"))){ var cf = UI.f[UI.view]; cf.team = cf.status = cf.prio = cf.person = ""; cf.ceo = false; render(); return; }
+  if((b = t.closest("[data-pplpick]"))){ $("pplFile").click(); return; }
+  if(t.closest(".psel")) return;
   if((b = t.closest("[data-new]"))){ createItem(b.dataset.new); return; }
   if((b = t.closest("[data-cal]"))){ var s = +b.dataset.cal; if(!s){ var n = new Date(); UI.cal = {y:n.getFullYear(),m:n.getMonth()+1}; } else { UI.cal.m += s; if(UI.cal.m<1){ UI.cal.m = 12; UI.cal.y--; } if(UI.cal.m>12){ UI.cal.m = 1; UI.cal.y++; } } render(); return; }
   if((b = t.closest("[data-jump]"))){ jump(b.dataset.jump); return; }
@@ -906,8 +992,30 @@ view.addEventListener("keydown", function(e){ if(e.key==="Enter" && e.target.mat
 view.addEventListener("change", function(e){
   var t = e.target;
   if(t.dataset.quick){ var it = find("task",t.dataset.quick); if(it) save("task", it, {status:t.value}); t.blur(); return; }
-  if(t.dataset.f){ UI.f[UI.view][t.dataset.f] = t.value; render(); }
+  if(t.dataset.f){ UI.f[UI.view][t.dataset.f] = t.value; render(); return; }
+  if(t.dataset.plink){ t.disabled = true; api.linkPerson(t.value || null, t.dataset.plink).then(function(){ toast("Photo updated."); return loadPeople(); }).catch(function(er){ fail(er); render(); }); return; }
+  if(t.id==="pplFile" && t.files && t.files[0]) importPeopleFile(t.files[0]);
 });
+function importPeopleFile(file){
+  var bad = function(){ toast("This isn’t a team photos file.", true); };
+  if(file.size > 3000000){ bad(); return; }
+  var fr = new FileReader();
+  fr.onerror = bad;
+  fr.onload = function(){
+    var j = null, rows = []; try{ j = JSON.parse(fr.result); }catch(e){}
+    if(!j || j.ccprPeople!==1 || !Array.isArray(j.people) || !j.people.length || j.people.length>300){ bad(); return; }
+    var okAll = j.people.every(function(x, i){
+      if(!x || typeof x.id!=="string" || !/^[a-z0-9-]{2,60}$/.test(x.id) || typeof x.name!=="string" || !x.name.trim() || x.name.length>80) return false;
+      if(x.photo!=null && (typeof x.photo!=="string" || x.photo.length>40000 || !PHOTO_OK.test(x.photo))) return false;
+      rows.push({id:x.id, name:x.name.trim(), title:String(x.title||"").slice(0,120), team:String(x.team||"").slice(0,60),
+        aliases:(Array.isArray(x.aliases)?x.aliases:[]).filter(function(a){ return typeof a==="string"; }).slice(0,8).map(function(a){ return a.slice(0,80); }), photo:x.photo||null, sort:typeof x.sort==="number"?x.sort:i+1});
+      return true; });
+    if(!okAll){ bad(); return; }
+    api.importPeople(rows).then(function(n){ toast(T("{0} photos added.", n)); return loadPeople(); }).catch(fail);
+  };
+  fr.readAsText(file);
+}
+document.addEventListener("click", function(e){ var b = e.target.closest && e.target.closest("[data-detail]"); if(b) setSimple(!SIMPLE); });
 view.addEventListener("input", function(e){
   var id = e.target.id; if(id!=="fq" && id!=="pq") return;
   if(id==="fq") UI.f[UI.view].q = e.target.value; else UI.pq = e.target.value;
@@ -957,20 +1065,21 @@ function openDrawer(type, id, fresh){
     '<textarea class="dname" id="d_name" rows="1" dir="auto" maxlength="200" aria-label="Name"'+dis+'></textarea>'+
     (ed?'':'<div class="ro">'+(isT?"You can read and comment. Editing is for the people on this task and admins.":"You can read and comment. Editing is for the people on this project and admins.")+'</div>')+
     '<div class="g2"><div><label class="lb" for="d_status">Status</label><select class="field" id="d_status"'+dis+'>'+STATUS.map(function(s){ return opt(s,""); }).join("")+'</select></div>'+
-    '<div><label class="lb" for="d_priority">Priority</label><select class="field" id="d_priority"'+dis+'>'+opt("","","None")+PRIORITY.map(function(s){ return opt(s,""); }).join("")+'</select></div>'+
-    '<div><label class="lb" for="d_start_date">Start date</label><input class="field" id="d_start_date" type="date"'+dis+'></div>'+
+    '<div class="xd"><label class="lb" for="d_priority">Priority</label><select class="field" id="d_priority"'+dis+'>'+opt("","","None")+PRIORITY.map(function(s){ return opt(s,""); }).join("")+'</select></div>'+
+    '<div class="xd"><label class="lb" for="d_start_date">Start date</label><input class="field" id="d_start_date" type="date"'+dis+'></div>'+
     '<div><label class="lb" for="d_due_date">Due date</label><input class="field" id="d_due_date" type="date"'+dis+'></div>'+
-    '<div><label class="lb" for="d_due_text">Due note (when there is no exact date)</label><input class="field" id="d_due_text" maxlength="60" placeholder="e.g. TBC, late November" dir="auto"'+dis+'></div>'+
-    (isT ? '<div><label class="lb" for="d_ceo_decision">Needs a CEO decision</label><select class="field" id="d_ceo_decision"'+dis+'>'+opt("","","Not set")+opt("Yes","")+opt("No","")+'</select></div>'+
+    '<div class="xd"><label class="lb" for="d_due_text">Due note (when there is no exact date)</label><input class="field" id="d_due_text" maxlength="60" placeholder="e.g. TBC, late November" dir="auto"'+dis+'></div>'+
+    (isT ? '<div class="xd"><label class="lb" for="d_ceo_decision">Needs a CEO decision</label><select class="field" id="d_ceo_decision"'+dis+'>'+opt("","","Not set")+opt("Yes","")+opt("No","")+'</select></div>'+
            '<div><label class="lb" for="d_team">Team</label><input class="field" id="d_team" list="teamList" maxlength="60" dir="auto"'+dis+'><datalist id="teamList">'+teamsOf(board).map(function(x){ return '<option value="'+esc(x)+'">'; }).join("")+'</datalist></div>'+
-           '<div><label class="lb" for="d_project_id">Linked project</label><select class="field" id="d_project_id" data-nt'+dis+'>'+opt("","",T("Standalone"))+D.projects.map(function(p){ return opt(p.id,"",p.name); }).join("")+'</select></div>'+
-           '<div><label class="lb" for="d_board">Tracker</label><select class="field" id="d_board"'+dis+'>'+opt("main","","Tasks")+opt("t4","","T4 Tracker")+'</select></div>'
-         : '<div><label class="lb" for="d_type">Type</label><select class="field" id="d_type"'+dis+'>'+opt("Main Project","")+opt("Shared Project","")+'</select></div>'+
-           '<div><label class="lb" for="d_lead_area">Lead area</label><select class="field" id="d_lead_area"'+dis+'>'+opt("","","None")+AREAS.main.map(function(a){ return opt(a,""); }).join("")+'</select></div>')+
-    '<div><label class="lb" for="d_owner_text">Owner (as written)</label><input class="field" id="d_owner_text" maxlength="80" dir="auto"'+dis+'></div></div>'+
+           '<div class="xd"><label class="lb" for="d_project_id">Linked project</label><select class="field" id="d_project_id" data-nt'+dis+'>'+opt("","",T("Standalone"))+D.projects.map(function(p){ return opt(p.id,"",p.name); }).join("")+'</select></div>'+
+           '<div class="xd"><label class="lb" for="d_board">Tracker</label><select class="field" id="d_board"'+dis+'>'+opt("main","","Tasks")+opt("t4","","T4 Tracker")+'</select></div>'
+         : '<div class="xd"><label class="lb" for="d_type">Type</label><select class="field" id="d_type"'+dis+'>'+opt("Main Project","")+opt("Shared Project","")+'</select></div>'+
+           '<div class="xd"><label class="lb" for="d_lead_area">Lead area</label><select class="field" id="d_lead_area"'+dis+'>'+opt("","","None")+AREAS.main.map(function(a){ return opt(a,""); }).join("")+'</select></div>')+
+    '<div class="xd"><label class="lb" for="d_owner_text">Owner (as written)</label><input class="field" id="d_owner_text" maxlength="80" dir="auto"'+dis+'></div></div>'+
     '<div><span class="lb">'+(isT?"People on this task":"People on this project")+'</span><div class="chips" id="d_people"></div></div>'+
-    '<div><span class="lb">Involved teams</span><div class="chips" id="d_areas" data-areas="'+esc(areas.join("|"))+'"></div></div>'+
+    '<div class="xd"><span class="lb">Involved teams</span><div class="chips" id="d_areas" data-areas="'+esc(areas.join("|"))+'"></div></div>'+
     '<div><label class="lb" for="d_notes">Follow-up notes</label><textarea class="field" id="d_notes" dir="auto"'+dis+'></textarea></div>'+
+    '<button type="button" class="btn ghost sm dmore" data-detail><span class="s-on">More details</span><span class="s-off">Fewer details</span></button>'+
     '<div class="dfoot"><span id="dLinks"></span>'+(ed?'<button class="btn danger sm" id="dDel" type="button">Delete</button>':'')+'</div>'+
     '<div><span class="lb">Comments and history</span><div class="crow"><textarea class="field" id="dComment" placeholder="Write a comment" dir="auto" maxlength="1000"></textarea><button class="btn sm" id="dSend" type="button">Send</button></div></div>'+
     '<div class="tl" id="dTl"><small>Loading history…</small></div></aside>';
@@ -986,7 +1095,7 @@ function syncDrawer(){
   var up = profile(it.updated_by);
   $("dMeta").setAttribute("data-nt",""); $("dMeta").textContent = T(UI.open.type==="task"?"Task":"Project")+" · "+T("updated {0}", ago(it.updated_at))+(up?" "+T("by")+" "+up.name:"");
   var ppl = members();
-  $("d_people").innerHTML = ppl.map(function(p){ var on = (it.assignees||[]).indexOf(p.id)>=0; return '<button type="button" class="tg" data-person="'+p.id+'" aria-pressed="'+on+'"'+(ed?"":" disabled")+' dir="auto">'+esc(p.name)+'</button>'; }).join("") || '<span class="count">No approved members yet.</span>';
+  $("d_people").innerHTML = ppl.map(function(p){ var on = (it.assignees||[]).indexOf(p.id)>=0; return '<button type="button" class="tg tgp" data-person="'+p.id+'" aria-pressed="'+on+'"'+(ed?"":" disabled")+' data-nt>'+pav(p.name, personOf(p))+'<span dir="auto">'+esc(p.name)+'</span></button>'; }).join("") || '<span class="count">No approved members yet.</span>';
   var ar = $("d_areas").dataset.areas.split("|");
   $("d_areas").innerHTML = ar.map(function(a){ var on = (it.areas||[]).indexOf(a)>=0; return '<button type="button" class="tg" data-area="'+esc(a)+'" aria-pressed="'+on+'"'+(ed?"":" disabled")+'>'+esc(a)+'</button>'; }).join("");
   $("dLinks").innerHTML = (it.due_date && it.due_date.slice(0,4)==="2027") ? '<a class="btn ghost sm" href="../cal/index.html#'+MONTHS[+it.due_date.slice(5,7)-1].toLowerCase()+'" target="_blank" rel="noopener">See it in تقويمي</a>' : '';
