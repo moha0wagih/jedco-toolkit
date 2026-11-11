@@ -9,7 +9,11 @@ const def = (id, name, o) => PM.def('items', id, name, Object.assign({ forms: ['
 const isItems = sp => (sp.form === 'items' || sp.form === 'steps' || sp.form === 'bullets' || sp.form === 'timeline') && sp.n >= 2 && sp.n <= 8;
 const fitN = (sp, a, b) => sp.n >= a && sp.n <= b;
 function its(sp) {
-  return sp.items.map(it => (!it.title && it.text && PM.words(it.text) <= 9 && !(it.bullets || []).length) ? Object.assign({}, it, { title: it.text, text: '', _t2t: true }) : it);
+  // short bare lines read better as titles — but only when every bare line is short, so siblings never get two different styles
+  const short = it => !it.title && it.text && PM.words(it.text) <= 9 && !(it.bullets || []).length;
+  const bare = sp.items.filter(it => !it.title);
+  if (!bare.length || !bare.every(short)) return sp.items;
+  return sp.items.map(it => short(it) ? Object.assign({}, it, { title: it.text, text: '', _t2t: true }) : it);
 }
 const bindOf = (it, i) => 'main.items.' + i + '.';
 const ips = (c, it, i, o = {}) => PM.itemPs(c, it._t2t ? { title: it.title, bullets: it.bullets } : it, Object.assign({ bind: bindOf(it, i) }, o, it._t2t ? { tBind: 'text' } : {})).map(p => { if (it._t2t && p.bind && p.bind.endsWith('title')) p.bind = p.bind.replace(/title$/, 'text'); return p; });

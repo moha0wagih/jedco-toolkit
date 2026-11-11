@@ -24,6 +24,7 @@
     <span class="sp"></span>
     <div class="seg wide" id="segBg" title="لون الصفحات"><button data-v="white">أبيض</button><button data-v="grey">رمادي فاتح</button></div>
     <div class="seg wide" id="segTone" title="نمط العرض"><button data-v="light">فاتح</button><button data-v="dark">داكن</button></div>
+    <button class="tbb" id="bDirector" title="المخرج: ابنِ عرض كامل من مادة خام أو فكرة"><svg class="i" data-ic="clapperboard"></svg><span class="t">المخرج</span></button>
     <button class="tbb ghost" id="bCopilot" title="تحسين التوزيع بكوبايلوت — اختياري" data-needs-online><svg class="i" data-ic="sparkles"></svg><span class="t">كوبايلوت</span></button>
     <button class="tbb" id="bStory" title="قصة العرض وكيف تكون أفضل"><svg class="i" data-ic="book-open"></svg><span class="t">القصة</span></button>
     <button class="tbb" id="bCheck" title="فحص العرض"><svg class="i" data-ic="shield-check"></svg><span class="t">فحص</span></button>
@@ -79,12 +80,19 @@
   <div class="st-card">
     <div class="lg" id="sLogo"></div>
     <h1>صانع العروض</h1>
-    <p class="sub">ارفع ملفك، والأداة تقرأ المحتوى وتوزّعه على تصاميم بهوية مطارات جدة. تقدر تعدّل كل شي بيدك بعدها.</p>
+    <p class="sub">ابدأ من فكرة أو محتوى خام مع «المخرج»، أو ارفع ملفك الجاهز. كل شي يطلع بهوية مطارات جدة وتقدر تعدّله بيدك.</p>
+    <div class="st-two">
+    <button class="st-dir" id="stDirector" type="button">
+      <div class="ic"><svg class="i" data-ic="clapperboard" style="width:30px;height:30px"></svg></div>
+      <b>المخرج</b>
+      <span>اكتب فكرة، أو الصق محتوى خام أو أرقام، ويطلع لك عرض تنفيذي كامل</span>
+    </button>
     <label class="st-drop" id="stDrop"><input type="file" id="fIn" accept=".pptx,.docx,.json" hidden>
       <div class="ic"><svg class="i" data-ic="upload" style="width:30px;height:30px"></svg></div>
       <b>اسحب الملف هنا أو اضغط للاختيار</b>
       <span>Word ‏(.docx) · PowerPoint ‏(.pptx) · أو ملف مشروع محفوظ (.json)</span>
     </label>
+    </div>
     <div class="st-opts">
       <label>لغة العرض <div class="seg" id="stLang"><button data-v="auto" class="on">تلقائي</button><button data-v="ar">عربي</button><button data-v="en">English</button></div></label>
       <label>لون الصفحات <div class="seg" id="stBg"><button data-v="white" class="on">أبيض</button><button data-v="grey">رمادي فاتح</button></div></label>
@@ -97,6 +105,6 @@
       <button class="st-btn hide" id="stBack"><svg class="i" data-ic="arrow-right"></svg>رجوع للعرض الحالي</button>
     </div>
     <div class="st-recent hide" id="stRecent"><h5>ملفاتي (محفوظة تلقائياً على هذا الجهاز)</h5><div id="stRecentList"></div></div>
-    <div class="credit">Designed by Mohammed Wagih · 2026 · v2.0</div>
+    <div class="credit">Designed by Mohammed Wagih · 2026 · v2.0 · build 1</div>
   </div>
 </div>
