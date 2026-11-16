@@ -1,4 +1,4 @@
-/* JEDCO Toolkit — online copy cache.
+/* Wagih Toolkit — online copy cache.
    First visit downloads each tool once; after that tools open from the device.
    · pages (html): fresh copy when online, saved copy when offline or slow
    · heavy files (js/wasm/images): saved copy right away, refreshed quietly in the background */

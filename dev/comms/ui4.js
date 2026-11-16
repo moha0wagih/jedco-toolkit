@@ -17,7 +17,7 @@
   function brandButtons() {
     const brand = document.querySelector('#topbar .brand'); if (!brand || q('u4Brand')) return;
     const box = document.createElement('span'); box.id = 'u4Brand';
-    box.innerHTML = `<span class="u4sep"></span><button type="button" id="u4Home" title="كل الأدوات (الرجوع لأدوات مطارات جدة)">${I_HOME}</button><button type="button" id="u4Notes" title="ملاحظات عائمة">${I_NOTE}<i></i></button>`;
+    box.innerHTML = `<span class="u4sep"></span><button type="button" id="u4Home" title="كل الأدوات (الرجوع لـ Wagih Toolkit)">${I_HOME}</button><button type="button" id="u4Notes" title="ملاحظات عائمة">${I_NOTE}<i></i></button>`;
     brand.appendChild(box);
     q('u4Home').onclick = () => { const h = q('hubHome'); if (h) h.click(); };
     q('u4Notes').onclick = () => { const f = q('jnFab'); if (f) f.click(); };

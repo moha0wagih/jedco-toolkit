@@ -150,8 +150,8 @@
       <label class="crtL">الشعار</label>
       <div class="crtLogos" data-k="logo">
         <button data-v="full"><span class="lgv"><img alt=""></span><small>الكامل</small></button>
-        <button data-v="ar"><span class="lgv"><img alt=""></span><small>مطارات جدة</small></button>
-        <button data-v="en"><span class="lgv"><img alt=""></span><small>jeddah airports</small></button>
+        <button data-v="ar"><span class="lgv"><img alt=""></span><small>عربي</small></button>
+        <button data-v="en"><span class="lgv"><img alt=""></span><small>English</small></button>
       </div>
       <div class="crtSec">النص</div>
       <label class="crtL">بداية النص</label><textarea data-f="l1" rows="3"></textarea>

@@ -1,4 +1,4 @@
-/* أدوات مطارات جدة — shared layer loaded by every tool.
+/* Wagih Toolkit — shared layer loaded by every tool.
    Designed by Mohammed Wagih · 2026 · v2.0 */
 (function () {
   'use strict';
@@ -153,8 +153,8 @@
     if (framed || document.getElementById('hubHome')) return;
     var a = document.createElement('a');
     a.id = 'hubHome';
-    a.href = '../../JEDCO Toolkit.html';
-    a.title = 'الرجوع لأدوات مطارات جدة';
+    a.href = '../../Wagih Toolkit.html';
+    a.title = 'الرجوع لـ Wagih Toolkit';
     a.innerHTML = '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></svg><span>كل الأدوات</span>';
     a.addEventListener('click', function (e) {
       if (dirty && !window.__hubLeaveOk) {

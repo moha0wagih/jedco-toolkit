@@ -49,8 +49,8 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.modalOp
 UI.init = function () {
   PM.injectRenderCSS();
   $$('svg[data-ic]').forEach(s => { s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor'); s.setAttribute('stroke-width', '1.8'); s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round'); s.innerHTML = icPath(s.dataset.ic); });
-  $('#hLogo').innerHTML = PM.logoSVG('FFFFFF');
-  $('#sLogo').innerHTML = PM.logoSVG('FFFFFF');
+  
+  
   Ed.mount($('#stageHost'));
   bindTop(); bindStart(); bindStrip(); bindLaybar(); bindTabs();
   if (PM.Dock) PM.Dock.mount();
@@ -228,7 +228,7 @@ async function exportAs(kind) {
   if (kind === 'pptx') return exportPptx();
   if (kind === 'pdf') { const b = await pdfBlob(); if (!b) return; PM.download(b, fileName('pdf'), 'application/pdf'); UI.toast('حفظت ملف PDF ✓'); return; }
   if (kind === 'pdfMail' || kind === 'pptxMail') {
-    if (!window.JEDMAIL) { UI.toast('ميزة Outlook ما انحملت، افتح الأداة من «أدوات مطارات جدة»', 4200); return; }
+    if (!window.JEDMAIL) { UI.toast('ميزة Outlook ما انحملت، افتح الأداة من «Wagih Toolkit»', 4200); return; }
     const pdf = kind === 'pdfMail';
     const b = pdf ? await pdfBlob() : await pptxBlob(); if (!b) return;
     const name = fileName(pdf ? 'pdf' : 'pptx');

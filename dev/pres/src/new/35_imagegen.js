@@ -99,7 +99,7 @@ var O={
     ['wideL','عدسة واسعة','24mm wide-angle lens with natural perspective and no distortion']
   ],
   color:[
-    ['jed','ألوان مطارات جدة','a palette guided by deep navy (#002657), royal blue (#004EAA) and sky blue (#62B6F3), used naturally in the environment and light, never as logos or graphics'],
+    ['jed','ألوان الهوية','a palette guided by deep navy (#002657), royal blue (#004EAA) and sky blue (#62B6F3), used naturally in the environment and light, never as logos or graphics'],
     ['warmC','دافئة','a warm, inviting palette'],
     ['coolC','باردة','a cool, crisp palette'],
     ['neutralC','محايدة','neutral, true-to-life colors'],

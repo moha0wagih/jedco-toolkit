@@ -12,7 +12,7 @@
 
   /* ---------------- start page ---------------- */
   const st = document.createElement('div'); st.id = 'v2Start'; st.setAttribute('role', 'dialog'); st.setAttribute('aria-label', 'صفحة البداية');
-  st.innerHTML = `<div class="v2h"><span class="lg">${ASSETS.logo}</span>مصمم التواصل الداخلي</div>
+  st.innerHTML = `<div class="v2h">مصمم التواصل الداخلي</div>
   <div class="v2b">
     <button class="v2plus" type="button" data-v="plus" aria-label="تصميم جديد">${IC('plus', 1.6)}<span>تصميم جديد</span></button>
     <div class="v2new" role="group" aria-label="ايش تبي تصمم؟">
@@ -89,7 +89,7 @@
     em.addEventListener('click', e => { if (!e.target.closest('[data-v2exp]')) return; em.style.display = 'none'; share(); });
   }
   async function share() {
-    if (!window.JEDMAIL) { toast('ميزة المشاركة ما انحملت، افتح الأداة من «أدوات مطارات جدة»'); return; }
+    if (!window.JEDMAIL) { toast('ميزة المشاركة ما انحملت، افتح الأداة من «Wagih Toolkit»'); return; }
     let o; try { o = designFile(); } catch (e) { console.error(e); toast('تعذّر تجهيز ملف التصميم'); return; }
     const name = fileBase() + DF.ext;
     const title = (o.boards && o.boards[0] && o.boards[0].title) || 'Announcement';

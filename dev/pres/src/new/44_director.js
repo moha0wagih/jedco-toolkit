@@ -628,7 +628,7 @@ function finish(specs, o) {
   const hadDeck = !!ST.deck;
   const d = D.buildDeck(tidy.specs, o);
   PM.UI.closeModal();
-  PM.UI.progress('أوزّع التصاميم بهوية مطارات جدة…', `${d.slides.length} شريحة`);
+  PM.UI.progress('أوزّع التصاميم بالهوية الرسمية…', `${d.slides.length} شريحة`);
   setTimeout(() => {
     try {
       PM.UI.openDeck(d);

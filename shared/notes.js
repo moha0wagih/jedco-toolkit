@@ -1,4 +1,4 @@
-/* أدوات مطارات جدة — ملاحظات عائمة (floating sticky notes over every tool).
+/* Wagih Toolkit — ملاحظات عائمة (floating sticky notes over every tool).
    Designed by Mohammed Wagih · 2026 · v2.0
    Saved on this device as you type. Drag a note by its top bar, resize from its corner.
    Works the same in Safari, Chrome and Edge, on the computer and the phone. */

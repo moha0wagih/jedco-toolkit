@@ -1,4 +1,4 @@
-/* أدوات مطارات جدة — «فتح في Outlook»: a ready new message with the file attached.
+/* Wagih Toolkit — «فتح في Outlook»: a ready new message with the file attached.
    Designed by Mohammed Wagih · 2026 · v2.0
 
    Computer: builds a draft e-mail file (.eml, marked unsent) that opens in Outlook
@@ -43,7 +43,7 @@
       'To: ',
       'Subject: ' + hdrWord(o.subject || ''),
       'X-Unsent: 1',
-      'X-Mailer: Jeddah Airports Toolkit',
+      'X-Mailer: Wagih Toolkit',
       'MIME-Version: 1.0',
       'Content-Type: multipart/mixed; boundary="' + bnd + '"',
       '',

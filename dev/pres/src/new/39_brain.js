@@ -200,7 +200,7 @@ B.photoLayout = function (suggest) {
   if (suggest) { s.objs.filter(o => o.t === 'image' && o.bindImg).forEach(o => { const i = +o.bindImg.split('.')[1]; o.src = PM.suggestPhoto(d, s, i, null, PM.specText(s.spec)); s.spec.autoImgs[i] = o.src; }); }
   d.photoSug = keep;
   PM.renumber(d); PM.commit('photo'); PM.UI.renderAll();
-  return { ok: true, msg: suggest ? 'حطيت تصميماً بصورة مقترحة — اضغط عليها واصنعها' : 'حطيت تصميماً فيه صورة من مكتبة مطارات جدة' };
+  return { ok: true, msg: suggest ? 'حطيت تصميماً بصورة مقترحة — اضغط عليها واصنعها' : 'حطيت تصميماً فيه صورة من مكتبة الصور' };
 };
 /* split a dense slide into two */
 B.split = function (i) {
@@ -350,7 +350,7 @@ PM.critique = function (d, i) {
   const kind = s.spec.kind;
   const issues = PM.checkIssues(d).filter(x => x.i === i);
   if (kind !== 'content') {
-    add('good', kind === 'cover' ? 'غلاف رسمي بهوية مطارات جدة' : kind === 'closing' ? 'ختام يطابق الغلاف' : kind === 'divider' ? 'فاصل قسم بعنوان فقط — حسب التوجيه' : 'جدول أعمال من القالب الرسمي', '');
+    add('good', kind === 'cover' ? 'غلاف رسمي بالهوية' : kind === 'closing' ? 'ختام يطابق الغلاف' : kind === 'divider' ? 'فاصل قسم بعنوان فقط — حسب التوجيه' : 'جدول أعمال من القالب الرسمي', '');
     if (s.spec.title && words(s.spec.title) > 9) add('warn', 'العنوان طويل لشريحة ' + (kind === 'divider' ? 'فاصل' : 'رئيسية'), `${words(s.spec.title)} كلمة — الأقوى ٣ إلى ٦ كلمات`, { label: 'اختصره عبر كوبايلوت', run: () => B.copilotDirective('اختصر العنوان إلى ٣–٦ كلمات بدون ما يضيع معناه', s.objs.filter(o => o.t === 'text' && o.paras.some(p => p.bind === 'title'))) });
   } else {
     // density
@@ -400,7 +400,7 @@ PM.critique = function (d, i) {
   issues.forEach(x => add(x.level === 'e' ? 'bad' : 'warn', x.t.replace(/^الشريحة \d+: /, ''), x.d, null, x.level === 'e' ? 2 : 0.7));
   // brand colours
   const off = new Set(); s.objs.forEach(o => { if (o.t === 'text') o.paras.forEach(p => { const c = String(p.color || '').toUpperCase(); if (c && !PALETTE.has(c)) off.add(c); }); });
-  if (off.size) add('warn', 'ألوان خارج هوية مطارات جدة', [...off].map(c => '#' + c).join('، '), { label: 'رجّعها لألوان الهوية', run: () => { s.objs.forEach(o => { if (o.t === 'text') o.paras.forEach(p => { if (!PALETTE.has(String(p.color).toUpperCase())) p.color = (s.tone === 'dark' || (!s.tone && d.dark)) ? K.WHITE : K.BODY; }); }); s.edited = true; PM.commit('brand'); PM.Ed.render(); return { ok: true, msg: 'رجّعت الألوان للهوية' }; } });
+  if (off.size) add('warn', 'ألوان خارج الهوية', [...off].map(c => '#' + c).join('، '), { label: 'رجّعها لألوان الهوية', run: () => { s.objs.forEach(o => { if (o.t === 'text') o.paras.forEach(p => { if (!PALETTE.has(String(p.color).toUpperCase())) p.color = (s.tone === 'dark' || (!s.tone && d.dark)) ? K.WHITE : K.BODY; }); }); s.edited = true; PM.commit('brand'); PM.Ed.render(); return { ok: true, msg: 'رجّعت الألوان للهوية' }; } });
   else add('good', 'ألوان وخطوط الهوية', 'Tajawal للعربي و Sequel للأرقام');
   // consistency of the title position with the deck
   if (kind === 'content') {

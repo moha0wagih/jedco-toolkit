@@ -1,7 +1,7 @@
 {
-  "name": "JEDCO Toolkit · أدوات مطارات جدة",
-  "short_name": "JEDCO Toolkit",
-  "start_url": "../../JEDCO%20Toolkit.html",
+  "name": "Wagih Toolkit",
+  "short_name": "Wagih Toolkit",
+  "start_url": "../../Wagih%20Toolkit.html",
   "scope": "../../",
   "display": "standalone",
   "dir": "rtl",
